@@ -3,10 +3,13 @@ import * as d3 from "d3";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Trash2, Plus } from "lucide-react";
 
 interface TreeNode {
   value: number;
   children: TreeNode[];
+  x?: number;
+  y?: number;
 }
 
 const BinaryTree = () => {
@@ -34,6 +37,35 @@ const BinaryTree = () => {
     setInputValue("");
   };
 
+  const deleteNode = (value: number) => {
+    const remove = (node: TreeNode, value: number): TreeNode | null => {
+      if (node.value === value) {
+        if (node.children.length === 0) return null;
+        if (node.children.length === 1) return node.children[0];
+        const successor = findMin(node.children[1]);
+        node.value = successor.value;
+        node.children[1] = remove(node.children[1], successor.value) || { value: 0, children: [] };
+        return node;
+      }
+      
+      if (node.children.length > 0) {
+        node.children = node.children
+          .map(child => remove(child, value))
+          .filter((child): child is TreeNode => child !== null);
+      }
+      return node;
+    };
+
+    const findMin = (node: TreeNode): TreeNode => {
+      return node.children[0] ? findMin(node.children[0]) : node;
+    };
+
+    setTree((prevTree) => {
+      const newTree = remove({ ...prevTree }, value);
+      return newTree || { value: 10, children: [] };
+    });
+  };
+
   useEffect(() => {
     if (!svgRef.current) return;
 
@@ -57,38 +89,76 @@ const BinaryTree = () => {
     const treeLayout = d3.tree().size([width - 100, height - 100]);
     const treeData = treeLayout(hierarchy);
 
-    // Draw links
-    g.selectAll(".link")
+    // Add drag behavior
+    const drag = d3.drag<SVGGElement, any>()
+      .on("drag", (event, d: any) => {
+        d.x = event.x;
+        d.y = event.y;
+        d3.select(event.sourceEvent.target.parentNode)
+          .attr("transform", `translate(${d.x},${d.y})`);
+        
+        // Update links
+        g.selectAll(".link")
+          .attr("d", d3.linkVertical()
+            .x((d: any) => d.x)
+            .y((d: any) => d.y));
+      });
+
+    // Draw links with animation
+    const links = g.selectAll(".link")
       .data(treeData.links())
       .enter()
       .append("path")
       .attr("class", "link")
       .attr("fill", "none")
-      .attr("stroke", "gray")
+      .attr("stroke", "#9333ea")
+      .attr("stroke-width", 2)
       .attr("d", d3.linkVertical()
         .x((d: any) => d.x)
-        .y((d: any) => d.y));
+        .y((d: any) => d.y))
+      .style("opacity", 0)
+      .transition()
+      .duration(500)
+      .style("opacity", 1);
 
-    // Draw nodes
+    // Draw nodes with animation
     const nodes = g
       .selectAll(".node")
       .data(treeData.descendants())
       .enter()
       .append("g")
       .attr("class", "node")
-      .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+      .attr("transform", (d: any) => `translate(${d.x},${d.y})`)
+      .style("opacity", 0)
+      .transition()
+      .duration(500)
+      .style("opacity", 1);
 
+    // Node circles with improved styling
     nodes
       .append("circle")
-      .attr("r", 20)
+      .attr("r", 25)
       .attr("fill", "white")
-      .attr("stroke", "black");
+      .attr("stroke", "#9333ea")
+      .attr("stroke-width", 2)
+      .attr("class", "hover:stroke-primary/80 transition-colors cursor-pointer");
 
+    // Node values
     nodes
       .append("text")
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
+      .attr("class", "text-sm font-medium")
       .text((d: any) => d.data.value);
+
+    // Add drag behavior to nodes
+    g.selectAll(".node").call(drag as any);
+
+    // Add delete functionality on double click
+    g.selectAll(".node").on("dblclick", (event, d: any) => {
+      event.preventDefault();
+      deleteNode(d.data.value);
+    });
 
   }, [tree]);
 
@@ -123,7 +193,8 @@ const BinaryTree = () => {
                   placeholder="Enter a number"
                 />
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full gap-2">
+                <Plus className="h-4 w-4" />
                 Insert Node
               </Button>
             </form>
@@ -135,7 +206,9 @@ const BinaryTree = () => {
               Currently supporting:
               <ul className="list-disc list-inside mt-2">
                 <li>Node insertion</li>
-                <li>Tree visualization</li>
+                <li>Node deletion (double-click node)</li>
+                <li>Node dragging</li>
+                <li>Animated transitions</li>
               </ul>
             </p>
           </div>
