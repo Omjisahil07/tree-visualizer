@@ -1,8 +1,8 @@
-import { Tree, Share2, Zap, Code } from "lucide-react";
+import { Trees, Share2, Zap, Code } from "lucide-react";
 
 const features = [
   {
-    icon: <Tree className="w-6 h-6" />,
+    icon: <Trees className="w-6 h-6" />,
     title: "Interactive Visualization",
     description: "See your data structures come to life with real-time visual representation"
   },
