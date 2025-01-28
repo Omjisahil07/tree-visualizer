@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Tree from "./pages/Tree";
+import BinaryTree from "./pages/trees/BinaryTree";
+import BSTTree from "./pages/trees/BSTTree";
+import AVLTree from "./pages/trees/AVLTree";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -18,6 +21,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/tree" element={<Tree />} />
+          <Route path="/tree/binary-tree" element={<BinaryTree />} />
+          <Route path="/tree/bst-tree" element={<BSTTree />} />
+          <Route path="/tree/avl-tree" element={<AVLTree />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

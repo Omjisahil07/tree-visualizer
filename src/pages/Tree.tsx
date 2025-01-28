@@ -1,26 +1,26 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BinaryTree, TreeBinary, GitFork } from "lucide-react";
+import { GitFork, TreePine } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const treeTypes = [
   {
-    icon: <BinaryTree className="w-12 h-12" />,
+    icon: <TreePine className="w-12 h-12" />,
     title: "Binary Tree",
     description: "A tree data structure in which each node has at most two children, referred to as the left child and the right child.",
-    link: "/binary-tree"
+    link: "/tree/binary-tree"
   },
   {
-    icon: <TreeBinary className="w-12 h-12" />,
+    icon: <TreePine className="w-12 h-12" />,
     title: "Binary Search Tree (BST)",
     description: "A binary tree where the left subtree of a node contains only nodes with keys lesser than the node's key and the right subtree contains only nodes with keys greater than the node's key.",
-    link: "/bst"
+    link: "/tree/bst-tree"
   },
   {
     icon: <GitFork className="w-12 h-12" />,
     title: "AVL Tree",
     description: "Self-balancing binary search tree where the difference between heights of left and right subtrees cannot be more than one for all nodes.",
-    link: "/avl-tree"
+    link: "/tree/avl-tree"
   }
 ];
 
