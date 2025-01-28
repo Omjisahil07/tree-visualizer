@@ -104,11 +104,10 @@ const BinaryTree = () => {
             .y((d: any) => d.y));
       });
 
-    // Draw links with animation
-    const links = g.selectAll(".link")
+    // Draw links
+    g.selectAll(".link")
       .data(treeData.links())
-      .enter()
-      .append("path")
+      .join("path")
       .attr("class", "link")
       .attr("fill", "none")
       .attr("stroke", "#9333ea")
@@ -121,12 +120,11 @@ const BinaryTree = () => {
       .duration(500)
       .style("opacity", 1);
 
-    // Draw nodes with animation
-    const nodes = g
+    // Draw nodes
+    const nodeGroups = g
       .selectAll(".node")
       .data(treeData.descendants())
-      .enter()
-      .append("g")
+      .join("g")
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`)
       .style("opacity", 0)
@@ -134,8 +132,8 @@ const BinaryTree = () => {
       .duration(500)
       .style("opacity", 1);
 
-    // Node circles with improved styling
-    nodes
+    // Add circles to nodes
+    g.selectAll(".node")
       .append("circle")
       .attr("r", 25)
       .attr("fill", "white")
@@ -143,8 +141,8 @@ const BinaryTree = () => {
       .attr("stroke-width", 2)
       .attr("class", "hover:stroke-primary/80 transition-colors cursor-pointer");
 
-    // Node values
-    nodes
+    // Add text to nodes
+    g.selectAll(".node")
       .append("text")
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
