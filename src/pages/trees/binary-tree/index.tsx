@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { TreeVisualization } from "./TreeVisualization";
 import { TreeNode } from "./TreeNode";
 import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder } from "./TreeOperations";
+import { toast } from "sonner";
 
 const BinaryTree = () => {
   const [tree, setTree] = useState<TreeNode>({ value: null, children: [] });
@@ -16,29 +17,48 @@ const BinaryTree = () => {
   const [isTraversing, setIsTraversing] = useState(false);
   const [currentStep, setCurrentStep] = useState<string>("");
 
-  const handleInsert = (value: number) => {
-    const newValue = parseInt(value.toString());
-    if (isNaN(newValue)) return;
-    setTree(prevTree => insertNode(prevTree, newValue));
+  const handleInsert = (e: React.FormEvent) => {
+    e.preventDefault();
+    const value = parseInt(inputValue);
+    if (isNaN(value)) {
+      toast.error("Please enter a valid number");
+      return;
+    }
+    setTree(prevTree => insertNode(prevTree, value));
     setInputValue("");
+    toast.success(`Node ${value} inserted successfully`);
   };
 
-  const handleUpdate = () => {
-    if (selectedNode === null) return;
+  const handleNodeClick = (value: number) => {
+    setSelectedNode(value);
+    setUpdateValue(value.toString());
+  };
+
+  const handleUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedNode === null) {
+      toast.error("Please select a node to update");
+      return;
+    }
     const newValue = parseInt(updateValue);
-    if (isNaN(newValue)) return;
+    if (isNaN(newValue)) {
+      toast.error("Please enter a valid number");
+      return;
+    }
     
     setTree(prevTree => updateNode(prevTree, selectedNode, newValue));
     setUpdateValue("");
     setSelectedNode(null);
+    toast.success(`Node updated from ${selectedNode} to ${newValue}`);
   };
 
   const handleDelete = (value: number) => {
     setTree(prevTree => deleteNode(prevTree, value));
-  };
-
-  const handleNodeHighlight = (value: number | null) => {
-    setSelectedNode(value);
+    if (selectedNode === value) {
+      setSelectedNode(null);
+      setUpdateValue("");
+    }
+    toast.success(`Node ${value} deleted successfully`);
   };
 
   const handleTraversal = async (type: 'inorder' | 'preorder' | 'postorder') => {
@@ -47,8 +67,7 @@ const BinaryTree = () => {
     setIsTraversing(true);
     let result: (number | null)[] = [];
     
-    const highlightNode = async (value: number | null, step: string) => {
-      handleNodeHighlight(value);
+    const handleStep = async (value: number | null, step: string) => {
       setCurrentStep(step);
       await new Promise(resolve => setTimeout(resolve, 1000));
     };
@@ -56,19 +75,18 @@ const BinaryTree = () => {
     try {
       switch (type) {
         case 'inorder':
-          result = await traverseInOrder(tree, highlightNode);
+          result = await traverseInOrder(tree, handleStep);
           break;
         case 'preorder':
-          result = await traversePreOrder(tree, highlightNode);
+          result = await traversePreOrder(tree, handleStep);
           break;
         case 'postorder':
-          result = await traversePostOrder(tree, highlightNode);
+          result = await traversePostOrder(tree, handleStep);
           break;
       }
-    } finally {
       setTraversalArray(result);
+    } finally {
       setIsTraversing(false);
-      handleNodeHighlight(null);
       setCurrentStep("");
     }
   };
@@ -82,7 +100,8 @@ const BinaryTree = () => {
           <TreeVisualization
             tree={tree}
             onNodeDelete={handleDelete}
-            onNodeHighlight={handleNodeHighlight}
+            onNodeClick={handleNodeClick}
+            onNodeHighlight={(value) => setSelectedNode(value)}
           />
           {currentStep && (
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
@@ -112,7 +131,7 @@ const BinaryTree = () => {
         <div className="space-y-6 bg-white rounded-lg shadow-lg p-6">
           <div>
             <h2 className="text-2xl font-semibold mb-4">Controls</h2>
-            <form onSubmit={(e) => { e.preventDefault(); handleInsert(Number(inputValue)); }} className="space-y-4">
+            <form onSubmit={handleInsert} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="nodeValue">Node Value</Label>
                 <Input
@@ -133,7 +152,7 @@ const BinaryTree = () => {
           {selectedNode !== null && (
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Update Node</h3>
-              <div className="space-y-2">
+              <form onSubmit={handleUpdate} className="space-y-2">
                 <Label htmlFor="updateValue">New Value for Node {selectedNode}</Label>
                 <Input
                   id="updateValue"
@@ -142,10 +161,10 @@ const BinaryTree = () => {
                   onChange={(e) => setUpdateValue(e.target.value)}
                   placeholder="Enter new value"
                 />
-                <Button onClick={handleUpdate} className="w-full">
+                <Button type="submit" className="w-full">
                   Update Node
                 </Button>
-              </div>
+              </form>
             </div>
           )}
           

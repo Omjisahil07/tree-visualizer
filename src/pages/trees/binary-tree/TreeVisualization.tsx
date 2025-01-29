@@ -5,10 +5,16 @@ import { TreeNode } from './TreeNode';
 interface TreeVisualizationProps {
   tree: TreeNode;
   onNodeDelete: (value: number) => void;
+  onNodeClick: (value: number) => void;
   onNodeHighlight: (value: number | null) => void;
 }
 
-export const TreeVisualization = ({ tree, onNodeDelete, onNodeHighlight }: TreeVisualizationProps) => {
+export const TreeVisualization = ({ 
+  tree, 
+  onNodeDelete, 
+  onNodeClick,
+  onNodeHighlight 
+}: TreeVisualizationProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -84,6 +90,14 @@ export const TreeVisualization = ({ tree, onNodeDelete, onNodeHighlight }: TreeV
     // Add drag behavior to nodes
     nodes.call(drag as any);
 
+    // Add click handler for node update
+    nodes.on("click", (event, d: any) => {
+      event.preventDefault();
+      if (d.data.value !== null) {
+        onNodeClick(d.data.value);
+      }
+    });
+
     // Add delete functionality on double click
     nodes.on("dblclick", (event, d: any) => {
       event.preventDefault();
@@ -92,7 +106,7 @@ export const TreeVisualization = ({ tree, onNodeDelete, onNodeHighlight }: TreeV
       }
     });
 
-  }, [tree, onNodeDelete]);
+  }, [tree, onNodeDelete, onNodeClick, onNodeHighlight]);
 
   return (
     <svg
