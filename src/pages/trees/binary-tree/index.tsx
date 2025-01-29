@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { TreeVisualization } from "./TreeVisualization";
-import { TreeNode, createNode, updateNode } from "./TreeNode";
+import { TreeNode } from "./TreeNode";
 import { insertNode, deleteNode, traverseInOrder, traversePreOrder, traversePostOrder } from "./TreeOperations";
 
 const BinaryTree = () => {
@@ -14,6 +14,7 @@ const BinaryTree = () => {
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
   const [traversalArray, setTraversalArray] = useState<(number | null)[]>([]);
   const [isTraversing, setIsTraversing] = useState(false);
+  const [currentStep, setCurrentStep] = useState<string>("");
 
   const handleInsert = (value: number) => {
     const newValue = parseInt(value.toString());
@@ -26,7 +27,20 @@ const BinaryTree = () => {
     if (selectedNode === null) return;
     const newValue = parseInt(updateValue);
     if (isNaN(newValue)) return;
-    setTree(prevTree => updateNode(prevTree, selectedNode, newValue));
+    
+    setTree(prevTree => {
+      const updateNode = (node: TreeNode): TreeNode => {
+        if (node.value === selectedNode) {
+          return { ...node, value: newValue };
+        }
+        return {
+          ...node,
+          children: node.children.map(child => updateNode(child))
+        };
+      };
+      return updateNode(prevTree);
+    });
+    
     setUpdateValue("");
     setSelectedNode(null);
   };
@@ -45,8 +59,9 @@ const BinaryTree = () => {
     setIsTraversing(true);
     let result: (number | null)[] = [];
     
-    const highlightNode = async (value: number | null) => {
+    const highlightNode = async (value: number | null, step: string) => {
       handleNodeHighlight(value);
+      setCurrentStep(step);
     };
 
     switch (type) {
@@ -64,6 +79,7 @@ const BinaryTree = () => {
     setTraversalArray(result);
     setIsTraversing(false);
     handleNodeHighlight(null);
+    setCurrentStep("");
   };
 
   return (
@@ -77,6 +93,14 @@ const BinaryTree = () => {
             onNodeDelete={handleDelete}
             onNodeHighlight={handleNodeHighlight}
           />
+          {currentStep && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <h3 className="text-lg font-medium mb-2">Current Step:</h3>
+              <pre className="bg-black text-white p-4 rounded-lg">
+                {currentStep}
+              </pre>
+            </div>
+          )}
           {traversalArray.length > 0 && (
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <h3 className="text-lg font-medium mb-2">Traversal Result:</h3>
