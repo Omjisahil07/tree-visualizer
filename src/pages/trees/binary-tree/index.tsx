@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { TreeVisualization } from "./TreeVisualization";
 import { TreeNode } from "./TreeNode";
-import { insertNode, deleteNode, traverseInOrder, traversePreOrder, traversePostOrder } from "./TreeOperations";
+import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder } from "./TreeOperations";
 
 const BinaryTree = () => {
   const [tree, setTree] = useState<TreeNode>({ value: null, children: [] });
@@ -28,19 +28,7 @@ const BinaryTree = () => {
     const newValue = parseInt(updateValue);
     if (isNaN(newValue)) return;
     
-    setTree(prevTree => {
-      const updateNode = (node: TreeNode): TreeNode => {
-        if (node.value === selectedNode) {
-          return { ...node, value: newValue };
-        }
-        return {
-          ...node,
-          children: node.children.map(child => updateNode(child))
-        };
-      };
-      return updateNode(prevTree);
-    });
-    
+    setTree(prevTree => updateNode(prevTree, selectedNode, newValue));
     setUpdateValue("");
     setSelectedNode(null);
   };
@@ -62,24 +50,27 @@ const BinaryTree = () => {
     const highlightNode = async (value: number | null, step: string) => {
       handleNodeHighlight(value);
       setCurrentStep(step);
+      await new Promise(resolve => setTimeout(resolve, 1000));
     };
 
-    switch (type) {
-      case 'inorder':
-        result = await traverseInOrder(tree, highlightNode);
-        break;
-      case 'preorder':
-        result = await traversePreOrder(tree, highlightNode);
-        break;
-      case 'postorder':
-        result = await traversePostOrder(tree, highlightNode);
-        break;
+    try {
+      switch (type) {
+        case 'inorder':
+          result = await traverseInOrder(tree, highlightNode);
+          break;
+        case 'preorder':
+          result = await traversePreOrder(tree, highlightNode);
+          break;
+        case 'postorder':
+          result = await traversePostOrder(tree, highlightNode);
+          break;
+      }
+    } finally {
+      setTraversalArray(result);
+      setIsTraversing(false);
+      handleNodeHighlight(null);
+      setCurrentStep("");
     }
-    
-    setTraversalArray(result);
-    setIsTraversing(false);
-    handleNodeHighlight(null);
-    setCurrentStep("");
   };
 
   return (
@@ -96,7 +87,7 @@ const BinaryTree = () => {
           {currentStep && (
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <h3 className="text-lg font-medium mb-2">Current Step:</h3>
-              <pre className="bg-black text-white p-4 rounded-lg">
+              <pre className="bg-black text-white p-4 rounded-lg whitespace-pre-wrap font-mono text-sm">
                 {currentStep}
               </pre>
             </div>
@@ -143,7 +134,7 @@ const BinaryTree = () => {
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Update Node</h3>
               <div className="space-y-2">
-                <Label htmlFor="updateValue">New Value</Label>
+                <Label htmlFor="updateValue">New Value for Node {selectedNode}</Label>
                 <Input
                   id="updateValue"
                   type="number"

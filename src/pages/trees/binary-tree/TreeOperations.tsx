@@ -47,23 +47,40 @@ export const deleteNode = (tree: TreeNode, value: number): TreeNode => {
   return newTree || { value: null, children: [] };
 };
 
+export const updateNode = (tree: TreeNode, oldValue: number | null, newValue: number): TreeNode => {
+  if (!tree) return tree;
+  
+  const update = (node: TreeNode): TreeNode => {
+    if (node.value === oldValue) {
+      return { ...node, value: newValue };
+    }
+    
+    return {
+      ...node,
+      children: node.children.map(child => update(child))
+    };
+  };
+
+  return update({ ...tree });
+};
+
 export const traverseInOrder = async (node: TreeNode, callback: (value: number | null, step: string) => void): Promise<(number | null)[]> => {
   const result: (number | null)[] = [];
   
   const traverse = async (node: TreeNode) => {
     if (!node || node.value === null) {
-      await callback(null, "if this is null\n    return");
+      await callback(null, "if (node === null)\n    return;");
       return;
     }
     
-    await callback(node.value, "Inorder(left)");
+    await callback(node.value, "// Traverse left subtree\ntraverseInOrder(node.left);");
     if (node.children[0]) await traverse(node.children[0]);
     
     result.push(node.value);
-    await callback(node.value, "visit this");
+    await callback(node.value, "// Visit current node\nvisit(node.value);");
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    await callback(node.value, "Inorder(right)");
+    await callback(node.value, "// Traverse right subtree\ntraverseInOrder(node.right);");
     if (node.children[1]) await traverse(node.children[1]);
   };
 
@@ -76,18 +93,18 @@ export const traversePreOrder = async (node: TreeNode, callback: (value: number 
   
   const traverse = async (node: TreeNode) => {
     if (!node || node.value === null) {
-      await callback(null, "if this is null\n    return");
+      await callback(null, "if (node === null)\n    return;");
       return;
     }
     
     result.push(node.value);
-    await callback(node.value, "visit this");
+    await callback(node.value, "// Visit current node\nvisit(node.value);");
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    await callback(node.value, "Preorder(left)");
+    await callback(node.value, "// Traverse left subtree\ntraversePreOrder(node.left);");
     if (node.children[0]) await traverse(node.children[0]);
     
-    await callback(node.value, "Preorder(right)");
+    await callback(node.value, "// Traverse right subtree\ntraversePreOrder(node.right);");
     if (node.children[1]) await traverse(node.children[1]);
   };
 
@@ -100,18 +117,18 @@ export const traversePostOrder = async (node: TreeNode, callback: (value: number
   
   const traverse = async (node: TreeNode) => {
     if (!node || node.value === null) {
-      await callback(null, "if this is null\n    return");
+      await callback(null, "if (node === null)\n    return;");
       return;
     }
     
-    await callback(node.value, "Postorder(left)");
+    await callback(node.value, "// Traverse left subtree\ntraversePostOrder(node.left);");
     if (node.children[0]) await traverse(node.children[0]);
     
-    await callback(node.value, "Postorder(right)");
+    await callback(node.value, "// Traverse right subtree\ntraversePostOrder(node.right);");
     if (node.children[1]) await traverse(node.children[1]);
     
     result.push(node.value);
-    await callback(node.value, "visit this");
+    await callback(node.value, "// Visit current node\nvisit(node.value);");
     await new Promise(resolve => setTimeout(resolve, 1000));
   };
 
