@@ -15,6 +15,8 @@ interface TreeNode {
 const BinaryTree = () => {
   const [tree, setTree] = useState<TreeNode>({ value: 10, children: [] });
   const [inputValue, setInputValue] = useState("");
+  const [traversalArray, setTraversalArray] = useState<number[]>([]);
+  const [isTraversing, setIsTraversing] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const insertNode = (value: number) => {
@@ -64,6 +66,118 @@ const BinaryTree = () => {
       const newTree = remove({ ...prevTree }, value);
       return newTree || { value: 10, children: [] };
     });
+  };
+
+  const traverseInOrder = async (node: TreeNode): Promise<number[]> => {
+    const result: number[] = [];
+    
+    const traverse = async (node: TreeNode) => {
+      if (!node) return;
+      
+      if (node.children[0]) await traverse(node.children[0]);
+      
+      result.push(node.value);
+      // Highlight current node
+      d3.select(svgRef.current)
+        .selectAll(".node")
+        .filter((d: any) => d.data.value === node.value)
+        .select("circle")
+        .transition()
+        .duration(500)
+        .attr("fill", "#9333ea")
+        .transition()
+        .duration(500)
+        .attr("fill", "white");
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (node.children[1]) await traverse(node.children[1]);
+    };
+
+    setIsTraversing(true);
+    await traverse(node);
+    setIsTraversing(false);
+    return result;
+  };
+
+  const traversePreOrder = async (node: TreeNode): Promise<number[]> => {
+    const result: number[] = [];
+    
+    const traverse = async (node: TreeNode) => {
+      if (!node) return;
+      
+      result.push(node.value);
+      // Highlight current node
+      d3.select(svgRef.current)
+        .selectAll(".node")
+        .filter((d: any) => d.data.value === node.value)
+        .select("circle")
+        .transition()
+        .duration(500)
+        .attr("fill", "#9333ea")
+        .transition()
+        .duration(500)
+        .attr("fill", "white");
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (node.children[0]) await traverse(node.children[0]);
+      if (node.children[1]) await traverse(node.children[1]);
+    };
+
+    setIsTraversing(true);
+    await traverse(node);
+    setIsTraversing(false);
+    return result;
+  };
+
+  const traversePostOrder = async (node: TreeNode): Promise<number[]> => {
+    const result: number[] = [];
+    
+    const traverse = async (node: TreeNode) => {
+      if (!node) return;
+      
+      if (node.children[0]) await traverse(node.children[0]);
+      if (node.children[1]) await traverse(node.children[1]);
+      
+      result.push(node.value);
+      // Highlight current node
+      d3.select(svgRef.current)
+        .selectAll(".node")
+        .filter((d: any) => d.data.value === node.value)
+        .select("circle")
+        .transition()
+        .duration(500)
+        .attr("fill", "#9333ea")
+        .transition()
+        .duration(500)
+        .attr("fill", "white");
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    };
+
+    setIsTraversing(true);
+    await traverse(node);
+    setIsTraversing(false);
+    return result;
+  };
+
+  const handleTraversal = async (type: 'inorder' | 'preorder' | 'postorder') => {
+    if (isTraversing) return;
+    
+    let result: number[] = [];
+    switch (type) {
+      case 'inorder':
+        result = await traverseInOrder(tree);
+        break;
+      case 'preorder':
+        result = await traversePreOrder(tree);
+        break;
+      case 'postorder':
+        result = await traversePostOrder(tree);
+        break;
+    }
+    setTraversalArray(result);
   };
 
   useEffect(() => {
@@ -175,6 +289,21 @@ const BinaryTree = () => {
             ref={svgRef}
             className="w-full h-[500px] border border-gray-200 rounded-lg"
           />
+          {traversalArray.length > 0 && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <h3 className="text-lg font-medium mb-2">Traversal Result:</h3>
+              <div className="flex flex-wrap gap-2">
+                {traversalArray.map((value, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full"
+                  >
+                    {value}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         
         <div className="space-y-6 bg-white rounded-lg shadow-lg p-6">
@@ -198,6 +327,33 @@ const BinaryTree = () => {
             </form>
           </div>
           
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Traversal Controls</h3>
+            <div className="grid grid-cols-1 gap-2">
+              <Button 
+                onClick={() => handleTraversal('inorder')}
+                disabled={isTraversing}
+                variant="outline"
+              >
+                In-order Traversal
+              </Button>
+              <Button 
+                onClick={() => handleTraversal('preorder')}
+                disabled={isTraversing}
+                variant="outline"
+              >
+                Pre-order Traversal
+              </Button>
+              <Button 
+                onClick={() => handleTraversal('postorder')}
+                disabled={isTraversing}
+                variant="outline"
+              >
+                Post-order Traversal
+              </Button>
+            </div>
+          </div>
+          
           <div className="space-y-2">
             <h3 className="text-lg font-medium">Operations</h3>
             <p className="text-sm text-muted-foreground">
@@ -206,7 +362,8 @@ const BinaryTree = () => {
                 <li>Node insertion</li>
                 <li>Node deletion (double-click node)</li>
                 <li>Node dragging</li>
-                <li>Animated transitions</li>
+                <li>Tree traversal animations</li>
+                <li>Traversal array display</li>
               </ul>
             </p>
           </div>
