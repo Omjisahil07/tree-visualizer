@@ -55,13 +55,13 @@ export const TreeVisualization = ({
             .y((d: any) => d.y));
       });
 
-    // Draw links with orange color
+    // Draw links with primary color
     g.selectAll(".link")
       .data(treeData.links())
       .join("path")
       .attr("class", "link")
       .attr("fill", "none")
-      .attr("stroke", "#f97316")
+      .attr("stroke", "hsl(var(--primary))")
       .attr("stroke-width", 2)
       .attr("d", d3.linkVertical()
         .x((d: any) => d.x)
@@ -78,11 +78,11 @@ export const TreeVisualization = ({
     nodes.append("circle")
       .attr("r", 25)
       .attr("fill", (d: any) => {
-        if (d.data.value === currentNode) return "#f97316";
-        if (visitedNodes.includes(d.data.value)) return "#fdba74";
+        if (d.data.value === currentNode) return "hsl(var(--primary))";
+        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary) / 0.5)";
         return "white";
       })
-      .attr("stroke", "#f97316")
+      .attr("stroke", "hsl(var(--primary))")
       .attr("stroke-width", 2)
       .attr("class", "transition-colors duration-300");
 

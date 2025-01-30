@@ -5,11 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { TreeVisualization } from "./TreeVisualization";
 import { TreeNode } from "./TreeNode";
-import { insertNode, deleteNode, updateNode } from "./TreeOperations";
+import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder } from "./TreeOperations";
 import { toast } from "sonner";
 import { TraversalPseudocode } from "./components/TraversalPseudocode";
 import { VisitationSequence } from "./components/VisitationSequence";
 import { TraversalControls } from "./components/TraversalControls";
+import { Instructions } from "./components/Instructions";
 
 const BinaryTree = () => {
   const [tree, setTree] = useState<TreeNode>({ value: null, children: [] });
@@ -22,6 +23,7 @@ const BinaryTree = () => {
   const [currentStep, setCurrentStep] = useState("");
   const [currentLine, setCurrentLine] = useState(-1);
   const [isPaused, setIsPaused] = useState(false);
+  const [traversalType, setTraversalType] = useState("inorder");
 
   const handleInsert = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,35 +69,10 @@ const BinaryTree = () => {
     toast.success(`Node ${value} deleted successfully`);
   };
 
-  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-  const inorderTraversal = async (node: TreeNode) => {
-    if (!node || node.value === null || isPaused) return;
-
-    setCurrentLine(1);
-    setCurrentStep("Checking if node is null");
-    await sleep(1000);
-
-    setCurrentLine(3);
-    setCurrentStep("Traversing left subtree");
-    if (node.children[0]) {
-      await inorderTraversal(node.children[0]);
-    }
-    if (isPaused) return;
-
-    setCurrentLine(4);
-    setCurrentStep(`Visiting node ${node.value}`);
-    setCurrentNode(node.value);
-    setVisitedNodes(prev => [...prev, node.value]);
-    await sleep(1000);
-    if (isPaused) return;
-
-    setCurrentLine(5);
-    setCurrentStep("Traversing right subtree");
-    if (node.children[1]) {
-      await inorderTraversal(node.children[1]);
-    }
-  };
+  const handleTraversalStep = useCallback((value: number | null, step: string) => {
+    setCurrentNode(value);
+    setCurrentStep(step);
+  }, []);
 
   const startTraversal = async () => {
     setIsTraversing(true);
@@ -103,7 +80,15 @@ const BinaryTree = () => {
     setVisitedNodes([]);
     setCurrentNode(null);
     setCurrentLine(0);
-    await inorderTraversal(tree);
+
+    const traversalFunction = {
+      inorder: traverseInOrder,
+      preorder: traversePreOrder,
+      postorder: traversePostOrder
+    }[traversalType];
+
+    await traversalFunction(tree, handleTraversalStep);
+    
     if (!isPaused) {
       setIsTraversing(false);
       setCurrentLine(-1);
@@ -129,6 +114,8 @@ const BinaryTree = () => {
     <div className="container mx-auto py-12">
       <h1 className="text-4xl font-bold mb-6">Binary Tree Visualization</h1>
       
+      <Instructions />
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <TreeVisualization
@@ -146,6 +133,8 @@ const BinaryTree = () => {
               onPause={pauseTraversal}
               onReset={resetTraversal}
               isTraversing={isTraversing}
+              traversalType={traversalType}
+              onTraversalTypeChange={setTraversalType}
             />
             
             <div className="mt-4">
