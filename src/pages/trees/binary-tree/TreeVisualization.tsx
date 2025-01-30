@@ -4,10 +4,17 @@ import { TreeNode } from './TreeNode';
 
 interface TreeVisualizationProps {
   tree: TreeNode;
-  currentNode: number | null;
+  onNodeDelete: (value: number) => void;
+  onNodeClick: (value: number) => void;
+  onNodeHighlight: (value: number | null) => void;
 }
 
-export const TreeVisualization = ({ tree, currentNode }: TreeVisualizationProps) => {
+export const TreeVisualization = ({ 
+  tree, 
+  onNodeDelete, 
+  onNodeClick,
+  onNodeHighlight 
+}: TreeVisualizationProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -31,13 +38,28 @@ export const TreeVisualization = ({ tree, currentNode }: TreeVisualizationProps)
     const treeLayout = d3.tree().size([width - 100, height - 100]);
     const treeData = treeLayout(hierarchy);
 
-    // Draw links with orange color
+    // Add drag behavior
+    const drag = d3.drag<SVGGElement, any>()
+      .on("drag", (event, d: any) => {
+        d.x = event.x;
+        d.y = event.y;
+        d3.select(event.sourceEvent.target.parentNode)
+          .attr("transform", `translate(${d.x},${d.y})`);
+        
+        // Update links
+        g.selectAll(".link")
+          .attr("d", d3.linkVertical()
+            .x((d: any) => d.x)
+            .y((d: any) => d.y));
+      });
+
+    // Draw links
     g.selectAll(".link")
       .data(treeData.links())
       .join("path")
       .attr("class", "link")
       .attr("fill", "none")
-      .attr("stroke", "#ff8c00") // Orange color for links
+      .attr("stroke", "#9333ea")
       .attr("stroke-width", 2)
       .attr("d", d3.linkVertical()
         .x((d: any) => d.x)
@@ -50,16 +72,13 @@ export const TreeVisualization = ({ tree, currentNode }: TreeVisualizationProps)
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
-    // Add circles to nodes with orange fill
+    // Add circles to nodes
     nodes.append("circle")
       .attr("r", 25)
-      .attr("fill", (d: any) => {
-        if (d.data.value === null) return "white";
-        return d.data.value === currentNode ? "#ff8c00" : "white";
-      })
-      .attr("stroke", "#ff8c00")
+      .attr("fill", "white")
+      .attr("stroke", "#9333ea")
       .attr("stroke-width", 2)
-      .attr("class", "transition-colors duration-300");
+      .attr("class", "hover:stroke-primary/80 transition-colors cursor-pointer");
 
     // Add text to nodes
     nodes.append("text")
@@ -68,12 +87,31 @@ export const TreeVisualization = ({ tree, currentNode }: TreeVisualizationProps)
       .attr("class", "text-sm font-medium")
       .text((d: any) => d.data.value);
 
-  }, [tree, currentNode]);
+    // Add drag behavior to nodes
+    nodes.call(drag as any);
+
+    // Add click handler for node update
+    nodes.on("click", (event, d: any) => {
+      event.preventDefault();
+      if (d.data.value !== null) {
+        onNodeClick(d.data.value);
+      }
+    });
+
+    // Add delete functionality on double click
+    nodes.on("dblclick", (event, d: any) => {
+      event.preventDefault();
+      if (d.data.value !== null) {
+        onNodeDelete(d.data.value);
+      }
+    });
+
+  }, [tree, onNodeDelete, onNodeClick, onNodeHighlight]);
 
   return (
     <svg
       ref={svgRef}
-      className="w-full h-[500px] border border-gray-200 rounded-lg bg-white"
+      className="w-full h-[500px] border border-gray-200 rounded-lg"
     />
   );
 };
