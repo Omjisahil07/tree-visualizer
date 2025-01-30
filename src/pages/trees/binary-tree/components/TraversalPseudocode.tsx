@@ -51,7 +51,7 @@ export const TraversalPseudocode: React.FC<TraversalPseudocodeProps> = ({
             key={index}
             className={`py-1 px-2 ${
               index <= currentLine
-                ? "bg-orange-100 text-orange-800"
+                ? "bg-primary text-white"
                 : "text-gray-700"
             }`}
           >
@@ -60,8 +60,8 @@ export const TraversalPseudocode: React.FC<TraversalPseudocodeProps> = ({
         ))}
       </div>
       {currentStep && (
-        <div className="mt-4 p-2 bg-orange-50 border border-orange-200 rounded">
-          <p className="text-orange-800 text-sm">{currentStep}</p>
+        <div className="mt-4 p-2 bg-primary border border-primary rounded">
+          <p className="text-white text-sm">{currentStep}</p>
         </div>
       )}
     </div>

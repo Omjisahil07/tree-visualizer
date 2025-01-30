@@ -12,7 +12,7 @@ export const VisitationSequence: React.FC<VisitationSequenceProps> = ({ sequence
         {sequence.map((value, index) => (
           <div
             key={index}
-            className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full font-medium animate-fade-in"
+            className="px-3 py-1 bg-primary text-white rounded-full font-medium animate-fade-in"
           >
             {value}
           </div>
