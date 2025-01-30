@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { GitFork, TreePine } from "lucide-react";
 import { Link } from "react-router-dom";
+import {Footer }from "@/components/Footer";
 
 const treeTypes = [
   {
@@ -54,6 +55,7 @@ const Tree = () => {
           </Card>
         ))}
       </div>
+      <Footer/>
     </div>
   );
 };

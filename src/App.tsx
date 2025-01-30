@@ -9,6 +9,7 @@ import BinaryTree from "./pages/trees/binary-tree";
 import BSTTree from "./pages/trees/BSTTree";
 import AVLTree from "./pages/trees/AVLTree";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/tree/binary-tree" element={<BinaryTree />} />
           <Route path="/tree/bst-tree" element={<BSTTree />} />
           <Route path="/tree/avl-tree" element={<AVLTree />} />
+          <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

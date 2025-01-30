@@ -11,6 +11,7 @@ import { TraversalPseudocode } from "./components/TraversalPseudocode";
 import { VisitationSequence } from "./components/VisitationSequence";
 import { TraversalControls } from "./components/TraversalControls";
 import { Instructions } from "./components/Instructions";
+import { Footer } from "@/components/Footer";
 
 const BinaryTree = () => {
   const [tree, setTree] = useState<TreeNode>({ value: null, children: [] });
@@ -195,7 +196,9 @@ const BinaryTree = () => {
           />
         </div>
       </div>
+      <Footer/>
     </div>
+   
   );
 };
 
