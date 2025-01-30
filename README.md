@@ -1,69 +1,53 @@
-# Welcome to your Lovable project
+# 🌳 Tree Visualizer
 
-## Project info
+A dynamic **Tree Visualizer** built with **React, D3.js, and Tailwind CSS**, allowing users to insert, delete, and traverse nodes interactively with animations.
 
-**URL**: https://lovable.dev/projects/c675f432-57ab-4629-b955-689f479729a2
+## 🚀 Features
+- **Binary Search Tree (BST) Visualization**
+- **Node Insertion & Deletion** (via form and double-click)
+- **Draggable Nodes** (using D3.js drag behavior)
+- **Animated Traversals**
+  - Preorder (Root -> Left -> Right)
+  - Inorder (Left -> Root -> Right)
+  - Postorder (Left -> Right -> Root)
+  - Level Order (Breadth-First Search)
 
-## How can I edit this code?
+## 🛠 Tech Stack
+- **React** - UI components
+- **D3.js** - Tree visualization & animations
+- **Tailwind CSS** - Styling
+- **Lucide Icons** - UI icons
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/c675f432-57ab-4629-b955-689f479729a2) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## 📦 Installation
+```bash
+git clone https://github.com/your-username/tree-visualizer.git
+cd tree-visualizer
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 🎮 Usage
+1. **Insert Node**: Enter a number and click `Insert Node`.
+2. **Delete Node**: Double-click a node to remove it.
+3. **Drag Nodes**: Click and drag a node to move it.
+4. **Traverse Tree**: Click traversal buttons to animate node highlighting in the chosen order.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📸 Preview
+![Tree Visualizer Screenshot](preview.png)
 
-**Use GitHub Codespaces**
+## 📜 License
+This project is open-source under the **MIT License**.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🏆 Acknowledgments
+- **D3.js** for visualization
+- **ShadCN & Tailwind CSS** for UI design
+- **Lucide-react** for icons
 
-## What technologies are used for this project?
+---
+### 🎯 Future Enhancements
+- AVL & Red-Black Tree Support
+- Improved Styling & UI Animations
+- Dark Mode Support
 
-This project is built with .
+Feel free to contribute or suggest improvements! 🚀
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/c675f432-57ab-4629-b955-689f479729a2) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
