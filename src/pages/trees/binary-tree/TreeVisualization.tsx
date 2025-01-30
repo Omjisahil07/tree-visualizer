@@ -7,13 +7,17 @@ interface TreeVisualizationProps {
   onNodeDelete: (value: number) => void;
   onNodeClick: (value: number) => void;
   onNodeHighlight: (value: number | null) => void;
+  currentNode?: number | null;
+  visitedNodes: number[];
 }
 
 export const TreeVisualization = ({ 
   tree, 
   onNodeDelete, 
   onNodeClick,
-  onNodeHighlight 
+  onNodeHighlight,
+  currentNode,
+  visitedNodes
 }: TreeVisualizationProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -24,7 +28,6 @@ export const TreeVisualization = ({
     const height = 400;
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 
-    // Clear previous visualization
     d3.select(svgRef.current).selectAll("*").remove();
 
     const svg = d3.select(svgRef.current)
@@ -46,20 +49,19 @@ export const TreeVisualization = ({
         d3.select(event.sourceEvent.target.parentNode)
           .attr("transform", `translate(${d.x},${d.y})`);
         
-        // Update links
         g.selectAll(".link")
           .attr("d", d3.linkVertical()
             .x((d: any) => d.x)
             .y((d: any) => d.y));
       });
 
-    // Draw links
+    // Draw links with orange color
     g.selectAll(".link")
       .data(treeData.links())
       .join("path")
       .attr("class", "link")
       .attr("fill", "none")
-      .attr("stroke", "#9333ea")
+      .attr("stroke", "#f97316")
       .attr("stroke-width", 2)
       .attr("d", d3.linkVertical()
         .x((d: any) => d.x)
@@ -72,13 +74,17 @@ export const TreeVisualization = ({
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
-    // Add circles to nodes
+    // Add circles to nodes with dynamic colors
     nodes.append("circle")
       .attr("r", 25)
-      .attr("fill", "white")
-      .attr("stroke", "#9333ea")
+      .attr("fill", (d: any) => {
+        if (d.data.value === currentNode) return "#f97316";
+        if (visitedNodes.includes(d.data.value)) return "#fdba74";
+        return "white";
+      })
+      .attr("stroke", "#f97316")
       .attr("stroke-width", 2)
-      .attr("class", "hover:stroke-primary/80 transition-colors cursor-pointer");
+      .attr("class", "transition-colors duration-300");
 
     // Add text to nodes
     nodes.append("text")
@@ -106,7 +112,7 @@ export const TreeVisualization = ({
       }
     });
 
-  }, [tree, onNodeDelete, onNodeClick, onNodeHighlight]);
+  }, [tree, onNodeDelete, onNodeClick, onNodeHighlight, currentNode, visitedNodes]);
 
   return (
     <svg

@@ -1,21 +1,27 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { TreeVisualization } from "./TreeVisualization";
 import { TreeNode } from "./TreeNode";
-import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder } from "./TreeOperations";
+import { insertNode, deleteNode, updateNode } from "./TreeOperations";
 import { toast } from "sonner";
+import { TraversalPseudocode } from "./components/TraversalPseudocode";
+import { VisitationSequence } from "./components/VisitationSequence";
+import { TraversalControls } from "./components/TraversalControls";
 
 const BinaryTree = () => {
   const [tree, setTree] = useState<TreeNode>({ value: null, children: [] });
   const [inputValue, setInputValue] = useState("");
   const [updateValue, setUpdateValue] = useState("");
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
-  const [traversalArray, setTraversalArray] = useState<(number | null)[]>([]);
+  const [currentNode, setCurrentNode] = useState<number | null>(null);
+  const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [isTraversing, setIsTraversing] = useState(false);
-  const [currentStep, setCurrentStep] = useState<string>("");
+  const [currentStep, setCurrentStep] = useState("");
+  const [currentLine, setCurrentLine] = useState(-1);
+  const [isPaused, setIsPaused] = useState(false);
 
   const handleInsert = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,34 +67,62 @@ const BinaryTree = () => {
     toast.success(`Node ${value} deleted successfully`);
   };
 
-  const handleTraversal = async (type: 'inorder' | 'preorder' | 'postorder') => {
-    if (isTraversing) return;
-    
-    setIsTraversing(true);
-    let result: (number | null)[] = [];
-    
-    const handleStep = async (value: number | null, step: string) => {
-      setCurrentStep(step);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    };
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-    try {
-      switch (type) {
-        case 'inorder':
-          result = await traverseInOrder(tree, handleStep);
-          break;
-        case 'preorder':
-          result = await traversePreOrder(tree, handleStep);
-          break;
-        case 'postorder':
-          result = await traversePostOrder(tree, handleStep);
-          break;
-      }
-      setTraversalArray(result);
-    } finally {
-      setIsTraversing(false);
-      setCurrentStep("");
+  const inorderTraversal = async (node: TreeNode) => {
+    if (!node || node.value === null || isPaused) return;
+
+    setCurrentLine(1);
+    setCurrentStep("Checking if node is null");
+    await sleep(1000);
+
+    setCurrentLine(3);
+    setCurrentStep("Traversing left subtree");
+    if (node.children[0]) {
+      await inorderTraversal(node.children[0]);
     }
+    if (isPaused) return;
+
+    setCurrentLine(4);
+    setCurrentStep(`Visiting node ${node.value}`);
+    setCurrentNode(node.value);
+    setVisitedNodes(prev => [...prev, node.value]);
+    await sleep(1000);
+    if (isPaused) return;
+
+    setCurrentLine(5);
+    setCurrentStep("Traversing right subtree");
+    if (node.children[1]) {
+      await inorderTraversal(node.children[1]);
+    }
+  };
+
+  const startTraversal = async () => {
+    setIsTraversing(true);
+    setIsPaused(false);
+    setVisitedNodes([]);
+    setCurrentNode(null);
+    setCurrentLine(0);
+    await inorderTraversal(tree);
+    if (!isPaused) {
+      setIsTraversing(false);
+      setCurrentLine(-1);
+      setCurrentStep("Traversal complete");
+    }
+  };
+
+  const pauseTraversal = () => {
+    setIsPaused(true);
+    setIsTraversing(false);
+  };
+
+  const resetTraversal = () => {
+    setIsTraversing(false);
+    setIsPaused(false);
+    setVisitedNodes([]);
+    setCurrentNode(null);
+    setCurrentLine(-1);
+    setCurrentStep("");
   };
 
   return (
@@ -96,40 +130,32 @@ const BinaryTree = () => {
       <h1 className="text-4xl font-bold mb-6">Binary Tree Visualization</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-white rounded-lg shadow-lg p-6">
+        <div className="lg:col-span-2 space-y-6">
           <TreeVisualization
             tree={tree}
             onNodeDelete={handleDelete}
             onNodeClick={handleNodeClick}
-            onNodeHighlight={(value) => setSelectedNode(value)}
+            onNodeHighlight={setCurrentNode}
+            currentNode={currentNode}
+            visitedNodes={visitedNodes}
           />
-          {currentStep && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-lg font-medium mb-2">Current Step:</h3>
-              <pre className="bg-black text-white p-4 rounded-lg whitespace-pre-wrap font-mono text-sm">
-                {currentStep}
-              </pre>
+          
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <TraversalControls
+              onStart={startTraversal}
+              onPause={pauseTraversal}
+              onReset={resetTraversal}
+              isTraversing={isTraversing}
+            />
+            
+            <div className="mt-4">
+              <VisitationSequence sequence={visitedNodes} />
             </div>
-          )}
-          {traversalArray.length > 0 && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-lg font-medium mb-2">Traversal Result:</h3>
-              <div className="flex flex-wrap gap-2">
-                {traversalArray.map((value, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full"
-                  >
-                    {value}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+          </div>
         </div>
         
-        <div className="space-y-6 bg-white rounded-lg shadow-lg p-6">
-          <div>
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-semibold mb-4">Controls</h2>
             <form onSubmit={handleInsert} className="space-y-4">
               <div className="space-y-2">
@@ -150,65 +176,30 @@ const BinaryTree = () => {
           </div>
 
           {selectedNode !== null && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Update Node</h3>
-              <form onSubmit={handleUpdate} className="space-y-2">
-                <Label htmlFor="updateValue">New Value for Node {selectedNode}</Label>
-                <Input
-                  id="updateValue"
-                  type="number"
-                  value={updateValue}
-                  onChange={(e) => setUpdateValue(e.target.value)}
-                  placeholder="Enter new value"
-                />
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-lg font-medium mb-4">Update Node</h3>
+              <form onSubmit={handleUpdate} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="updateValue">New Value for Node {selectedNode}</Label>
+                  <Input
+                    id="updateValue"
+                    type="number"
+                    value={updateValue}
+                    onChange={(e) => setUpdateValue(e.target.value)}
+                    placeholder="Enter new value"
+                  />
+                </div>
                 <Button type="submit" className="w-full">
                   Update Node
                 </Button>
               </form>
             </div>
           )}
-          
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Traversal Controls</h3>
-            <div className="grid grid-cols-1 gap-2">
-              <Button 
-                onClick={() => handleTraversal('inorder')}
-                disabled={isTraversing}
-                variant="outline"
-              >
-                In-order Traversal
-              </Button>
-              <Button 
-                onClick={() => handleTraversal('preorder')}
-                disabled={isTraversing}
-                variant="outline"
-              >
-                Pre-order Traversal
-              </Button>
-              <Button 
-                onClick={() => handleTraversal('postorder')}
-                disabled={isTraversing}
-                variant="outline"
-              >
-                Post-order Traversal
-              </Button>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Operations</h3>
-            <p className="text-sm text-muted-foreground">
-              Currently supporting:
-              <ul className="list-disc list-inside mt-2">
-                <li>Node insertion</li>
-                <li>Node deletion (double-click node)</li>
-                <li>Node updating (click node)</li>
-                <li>Node dragging</li>
-                <li>Tree traversal animations</li>
-                <li>Traversal array display</li>
-              </ul>
-            </p>
-          </div>
+
+          <TraversalPseudocode
+            currentStep={currentStep}
+            currentLine={currentLine}
+          />
         </div>
       </div>
     </div>
