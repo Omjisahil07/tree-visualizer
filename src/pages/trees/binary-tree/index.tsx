@@ -11,7 +11,8 @@ const BinaryTree = () => {
   const [inputValue, setInputValue] = useState("");
   const [updateValue, setUpdateValue] = useState("");
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
-  const [traversalArray, setTraversalArray] = useState<number[]>([]);
+  const [visitationSequence, setVisitationSequence] = useState<number[]>([]);
+  const [currentNode, setCurrentNode] = useState<number | null>(null);
   const [isTraversing, setIsTraversing] = useState(false);
   const [currentStep, setCurrentStep] = useState<string>("");
   const [traversalType, setTraversalType] = useState<string>("");
@@ -56,26 +57,30 @@ const BinaryTree = () => {
     
     setIsTraversing(true);
     setTraversalType(type.charAt(0).toUpperCase() + type.slice(1));
-    let result: number[] = [];
+    setVisitationSequence([]);
+    setCurrentNode(null);
     
     const handleStep = async (value: number | null, step: string) => {
       setCurrentStep(step);
+      if (value !== null) {
+        setCurrentNode(value);
+        setVisitationSequence(prev => [...prev, value]);
+      }
       await new Promise(resolve => setTimeout(resolve, 1000));
     };
 
     try {
       switch (type) {
         case 'inorder':
-          result = await traverseInOrder(tree, handleStep);
+          await traverseInOrder(tree, handleStep);
           break;
         case 'preorder':
-          result = await traversePreOrder(tree, handleStep);
+          await traversePreOrder(tree, handleStep);
           break;
         case 'postorder':
-          result = await traversePostOrder(tree, handleStep);
+          await traversePostOrder(tree, handleStep);
           break;
       }
-      setTraversalArray(result);
     } finally {
       setIsTraversing(false);
     }
@@ -89,13 +94,15 @@ const BinaryTree = () => {
         <div className="lg:col-span-2 bg-white rounded-lg shadow-lg p-6">
           <TreeVisualization
             tree={tree}
-            onNodeDelete={deleteNode}
+            onNodeDelete={value => setTree(prevTree => deleteNode(prevTree, value))}
             onNodeClick={handleNodeClick}
             onNodeHighlight={setSelectedNode}
+            currentNode={currentNode}
           />
           <TraversalSteps 
             currentStep={currentStep}
-            traversalArray={traversalArray}
+            visitationSequence={visitationSequence}
+            currentNode={currentNode}
             traversalType={traversalType}
           />
         </div>

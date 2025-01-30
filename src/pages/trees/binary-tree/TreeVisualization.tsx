@@ -7,13 +7,15 @@ interface TreeVisualizationProps {
   onNodeDelete: (value: number) => void;
   onNodeClick: (value: number) => void;
   onNodeHighlight: (value: number | null) => void;
+  currentNode: number | null;
 }
 
 export const TreeVisualization = ({ 
   tree, 
   onNodeDelete, 
   onNodeClick,
-  onNodeHighlight 
+  onNodeHighlight,
+  currentNode 
 }: TreeVisualizationProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -59,7 +61,7 @@ export const TreeVisualization = ({
       .join("path")
       .attr("class", "link")
       .attr("fill", "none")
-      .attr("stroke", "#9333ea")
+      .attr("stroke", "#ff6b00")
       .attr("stroke-width", 2)
       .attr("d", d3.linkVertical()
         .x((d: any) => d.x)
@@ -75,16 +77,17 @@ export const TreeVisualization = ({
     // Add circles to nodes
     nodes.append("circle")
       .attr("r", 25)
-      .attr("fill", "white")
-      .attr("stroke", "#9333ea")
+      .attr("fill", (d: any) => d.data.value === currentNode ? "#ff6b00" : "white")
+      .attr("stroke", "#ff6b00")
       .attr("stroke-width", 2)
-      .attr("class", "hover:stroke-primary/80 transition-colors cursor-pointer");
+      .attr("class", "transition-colors duration-300 cursor-pointer hover:stroke-orange-400");
 
     // Add text to nodes
     nodes.append("text")
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
       .attr("class", "text-sm font-medium")
+      .attr("fill", (d: any) => d.data.value === currentNode ? "white" : "black")
       .text((d: any) => d.data.value);
 
     // Add drag behavior to nodes
@@ -106,7 +109,7 @@ export const TreeVisualization = ({
       }
     });
 
-  }, [tree, onNodeDelete, onNodeClick, onNodeHighlight]);
+  }, [tree, onNodeDelete, onNodeClick, onNodeHighlight, currentNode]);
 
   return (
     <svg

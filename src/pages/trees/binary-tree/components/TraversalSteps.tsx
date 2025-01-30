@@ -2,54 +2,46 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface TraversalStepsProps {
   currentStep: string;
-  traversalArray: number[];
+  visitationSequence: number[];
+  currentNode: number | null;
   traversalType: string;
 }
 
-const TraversalSteps = ({ currentStep, traversalArray, traversalType }: TraversalStepsProps) => {
+const TraversalSteps = ({ 
+  currentStep, 
+  visitationSequence, 
+  currentNode,
+  traversalType 
+}: TraversalStepsProps) => {
   return (
-    <div className="mt-4">
-      {currentStep && (
-        <Card className="mb-4 bg-black text-white">
-          <CardHeader>
-            <CardTitle className="text-xl">{traversalType} Traversal</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <pre className="font-mono text-sm whitespace-pre-wrap">
-              {currentStep.split('\n').map((line, i) => (
-                <div 
-                  key={i}
-                  className={`p-1 ${
-                    line.includes('visit') ? 'bg-yellow-500 text-black' : 
-                    line.includes('if') ? 'bg-red-500' : ''
-                  }`}
-                >
-                  {line}
-                </div>
-              ))}
-            </pre>
-          </CardContent>
-        </Card>
-      )}
-      {traversalArray.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Visitation sequence:</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {traversalArray.map((value, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full"
-                >
-                  {value}
-                </span>
-              ))}
+    <div className="mt-4 space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>{traversalType} Traversal</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {currentNode !== null && (
+            <div className="mb-4 p-4 bg-yellow-100 rounded-lg">
+              <p className="font-medium">Visit vertex with value {currentNode}</p>
+              <p>Visitation sequence: {visitationSequence.join(',')}</p>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+          <pre className="font-mono text-sm whitespace-pre-wrap">
+            {currentStep.split('\n').map((line, i) => (
+              <div 
+                key={i}
+                className={`p-2 ${
+                  line.includes('visit') ? 'bg-black text-white' : 
+                  line.includes('if') ? 'bg-red-500 text-white' :
+                  line.includes('Inorder') ? 'bg-red-500 text-white' : ''
+                }`}
+              >
+                {line}
+              </div>
+            ))}
+          </pre>
+        </CardContent>
+      </Card>
     </div>
   );
 };
