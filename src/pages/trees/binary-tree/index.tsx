@@ -69,9 +69,12 @@ const BinaryTree = () => {
     toast.success(`Node ${value} deleted successfully`);
   };
 
-  const handleTraversalStep = useCallback((value: number | null, step: string) => {
+  const handleTraversalStep = useCallback(async (value: number | null, step: string) => {
     setCurrentNode(value);
     setCurrentStep(step);
+    setVisitedNodes(prev => (value !== null && !prev.includes(value) ? [...prev, value] : prev));
+    setCurrentLine(prev => prev + 1);
+    await new Promise(resolve => setTimeout(resolve, 500)); // Add delay
   }, []);
 
   const startTraversal = async () => {
@@ -188,6 +191,7 @@ const BinaryTree = () => {
           <TraversalPseudocode
             currentStep={currentStep}
             currentLine={currentLine}
+            traversalType={traversalType} // Pass traversalType prop
           />
         </div>
       </div>

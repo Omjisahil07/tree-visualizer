@@ -79,7 +79,7 @@ export const TreeVisualization = ({
       .attr("r", 25)
       .attr("fill", (d: any) => {
         if (d.data.value === currentNode) return "hsl(var(--primary))";
-        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary) / 0.5)";
+        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary) / 0.8)";
         return "white";
       })
       .attr("stroke", "hsl(var(--primary))")

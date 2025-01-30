@@ -77,8 +77,10 @@ export const traverseInOrder = async (
     await callback(node.value, "// Traverse left subtree\ntraverseInOrder(node.left);");
     if (node.children[0]) await traverse(node.children[0]);
     
-    result.push(node.value);
-    await callback(node.value, "// Process current node\nvisit(node.value);");
+    if (!result.includes(node.value)) {
+      result.push(node.value);
+      await callback(node.value, "// Process current node\nvisit(node.value);");
+    }
     
     await callback(node.value, "// Traverse right subtree\ntraverseInOrder(node.right);");
     if (node.children[1]) await traverse(node.children[1]);
@@ -100,8 +102,10 @@ export const traversePreOrder = async (
       return;
     }
     
-    result.push(node.value);
-    await callback(node.value, "// Process current node\nvisit(node.value);");
+    if (!result.includes(node.value)) {
+      result.push(node.value);
+      await callback(node.value, "// Process current node\nvisit(node.value);");
+    }
     
     await callback(node.value, "// Traverse left subtree\ntraversePreOrder(node.left);");
     if (node.children[0]) await traverse(node.children[0]);
@@ -132,8 +136,10 @@ export const traversePostOrder = async (
     await callback(node.value, "// Traverse right subtree\ntraversePostOrder(node.right);");
     if (node.children[1]) await traverse(node.children[1]);
     
-    result.push(node.value);
-    await callback(node.value, "// Process current node\nvisit(node.value);");
+    if (!result.includes(node.value)) {
+      result.push(node.value);
+      await callback(node.value, "// Process current node\nvisit(node.value);");
+    }
   };
 
   await traverse(node);

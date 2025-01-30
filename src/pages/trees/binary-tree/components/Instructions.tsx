@@ -8,9 +8,9 @@ export const Instructions = () => {
         <h3 className="text-lg font-semibold">Available Functions</h3>
       </div>
       <ul className="space-y-2 text-sm text-muted-foreground">
+      <li>• Enter a number and click "Insert Node" to add a new node</li>
         <li>• Click on a node to select it for updating</li>
         <li>• Double click on a node to delete it</li>
-        <li>• Enter a number and click "Insert Node" to add a new node</li>
         <li>• Select a traversal type (Preorder, Inorder, or Postorder)</li>
         <li>• Use traversal controls to visualize the algorithm step by step</li>
       </ul>
