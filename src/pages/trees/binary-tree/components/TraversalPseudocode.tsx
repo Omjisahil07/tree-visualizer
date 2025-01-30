@@ -30,6 +30,19 @@ const pseudocodeMap = {
     "  postorderTraversal(node.left)",
     "  postorderTraversal(node.right)",
     "  visit(node)"
+  ],
+  levelorder: [
+    "function levelOrderTraversal(root):",
+    "  if (root === null)",
+    "    return",
+    "  let queue = [root]",
+    "  while (queue.length > 0):",
+    "    let node = queue.shift()",
+    "    visit(node)",
+    "    if (node.left !== null)",
+    "      queue.push(node.left)",
+    "    if (node.right !== null)",
+    "      queue.push(node.right)"
   ]
 };
 

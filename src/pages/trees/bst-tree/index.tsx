@@ -3,18 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-import { TreeVisualization } from "./TreeVisualization";
-import { TreeNode } from "./TreeNode";
-import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./TreeOperations";
+import { TreeVisualization } from "../binary-tree/TreeVisualization";
+import { TreeNode } from "../binary-tree/TreeNode";
+import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./BSTTreeOperations";
 import { toast } from "sonner";
-import { TraversalPseudocode } from "./components/TraversalPseudocode";
-import { VisitationSequence } from "./components/VisitationSequence";
-import { TraversalControls } from "./components/TraversalControls";
-import { Instructions } from "./components/Instructions";
+import { TraversalPseudocode } from "../binary-tree/components/TraversalPseudocode";
+import { VisitationSequence } from "../binary-tree/components/VisitationSequence";
+import { TraversalControls } from "../binary-tree/components/TraversalControls";
+import { Instructions } from "../binary-tree/components/Instructions";
 import { Footer } from "@/components/Footer";
 
-const BinaryTree = () => {
-  const [tree, setTree] = useState<TreeNode>({ value: null, children: [] });
+const BSTTree = () => {
+  const [tree, setTree] = useState<TreeNode>({ value: null, children: [{ value: null, children: [] }, { value: null, children: [] }] });
   const [inputValue, setInputValue] = useState("");
   const [updateValue, setUpdateValue] = useState("");
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
@@ -117,7 +117,7 @@ const BinaryTree = () => {
 
   return (
     <div className="container mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-6">Binary Tree Visualization</h1>
+      <h1 className="text-4xl font-bold mb-6">Binary Search Tree Visualization</h1>
       
       <Instructions />
       
@@ -203,4 +203,4 @@ const BinaryTree = () => {
   );
 };
 
-export default BinaryTree;
+export default BSTTree;

@@ -1,5 +1,22 @@
 import { TreeNode } from './TreeNode';
 
+// Simple Queue implementation
+class Queue<T> {
+  private items: T[] = [];
+  
+  enqueue(item: T) {
+    this.items.push(item);
+  }
+  
+  dequeue(): T | undefined {
+    return this.items.shift();
+  }
+  
+  get length(): number {
+    return this.items.length;
+  }
+}
+
 export const insertNode = (tree: TreeNode, value: number): TreeNode => {
   if (tree.value === null) {
     return { ...tree, value };
@@ -144,4 +161,19 @@ export const traversePostOrder = async (
 
   await traverse(node);
   return result;
+};
+
+export const traverseLevelOrder = async (root: TreeNode, visit: (value: number | null, step: string) => Promise<void>) => {
+  if (!root || !root.value) return;
+  const queue = new Queue<TreeNode>();
+  queue.enqueue(root);
+
+  while (queue.length > 0) {
+    const node = queue.dequeue();
+    if (node) {
+      await visit(node.value, "Visiting node");
+      if (node.children[0] && node.children[0].value !== null) queue.enqueue(node.children[0]);
+      if (node.children[1] && node.children[1].value !== null) queue.enqueue(node.children[1]);
+    }
+  }
 };
