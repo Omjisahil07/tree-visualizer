@@ -7,6 +7,7 @@ import { BSTVisualization } from "./components/BSTVisualization";
 import { BSTTraversalControls } from "./components/BSTTraversalControls";
 import { BSTInstructions } from "./components/BSTInstructions";
 import { BSTVisitationSequence } from "./components/BSTVisitationSequence";
+import { BSTPseudocode } from "./components/BSTPseudocode";
 import { BSTNode, TraversalType } from "./types/BSTTypes";
 import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./operations/BSTOperations";
 import { toast } from "sonner";
