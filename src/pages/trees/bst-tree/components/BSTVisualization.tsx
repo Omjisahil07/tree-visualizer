@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { TreeNode } from '../../binary-tree/TreeNode';
+import { BSTNode } from '../types/BSTTypes';
 
 interface BSTVisualizationProps {
-  tree: TreeNode;
+  tree: BSTNode;
   onNodeDelete: (value: number) => void;
   onNodeClick: (value: number) => void;
   currentNode?: number | null;
@@ -22,8 +22,8 @@ export const BSTVisualization = ({
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const width = 600;
-    const height = 400;
+    const width = 500; // Decreased from 600
+    const height = 300; // Decreased from 400
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 
     d3.select(svgRef.current).selectAll("*").remove();
@@ -35,8 +35,7 @@ export const BSTVisualization = ({
     const g = svg.append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Filter out null nodes for visualization
-    const processTreeForVisualization = (node: TreeNode): any => {
+    const processTreeForVisualization = (node: BSTNode): any => {
       if (!node || node.value === null) return null;
       return {
         value: node.value,
@@ -53,21 +52,7 @@ export const BSTVisualization = ({
     const treeLayout = d3.tree().size([width - 100, height - 100]);
     const treeData = treeLayout(hierarchy);
 
-    // Add drag behavior
-    const drag = d3.drag<SVGGElement, any>()
-      .on("drag", (event, d: any) => {
-        d.x = event.x;
-        d.y = event.y;
-        d3.select(event.sourceEvent.target.parentNode)
-          .attr("transform", `translate(${d.x},${d.y})`);
-        
-        g.selectAll(".link")
-          .attr("d", d3.linkVertical()
-            .x((d: any) => d.x)
-            .y((d: any) => d.y));
-      });
-
-    // Draw links with primary color and animation
+    // Add links with animation
     g.selectAll(".link")
       .data(treeData.links())
       .join("path")
@@ -83,14 +68,13 @@ export const BSTVisualization = ({
       .duration(500)
       .style("opacity", 1);
 
-    // Draw nodes with animation
+    // Add nodes with animation
     const nodes = g.selectAll(".node")
       .data(treeData.descendants())
       .join("g")
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
-    // Add circles to nodes with dynamic colors and animation
     nodes.append("circle")
       .attr("r", 0)
       .attr("fill", (d: any) => {
@@ -103,9 +87,8 @@ export const BSTVisualization = ({
       .attr("class", "transition-colors duration-300")
       .transition()
       .duration(500)
-      .attr("r", 25);
+      .attr("r", 20);
 
-    // Add text to nodes with animation
     nodes.append("text")
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
@@ -116,10 +99,6 @@ export const BSTVisualization = ({
       .duration(500)
       .style("opacity", 1);
 
-    // Add drag behavior to nodes
-    nodes.call(drag as any);
-
-    // Add click handler for node update
     nodes.on("click", (event, d: any) => {
       event.preventDefault();
       if (d.data.value !== null) {
@@ -127,7 +106,6 @@ export const BSTVisualization = ({
       }
     });
 
-    // Add delete functionality on double click
     nodes.on("dblclick", (event, d: any) => {
       event.preventDefault();
       if (d.data.value !== null) {
@@ -140,7 +118,7 @@ export const BSTVisualization = ({
   return (
     <svg
       ref={svgRef}
-      className="w-full h-[500px] border border-gray-200 rounded-lg"
+      className="w-full h-[400px] border border-gray-200 rounded-lg bg-white shadow-lg"
     />
   );
 };

@@ -28,6 +28,8 @@ const BSTTree = () => {
   const [isTraversing, setIsTraversing] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [traversalType, setTraversalType] = useState<TraversalType>("inorder");
+  const [currentStep, setCurrentStep] = useState("");
+  const [currentLine, setCurrentLine] = useState(-1);
 
   const handleInsert = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,22 +74,24 @@ const BSTTree = () => {
     toast.success(`Node ${value} deleted successfully`);
   };
 
-  const handleTraversalStep = useCallback(
-    async (value: number | null, step: string) => {
-      setCurrentNode(value);
-      setVisitedNodes((prev) =>
-        value !== null && !prev.includes(value) ? [...prev, value] : prev
-      );
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    },
-    []
-  );
+  const handleTraversalStep = useCallback(async (value: number | null, step: string) => {
+    if (isPaused) return;
+    setCurrentNode(value);
+    setCurrentStep(step);
+    setVisitedNodes(prev =>
+      value !== null && !prev.includes(value) ? [...prev, value] : prev
+    );
+    setCurrentLine(prev => prev + 1);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }, [isPaused]);
 
   const startTraversal = async () => {
     setIsTraversing(true);
     setIsPaused(false);
     setVisitedNodes([]);
     setCurrentNode(null);
+    setCurrentLine(0);
+    setCurrentStep("");
 
     const traversalFunction = {
       inorder: traverseInOrder,
@@ -96,10 +100,14 @@ const BSTTree = () => {
       levelorder: traverseLevelOrder,
     }[traversalType];
 
-    await traversalFunction(tree, handleTraversalStep);
+    if (!traversalFunction) return;
 
+    await traversalFunction(tree, handleTraversalStep);
+    
     if (!isPaused) {
       setIsTraversing(false);
+      setCurrentLine(-1);
+      setCurrentStep("Traversal complete");
     }
   };
 
@@ -131,6 +139,8 @@ const BSTTree = () => {
                 setIsPaused(false);
                 setVisitedNodes([]);
                 setCurrentNode(null);
+                setCurrentLine(-1);
+                setCurrentStep("");
               }}
               isTraversing={isTraversing}
               traversalType={traversalType}
@@ -184,6 +194,12 @@ const BSTTree = () => {
               </form>
             </div>
           )}
+
+          <BSTPseudocode
+            currentStep={currentStep}
+            currentLine={currentLine}
+            traversalType={traversalType}
+          />
         </div>
       </div>
       <Footer />
