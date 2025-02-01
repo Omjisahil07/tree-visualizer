@@ -30,7 +30,6 @@ export const TraversalControls = ({
             <SelectItem value="inorder">Inorder Traversal</SelectItem>
             <SelectItem value="preorder">Preorder Traversal</SelectItem>
             <SelectItem value="postorder">Postorder Traversal</SelectItem>
-            <SelectItem value="levelorder">Level Order Traversal</SelectItem>
           </SelectContent>
         </Select>
         <Button
