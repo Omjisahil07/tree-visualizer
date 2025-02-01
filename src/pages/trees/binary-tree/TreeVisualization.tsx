@@ -37,7 +37,21 @@ export const TreeVisualization = ({
     const g = svg.append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const hierarchy = d3.hierarchy(tree);
+    // Filter out null nodes for visualization while keeping them in the data structure
+    const processTreeForVisualization = (node: TreeNode): any => {
+      if (!node || node.value === null) return null;
+      return {
+        value: node.value,
+        children: node.children
+          .map(child => processTreeForVisualization(child))
+          .filter(child => child !== null)
+      };
+    };
+
+    const visualTree = processTreeForVisualization(tree);
+    if (!visualTree) return;
+
+    const hierarchy = d3.hierarchy(visualTree);
     const treeLayout = d3.tree().size([width - 100, height - 100]);
     const treeData = treeLayout(hierarchy);
 
@@ -55,7 +69,7 @@ export const TreeVisualization = ({
             .y((d: any) => d.y));
       });
 
-    // Draw links with primary color
+    // Draw links with primary color and animation
     g.selectAll(".link")
       .data(treeData.links())
       .join("path")
@@ -65,18 +79,22 @@ export const TreeVisualization = ({
       .attr("stroke-width", 2)
       .attr("d", d3.linkVertical()
         .x((d: any) => d.x)
-        .y((d: any) => d.y));
+        .y((d: any) => d.y))
+      .style("opacity", 0)
+      .transition()
+      .duration(500)
+      .style("opacity", 1);
 
-    // Draw nodes
+    // Draw nodes with animation
     const nodes = g.selectAll(".node")
       .data(treeData.descendants())
       .join("g")
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
-    // Add circles to nodes with dynamic colors
+    // Add circles to nodes with dynamic colors and animation
     nodes.append("circle")
-      .attr("r", 25)
+      .attr("r", 0)
       .attr("fill", (d: any) => {
         if (d.data.value === currentNode) return "hsl(var(--primary))";
         if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary) / 0.8)";
@@ -84,14 +102,21 @@ export const TreeVisualization = ({
       })
       .attr("stroke", "hsl(var(--primary))")
       .attr("stroke-width", 2)
-      .attr("class", "transition-colors duration-300");
+      .attr("class", "transition-colors duration-300")
+      .transition()
+      .duration(500)
+      .attr("r", 25);
 
-    // Add text to nodes
+    // Add text to nodes with animation
     nodes.append("text")
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
       .attr("class", "text-sm font-medium")
-      .text((d: any) => d.data.value);
+      .style("opacity", 0)
+      .text((d: any) => d.data.value)
+      .transition()
+      .duration(500)
+      .style("opacity", 1);
 
     // Add drag behavior to nodes
     nodes.call(drag as any);

@@ -1,111 +1,146 @@
-import React from "react";
-import { Trash2, Edit } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { BSTNode } from "../types/BSTTypes";
+import { useEffect, useRef } from 'react';
+import * as d3 from 'd3';
+import { TreeNode } from '../../binary-tree/TreeNode';
 
 interface BSTVisualizationProps {
-  tree: BSTNode;
+  tree: TreeNode;
   onNodeDelete: (value: number) => void;
   onNodeClick: (value: number) => void;
-  currentNode: number | null;
+  currentNode?: number | null;
   visitedNodes: number[];
 }
 
-export const BSTVisualization: React.FC<BSTVisualizationProps> = ({
-  tree,
-  onNodeDelete,
+export const BSTVisualization = ({ 
+  tree, 
+  onNodeDelete, 
   onNodeClick,
   currentNode,
-  visitedNodes,
-}) => {
-  const renderNode = (node: BSTNode, x: number, y: number, level: number) => {
-    if (!node.value) return null;
+  visitedNodes
+}: BSTVisualizationProps) => {
+  const svgRef = useRef<SVGSVGElement>(null);
 
-    const isHighlighted = currentNode === node.value;
-    const isVisited = visitedNodes.includes(node.value);
-    const spacing = 80 / (level + 1);
+  useEffect(() => {
+    if (!svgRef.current) return;
 
-    return (
-      <g key={`${x}-${y}`}>
-        {node.children.map((child, index) => {
-          if (child.value) {
-            const childX = x + (index === 0 ? -spacing : spacing);
-            const childY = y + 10;
-            return (
-              <line
-                key={`${x}-${y}-${index}`}
-                x1={x}
-                y1={y}
-                x2={childX}
-                y2={childY}
-                stroke="gray"
-                strokeWidth="2"
-              />
-            );
-          }
-          return null;
-        })}
-        
-        <circle
-          cx={x}
-          cy={y}
-          r="4"
-          fill={isHighlighted ? "yellow" : isVisited ? "green" : "hsl(var(--primary))"}
-          className="cursor-pointer"
-          onClick={() => onNodeClick(node.value!)}
-        />
-        
-        <text
-          x={x}
-          y={y - 1}
-          textAnchor="middle"
-          alignmentBaseline="middle"
-          fill="white"
-          fontSize="3"
-          className="cursor-pointer select-none"
-          onClick={() => onNodeClick(node.value!)}
-        >
-          {node.value}
-        </text>
-        
-        <g transform={`translate(${x + 3}, ${y - 3})`}>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-4 w-4"
-            onClick={(e) => {
-              e.stopPropagation();
-              onNodeDelete(node.value!);
-            }}
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </g>
+    const width = 600;
+    const height = 400;
+    const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 
-        {node.children.map((child, index) =>
-          child.value
-            ? renderNode(
-                child,
-                x + (index === 0 ? -spacing : spacing),
-                y + 10,
-                level + 1
-              )
-            : null
-        )}
-      </g>
-    );
-  };
+    d3.select(svgRef.current).selectAll("*").remove();
+
+    const svg = d3.select(svgRef.current)
+      .attr("width", width)
+      .attr("height", height);
+
+    const g = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Filter out null nodes for visualization
+    const processTreeForVisualization = (node: TreeNode): any => {
+      if (!node || node.value === null) return null;
+      return {
+        value: node.value,
+        children: node.children
+          .map(child => processTreeForVisualization(child))
+          .filter(child => child !== null)
+      };
+    };
+
+    const visualTree = processTreeForVisualization(tree);
+    if (!visualTree) return;
+
+    const hierarchy = d3.hierarchy(visualTree);
+    const treeLayout = d3.tree().size([width - 100, height - 100]);
+    const treeData = treeLayout(hierarchy);
+
+    // Add drag behavior
+    const drag = d3.drag<SVGGElement, any>()
+      .on("drag", (event, d: any) => {
+        d.x = event.x;
+        d.y = event.y;
+        d3.select(event.sourceEvent.target.parentNode)
+          .attr("transform", `translate(${d.x},${d.y})`);
+        
+        g.selectAll(".link")
+          .attr("d", d3.linkVertical()
+            .x((d: any) => d.x)
+            .y((d: any) => d.y));
+      });
+
+    // Draw links with primary color and animation
+    g.selectAll(".link")
+      .data(treeData.links())
+      .join("path")
+      .attr("class", "link")
+      .attr("fill", "none")
+      .attr("stroke", "hsl(var(--primary))")
+      .attr("stroke-width", 2)
+      .attr("d", d3.linkVertical()
+        .x((d: any) => d.x)
+        .y((d: any) => d.y))
+      .style("opacity", 0)
+      .transition()
+      .duration(500)
+      .style("opacity", 1);
+
+    // Draw nodes with animation
+    const nodes = g.selectAll(".node")
+      .data(treeData.descendants())
+      .join("g")
+      .attr("class", "node")
+      .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+
+    // Add circles to nodes with dynamic colors and animation
+    nodes.append("circle")
+      .attr("r", 0)
+      .attr("fill", (d: any) => {
+        if (d.data.value === currentNode) return "hsl(var(--primary))";
+        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary) / 0.8)";
+        return "white";
+      })
+      .attr("stroke", "hsl(var(--primary))")
+      .attr("stroke-width", 2)
+      .attr("class", "transition-colors duration-300")
+      .transition()
+      .duration(500)
+      .attr("r", 25);
+
+    // Add text to nodes with animation
+    nodes.append("text")
+      .attr("dy", ".35em")
+      .attr("text-anchor", "middle")
+      .attr("class", "text-sm font-medium")
+      .style("opacity", 0)
+      .text((d: any) => d.data.value)
+      .transition()
+      .duration(500)
+      .style("opacity", 1);
+
+    // Add drag behavior to nodes
+    nodes.call(drag as any);
+
+    // Add click handler for node update
+    nodes.on("click", (event, d: any) => {
+      event.preventDefault();
+      if (d.data.value !== null) {
+        onNodeClick(d.data.value);
+      }
+    });
+
+    // Add delete functionality on double click
+    nodes.on("dblclick", (event, d: any) => {
+      event.preventDefault();
+      if (d.data.value !== null) {
+        onNodeDelete(d.data.value);
+      }
+    });
+
+  }, [tree, onNodeDelete, onNodeClick, currentNode, visitedNodes]);
 
   return (
-    <div className="w-full aspect-video bg-white rounded-lg shadow-lg p-4">
-      <svg
-        viewBox="0 0 100 60"
-        width="100%"
-        height="100%"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {renderNode(tree, 50, 10, 1)}
-      </svg>
-    </div>
+    <svg
+      ref={svgRef}
+      className="w-full h-[500px] border border-gray-200 rounded-lg"
+    />
   );
 };
