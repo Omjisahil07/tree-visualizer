@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { TreeVisualization } from "./TreeVisualization";
-import { TreeNode } from "./TreeNode";
-import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder } from "./TreeOperations";
+import { BinaryTreeNode, InsertPosition } from "./types/BinaryTreeTypes";
+import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder } from "./operations/BinaryTreeOperations";
 import { TraversalPseudocode } from "./components/TraversalPseudocode";
 import { VisitationSequence } from "./components/VisitationSequence";
 import { TraversalControls } from "./components/TraversalControls";
@@ -10,7 +10,7 @@ import { TreeForm } from "./components/TreeForm";
 import { Footer } from "@/components/Footer";
 
 const BinaryTree = () => {
-  const [tree, setTree] = useState<TreeNode>({ value: null, children: [] });
+  const [tree, setTree] = useState<BinaryTreeNode>({ value: null, children: [] });
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
   const [currentNode, setCurrentNode] = useState<number | null>(null);
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
@@ -112,7 +112,7 @@ const BinaryTree = () => {
         
         <div className="space-y-6">
           <TreeForm
-            onInsert={(value) => setTree(prevTree => insertNode(prevTree, value))}
+            onInsert={(value, position) => setTree(prevTree => insertNode(prevTree, value, position))}
             onUpdate={(oldValue, newValue) => {
               setTree(prevTree => updateNode(prevTree, oldValue, newValue));
               setSelectedNode(null);

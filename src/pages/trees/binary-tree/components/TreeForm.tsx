@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { InsertPosition } from "../types/BinaryTreeTypes";
 
 interface TreeFormProps {
-  onInsert: (value: number) => void;
+  onInsert: (value: number, position: InsertPosition) => void;
   onUpdate: (oldValue: number, newValue: number) => void;
   selectedNode: number | null;
 }
@@ -14,6 +16,7 @@ interface TreeFormProps {
 export const TreeForm = ({ onInsert, onUpdate, selectedNode }: TreeFormProps) => {
   const [inputValue, setInputValue] = useState("");
   const [updateValue, setUpdateValue] = useState("");
+  const [insertPosition, setInsertPosition] = useState<InsertPosition>("auto");
 
   const handleInsert = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +25,7 @@ export const TreeForm = ({ onInsert, onUpdate, selectedNode }: TreeFormProps) =>
       toast.error("Please enter a valid number");
       return;
     }
-    onInsert(value);
+    onInsert(value, insertPosition);
     setInputValue("");
     toast.success(`Node ${value} inserted successfully`);
   };
@@ -58,6 +61,19 @@ export const TreeForm = ({ onInsert, onUpdate, selectedNode }: TreeFormProps) =>
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Enter a number"
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="insertPosition">Insert Position</Label>
+            <Select value={insertPosition} onValueChange={(value: InsertPosition) => setInsertPosition(value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select position" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto">Auto</SelectItem>
+                <SelectItem value="left">Left</SelectItem>
+                <SelectItem value="right">Right</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <Button type="submit" className="w-full gap-2">
             <Plus className="h-4 w-4" />
