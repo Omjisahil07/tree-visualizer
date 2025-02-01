@@ -3,28 +3,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-import { TreeVisualization } from "../binary-tree/TreeVisualization";
-import { TreeNode } from "../binary-tree/TreeNode";
-import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./BSTTreeOperations";
+import { BSTVisualization } from "./components/BSTVisualization";
+import { BSTTraversalControls } from "./components/BSTTraversalControls";
+import { BSTInstructions } from "./components/BSTInstructions";
+import { BSTVisitationSequence } from "./components/BSTVisitationSequence";
+import { BSTNode, TraversalType } from "./types/BSTTypes";
+import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./operations/BSTOperations";
 import { toast } from "sonner";
-import { TraversalPseudocode } from "../binary-tree/components/TraversalPseudocode";
-import { VisitationSequence } from "../binary-tree/components/VisitationSequence";
-import { TraversalControls } from "../binary-tree/components/TraversalControls";
-import { Instructions } from "../binary-tree/components/Instructions";
 import { Footer } from "@/components/Footer";
 
 const BSTTree = () => {
-  const [tree, setTree] = useState<TreeNode>({ value: null, children: [{ value: null, children: [] }, { value: null, children: [] }] });
+  const [tree, setTree] = useState<BSTNode>({
+    value: null,
+    children: [
+      { value: null, children: [] },
+      { value: null, children: [] },
+    ],
+  });
   const [inputValue, setInputValue] = useState("");
   const [updateValue, setUpdateValue] = useState("");
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
   const [currentNode, setCurrentNode] = useState<number | null>(null);
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [isTraversing, setIsTraversing] = useState(false);
-  const [currentStep, setCurrentStep] = useState("");
-  const [currentLine, setCurrentLine] = useState(-1);
   const [isPaused, setIsPaused] = useState(false);
-  const [traversalType, setTraversalType] = useState("inorder");
+  const [traversalType, setTraversalType] = useState<TraversalType>("inorder");
 
   const handleInsert = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +36,7 @@ const BSTTree = () => {
       toast.error("Please enter a valid number");
       return;
     }
-    setTree(prevTree => insertNode(prevTree, value));
+    setTree((prevTree) => insertNode(prevTree, value));
     setInputValue("");
     toast.success(`Node ${value} inserted successfully`);
   };
@@ -54,15 +57,14 @@ const BSTTree = () => {
       toast.error("Please enter a valid number");
       return;
     }
-    
-    setTree(prevTree => updateNode(prevTree, selectedNode, newValue));
+    setTree((prevTree) => updateNode(prevTree, selectedNode, newValue));
     setUpdateValue("");
     setSelectedNode(null);
     toast.success(`Node updated from ${selectedNode} to ${newValue}`);
   };
 
   const handleDelete = (value: number) => {
-    setTree(prevTree => deleteNode(prevTree, value));
+    setTree((prevTree) => deleteNode(prevTree, value));
     if (selectedNode === value) {
       setSelectedNode(null);
       setUpdateValue("");
@@ -70,84 +72,75 @@ const BSTTree = () => {
     toast.success(`Node ${value} deleted successfully`);
   };
 
-  const handleTraversalStep = useCallback(async (value: number | null, step: string) => {
-    setCurrentNode(value);
-    setCurrentStep(step);
-    setVisitedNodes(prev => (value !== null && !prev.includes(value) ? [...prev, value] : prev));
-    setCurrentLine(prev => prev + 1);
-    await new Promise(resolve => setTimeout(resolve, 500)); // Add delay
-  }, []);
+  const handleTraversalStep = useCallback(
+    async (value: number | null, step: string) => {
+      setCurrentNode(value);
+      setVisitedNodes((prev) =>
+        value !== null && !prev.includes(value) ? [...prev, value] : prev
+      );
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    },
+    []
+  );
 
   const startTraversal = async () => {
     setIsTraversing(true);
     setIsPaused(false);
     setVisitedNodes([]);
     setCurrentNode(null);
-    setCurrentLine(0);
 
     const traversalFunction = {
       inorder: traverseInOrder,
       preorder: traversePreOrder,
       postorder: traversePostOrder,
-      levelorder: traverseLevelOrder
+      levelorder: traverseLevelOrder,
     }[traversalType];
 
     await traversalFunction(tree, handleTraversalStep);
-    
+
     if (!isPaused) {
       setIsTraversing(false);
-      setCurrentLine(-1);
-      setCurrentStep("Traversal complete");
     }
-  };
-
-  const pauseTraversal = () => {
-    setIsPaused(true);
-    setIsTraversing(false);
-  };
-
-  const resetTraversal = () => {
-    setIsTraversing(false);
-    setIsPaused(false);
-    setVisitedNodes([]);
-    setCurrentNode(null);
-    setCurrentLine(-1);
-    setCurrentStep("");
   };
 
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-4xl font-bold mb-6">Binary Search Tree Visualization</h1>
-      
-      <Instructions />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <BSTInstructions />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
         <div className="lg:col-span-2 space-y-6">
-          <TreeVisualization
+          <BSTVisualization
             tree={tree}
             onNodeDelete={handleDelete}
             onNodeClick={handleNodeClick}
-            onNodeHighlight={setCurrentNode}
             currentNode={currentNode}
             visitedNodes={visitedNodes}
           />
-          
+
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <TraversalControls
+            <BSTTraversalControls
               onStart={startTraversal}
-              onPause={pauseTraversal}
-              onReset={resetTraversal}
+              onPause={() => {
+                setIsPaused(true);
+                setIsTraversing(false);
+              }}
+              onReset={() => {
+                setIsTraversing(false);
+                setIsPaused(false);
+                setVisitedNodes([]);
+                setCurrentNode(null);
+              }}
               isTraversing={isTraversing}
               traversalType={traversalType}
               onTraversalTypeChange={setTraversalType}
             />
-            
-            <div className="mt-4">
-              <VisitationSequence sequence={visitedNodes} />
-            </div>
+
+            <BSTVisitationSequence sequence={visitedNodes} />
           </div>
         </div>
-        
+
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-semibold mb-4">Controls</h2>
@@ -171,10 +164,12 @@ const BSTTree = () => {
 
           {selectedNode !== null && (
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-medium mb-4">Update Node</h3>
+              <h3 className="text-lg font-medium mb-4">
+                Update Node {selectedNode}
+              </h3>
               <form onSubmit={handleUpdate} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="updateValue">New Value for Node {selectedNode}</Label>
+                  <Label htmlFor="updateValue">New Value</Label>
                   <Input
                     id="updateValue"
                     type="number"
@@ -189,17 +184,10 @@ const BSTTree = () => {
               </form>
             </div>
           )}
-
-          <TraversalPseudocode
-            currentStep={currentStep}
-            currentLine={currentLine}
-            traversalType={traversalType} // Pass traversalType prop
-          />
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
-   
   );
 };
 
