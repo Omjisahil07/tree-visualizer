@@ -9,25 +9,37 @@ const pseudocodeMap = {
     "function inorderTraversal(node):",
     "  if (node === null)",
     "    return",
+    "  // Traverse left subtree",
     "  inorderTraversal(node.left)",
-    "  visit(node)",
-    "  inorderTraversal(node.right)"
+    "  // Process current node",
+    "  visit(node.value)",
+    "  // Traverse right subtree", 
+    "  inorderTraversal(node.right)",
+    "  return // Traversal complete"
   ],
   preorder: [
     "function preorderTraversal(node):",
     "  if (node === null)",
     "    return",
-    "  visit(node)",
+    "  // Process current node",
+    "  visit(node.value)",
+    "  // Traverse left subtree",
     "  preorderTraversal(node.left)",
-    "  preorderTraversal(node.right)"
+    "  // Traverse right subtree",
+    "  preorderTraversal(node.right)",
+    "  return // Traversal complete"
   ],
   postorder: [
     "function postorderTraversal(node):",
     "  if (node === null)",
     "    return",
+    "  // Traverse left subtree",
     "  postorderTraversal(node.left)",
+    "  // Traverse right subtree",
     "  postorderTraversal(node.right)",
-    "  visit(node)"
+    "  // Process current node",
+    "  visit(node.value)",
+    "  return // Traversal complete"
   ]
 };
 
