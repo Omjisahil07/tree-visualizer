@@ -8,6 +8,9 @@ import { TraversalControls } from "./components/TraversalControls";
 import { Instructions } from "./components/Instructions";
 import { TreeForm } from "./components/TreeForm";
 import { Footer } from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Wand2 } from "lucide-react";
+import { toast } from "sonner";
 
 const BinaryTree = () => {
   const [tree, setTree] = useState<BinaryTreeNode>({ value: null, children: [] });
@@ -77,6 +80,24 @@ const BinaryTree = () => {
     setCurrentStep("");
   };
 
+  const generateRandomTree = () => {
+    let newTree: BinaryTreeNode = { value: null, children: [] };
+    const numberOfNodes = Math.floor(Math.random() * 5) + 3; // Generate 3-7 nodes
+    
+    // Insert root node first
+    const rootValue = Math.floor(Math.random() * 50) + 1;
+    newTree = insertNode(newTree, rootValue, "auto");
+    
+    // Insert remaining nodes
+    for (let i = 1; i < numberOfNodes; i++) {
+      const value = Math.floor(Math.random() * 50) + 1;
+      newTree = insertNode(newTree, value, "auto");
+    }
+    
+    setTree(newTree);
+    toast.success(`Generated a random tree with ${numberOfNodes} nodes`);
+  };
+
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-4xl font-bold mb-6">Binary Tree Visualization</h1>
@@ -85,6 +106,16 @@ const BinaryTree = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
+          <div className="flex justify-end mb-4">
+            <Button
+              onClick={generateRandomTree}
+              variant="outline"
+              className="gap-2"
+            >
+              <Wand2 className="w-4 h-4" />
+              Generate Random Tree
+            </Button>
+          </div>
           <TreeVisualization
             tree={tree}
             onNodeDelete={handleDelete}

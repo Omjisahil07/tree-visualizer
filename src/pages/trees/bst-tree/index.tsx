@@ -1,8 +1,4 @@
 import { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus } from "lucide-react";
 import { BSTVisualization } from "./components/BSTVisualization";
 import { BSTTraversalControls } from "./components/BSTTraversalControls";
 import { BSTInstructions } from "./components/BSTInstructions";
@@ -12,6 +8,8 @@ import { BSTNode, TraversalType } from "./types/BSTTypes";
 import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./operations/BSTOperations";
 import { toast } from "sonner";
 import { Footer } from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Wand2 } from "lucide-react";
 
 const BSTTree = () => {
   const [tree, setTree] = useState<BSTNode>({
@@ -112,14 +110,42 @@ const BSTTree = () => {
     }
   };
 
+  const generateRandomBST = () => {
+    let newTree: BSTNode = { value: null, children: [] };
+    const numberOfNodes = Math.floor(Math.random() * 5) + 3; // Generate 3-7 nodes
+    const usedValues = new Set<number>();
+    
+    // Generate unique values for BST
+    while (usedValues.size < numberOfNodes) {
+      const value = Math.floor(Math.random() * 50) + 1;
+      if (!usedValues.has(value)) {
+        usedValues.add(value);
+        newTree = insertNode(newTree, value);
+      }
+    }
+    
+    setTree(newTree);
+    toast.success(`Generated a random BST with ${numberOfNodes} nodes`);
+  };
+
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-4xl font-bold mb-6">Binary Search Tree Visualization</h1>
-
+      
       <BSTInstructions />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
+          <div className="flex justify-end mb-4">
+            <Button
+              onClick={generateRandomBST}
+              variant="outline"
+              className="gap-2"
+            >
+              <Wand2 className="w-4 h-4" />
+              Generate Random Tree
+            </Button>
+          </div>
           <BSTVisualization
             tree={tree}
             onNodeDelete={handleDelete}
@@ -127,7 +153,7 @@ const BSTTree = () => {
             currentNode={currentNode}
             visitedNodes={visitedNodes}
           />
-
+          
           <div className="bg-white rounded-lg shadow-lg p-6">
             <BSTTraversalControls
               onStart={startTraversal}
