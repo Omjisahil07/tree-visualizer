@@ -9,37 +9,25 @@ const pseudocodeMap = {
     "function inorderTraversal(node):",
     "  if (node === null)",
     "    return",
-    "  // Traverse left subtree",
     "  inorderTraversal(node.left)",
-    "  // Process current node",
-    "  visit(node.value)",
-    "  // Traverse right subtree", 
-    "  inorderTraversal(node.right)",
-    "  return // Traversal complete"
+    "  visit(node)",
+    "  inorderTraversal(node.right)"
   ],
   preorder: [
     "function preorderTraversal(node):",
     "  if (node === null)",
     "    return",
-    "  // Process current node",
-    "  visit(node.value)",
-    "  // Traverse left subtree",
+    "  visit(node)",
     "  preorderTraversal(node.left)",
-    "  // Traverse right subtree",
-    "  preorderTraversal(node.right)",
-    "  return // Traversal complete"
+    "  preorderTraversal(node.right)"
   ],
   postorder: [
     "function postorderTraversal(node):",
     "  if (node === null)",
     "    return",
-    "  // Traverse left subtree",
     "  postorderTraversal(node.left)",
-    "  // Traverse right subtree",
     "  postorderTraversal(node.right)",
-    "  // Process current node",
-    "  visit(node.value)",
-    "  return // Traversal complete"
+    "  visit(node)"
   ],
   levelorder: [
     "function levelOrderTraversal(root):",
@@ -49,12 +37,11 @@ const pseudocodeMap = {
     "  queue.enqueue(root)",
     "  while (!queue.isEmpty())",
     "    node = queue.dequeue()",
-    "    visit(node.value)",
+    "    visit(node)",
     "    if (node.left !== null)",
     "      queue.enqueue(node.left)",
     "    if (node.right !== null)",
-    "      queue.enqueue(node.right)",
-    "  return // Traversal complete"
+    "      queue.enqueue(node.right)"
   ]
 };
 
