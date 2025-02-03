@@ -9,7 +9,9 @@ import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, 
 import { toast } from "sonner";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Wand2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Wand2, Plus } from "lucide-react";
 
 const BSTTree = () => {
   const [tree, setTree] = useState<BSTNode>({
@@ -235,3 +237,4 @@ const BSTTree = () => {
 };
 
 export default BSTTree;
+
