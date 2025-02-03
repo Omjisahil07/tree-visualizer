@@ -25,7 +25,7 @@ export const TreeVisualization = ({
     if (!svgRef.current) return;
 
     const width = 600;
-    const height = 300; // Reduced from 400
+    const height = 300;
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 
     d3.select(svgRef.current).selectAll("*").remove();
@@ -37,7 +37,6 @@ export const TreeVisualization = ({
     const g = svg.append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Filter out null nodes for visualization while keeping them in the data structure
     const processTreeForVisualization = (node: TreeNode): any => {
       if (!node || node.value === null) return null;
       return {
@@ -55,7 +54,6 @@ export const TreeVisualization = ({
     const treeLayout = d3.tree().size([width - 100, height - 100]);
     const treeData = treeLayout(hierarchy);
 
-    // Add drag behavior
     const drag = d3.drag<SVGGElement, any>()
       .on("drag", (event, d: any) => {
         d.x = event.x;
@@ -85,7 +83,6 @@ export const TreeVisualization = ({
       .duration(500)
       .style("opacity", 1);
 
-    // Draw nodes with animation
     const nodes = g.selectAll(".node")
       .data(treeData.descendants())
       .join("g")
@@ -142,7 +139,7 @@ export const TreeVisualization = ({
   return (
     <svg
       ref={svgRef}
-      className="w-full h-[400px] border border-gray-200 rounded-lg" // Reduced from 500px
+      className="w-full h-[400px] border border-gray-200 rounded-lg bg-white shadow-lg"
     />
   );
 };
