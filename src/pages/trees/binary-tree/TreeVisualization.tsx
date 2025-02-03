@@ -25,7 +25,7 @@ export const TreeVisualization = ({
     if (!svgRef.current) return;
 
     const width = 600;
-    const height = 400;
+    const height = 300; // Reduced from 400
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 
     d3.select(svgRef.current).selectAll("*").remove();
@@ -142,7 +142,7 @@ export const TreeVisualization = ({
   return (
     <svg
       ref={svgRef}
-      className="w-full h-[500px] border border-gray-200 rounded-lg"
+      className="w-full h-[400px] border border-gray-200 rounded-lg" // Reduced from 500px
     />
   );
 };
