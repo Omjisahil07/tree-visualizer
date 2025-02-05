@@ -25,6 +25,7 @@ export const AVLVisualization = ({
     const width = 600;
     const height = 300;
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+    const nodeRadius = 35; // Increased from 25 to 35
 
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -87,6 +88,7 @@ export const AVLVisualization = ({
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
+    // Node circles
     nodes.append("circle")
       .attr("r", 0)
       .attr("fill", (d: any) => {
@@ -99,10 +101,11 @@ export const AVLVisualization = ({
       .attr("class", "transition-colors duration-300")
       .transition()
       .duration(500)
-      .attr("r", 25);
+      .attr("r", nodeRadius);
 
+    // Node values
     nodes.append("text")
-      .attr("dy", ".35em")
+      .attr("dy", "-0.3em")
       .attr("text-anchor", "middle")
       .attr("class", "text-sm font-medium")
       .style("opacity", 0)
@@ -111,11 +114,11 @@ export const AVLVisualization = ({
       .duration(500)
       .style("opacity", 1);
 
-    // Add balance factor labels
+    // Balance factors (now inside the node)
     nodes.append("text")
-      .attr("dy", "-1.5em")
+      .attr("dy", "1em")
       .attr("text-anchor", "middle")
-      .attr("class", "text-xs text-primary")
+      .attr("class", "text-xs text-primary font-medium")
       .style("opacity", 0)
       .text((d: any) => `BF: ${d.data.balanceFactor || 0}`)
       .transition()
