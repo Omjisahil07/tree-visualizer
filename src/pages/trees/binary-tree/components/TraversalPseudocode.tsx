@@ -6,28 +6,39 @@ interface TraversalPseudocodeProps {
 
 const pseudocodeMap = {
   inorder: [
-    "function inorderTraversal(node):",
-    "  if (node === null)",
-    "    return",
-    "  inorderTraversal(node.left)",
-    "  visit(node)",
-    "  inorderTraversal(node.right)"
+    "InorderTraversal(Node):",
+    "  If Node is NOT NULL:",
+    "    InorderTraversal(Node.Left)",
+    "    Print(Node.Value)",
+    "    InorderTraversal(Node.Right)"
   ],
   preorder: [
-    "function preorderTraversal(node):",
-    "  if (node === null)",
-    "    return",
-    "  visit(node)",
-    "  preorderTraversal(node.left)",
-    "  preorderTraversal(node.right)"
+    "PreorderTraversal(Node):",
+    "  If Node is NOT NULL:",
+    "    Print(Node.Value)",
+    "    PreorderTraversal(Node.Left)",
+    "    PreorderTraversal(Node.Right)"
   ],
   postorder: [
-    "function postorderTraversal(node):",
-    "  if (node === null)",
-    "    return",
-    "  postorderTraversal(node.left)",
-    "  postorderTraversal(node.right)",
-    "  visit(node)"
+    "PostorderTraversal(Node):",
+    "  If Node is NOT NULL:",
+    "    PostorderTraversal(Node.Left)",
+    "    PostorderTraversal(Node.Right)",
+    "    Print(Node.Value)"
+  ],
+  levelorder: [
+    "LevelOrderTraversal(Node):",
+    "  If Node is NULL:",
+    "    Return",
+    "  Queue Q",
+    "  Enqueue(Node, Q)",
+    "  While Q is NOT Empty:",
+    "    Current = Dequeue(Q)",
+    "    Print(Current.Value)",
+    "    If Current.Left is NOT NULL:",
+    "      Enqueue(Current.Left, Q)",
+    "    If Current.Right is NOT NULL:",
+    "      Enqueue(Current.Right, Q)"
   ]
 };
 
