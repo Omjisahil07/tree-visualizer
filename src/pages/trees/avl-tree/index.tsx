@@ -1,19 +1,20 @@
 import { useState, useCallback } from "react";
 import { AVLVisualization } from "./components/AVLVisualization";
 import { AVLPseudocode } from "./components/AVLPseudocode";
+import { AVLControls } from "./components/AVLControls";
+import { AVLTraversalControls } from "./components/AVLTraversalControls";
 import { AVLNode, TraversalType } from "./types/AVLTypes";
-import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./operations/AVLOperations";
+import { 
+  insertNode, 
+  deleteNode, 
+  updateNode, 
+  traverseInOrder, 
+  traversePreOrder, 
+  traversePostOrder, 
+  traverseLevelOrder 
+} from "./operations/AVLOperations";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Wand2, Play, Pause, RotateCcw } from "lucide-react";
+import { Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { Footer } from "@/components/Footer";
 
@@ -113,7 +114,7 @@ const AVLTree = () => {
 
   const generateRandomAVL = () => {
     let newTree: AVLNode = { value: null, children: [], height: 0, balanceFactor: 0 };
-    const numberOfNodes = Math.floor(Math.random() * 5) + 3; // Generate 3-7 nodes
+    const numberOfNodes = Math.floor(Math.random() * 5) + 3;
     const usedValues = new Set<number>();
     
     while (usedValues.size < numberOfNodes) {
@@ -167,58 +168,22 @@ const AVLTree = () => {
           />
           
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="flex items-center space-x-4">
-              <Select
-                value={traversalType}
-                onValueChange={(value) => setTraversalType(value as TraversalType)}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select traversal type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="inorder">Inorder</SelectItem>
-                  <SelectItem value="preorder">Preorder</SelectItem>
-                  <SelectItem value="postorder">Postorder</SelectItem>
-                  <SelectItem value="levelorder">Level Order</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <div className="space-x-2">
-                {!isTraversing ? (
-                  <Button onClick={startTraversal} size="sm">
-                    <Play className="h-4 w-4 mr-2" />
-                    Start
-                  </Button>
-                ) : (
-                  <Button onClick={() => {
-                    setIsPaused(true);
-                    setIsTraversing(false);
-                  }} size="sm" variant="secondary">
-                    <Pause className="h-4 w-4 mr-2" />
-                    Pause
-                  </Button>
-                )}
-                <Button
-                  onClick={() => {
-                    setIsTraversing(false);
-                    setIsPaused(false);
-                    setVisitedNodes([]);
-                    setCurrentNode(null);
-                    setCurrentStep("");
-                  }}
-                  size="sm"
-                  variant="outline"
-                >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Reset
-                </Button>
-              </div>
-            </div>
-
-            <AVLPseudocode
+            <AVLTraversalControls
               traversalType={traversalType}
-              currentStep={currentStep}
-              currentLine={visitedNodes.length - 1}
+              setTraversalType={setTraversalType}
+              isTraversing={isTraversing}
+              startTraversal={startTraversal}
+              stopTraversal={() => {
+                setIsPaused(true);
+                setIsTraversing(false);
+              }}
+              resetTraversal={() => {
+                setIsTraversing(false);
+                setIsPaused(false);
+                setVisitedNodes([]);
+                setCurrentNode(null);
+                setCurrentStep("");
+              }}
             />
 
             {visitedNodes.length > 0 && (
@@ -240,47 +205,15 @@ const AVLTree = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4">Controls</h2>
-            <form onSubmit={handleInsert} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="nodeValue">Node Value</Label>
-                <Input
-                  id="nodeValue"
-                  type="number"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Enter a number"
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Insert Node
-              </Button>
-            </form>
-          </div>
-
-          {selectedNode !== null && (
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-medium mb-4">
-                Update Node {selectedNode}
-              </h3>
-              <form onSubmit={handleUpdate} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="updateValue">New Value</Label>
-                  <Input
-                    id="updateValue"
-                    type="number"
-                    value={updateValue}
-                    onChange={(e) => setUpdateValue(e.target.value)}
-                    placeholder="Enter new value"
-                  />
-                </div>
-                <Button type="submit" className="w-full">
-                  Update Node
-                </Button>
-              </form>
-            </div>
-          )}
+          <AVLControls
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            updateValue={updateValue}
+            setUpdateValue={setUpdateValue}
+            selectedNode={selectedNode}
+            handleInsert={handleInsert}
+            handleUpdate={handleUpdate}
+          />
 
           {currentStep && (
             <div className="bg-white rounded-lg shadow-lg p-4">
@@ -288,6 +221,12 @@ const AVLTree = () => {
               <p className="text-sm text-primary">{currentStep}</p>
             </div>
           )}
+
+          <AVLPseudocode
+            traversalType={traversalType}
+            currentStep={currentStep}
+            currentLine={visitedNodes.length - 1}
+          />
         </div>
       </div>
       <Footer />
