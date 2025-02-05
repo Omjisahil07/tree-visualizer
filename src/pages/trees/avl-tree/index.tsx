@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { AVLVisualization } from "./components/AVLVisualization";
+import { AVLPseudocode } from "./components/AVLPseudocode";
 import { AVLNode, TraversalType } from "./types/AVLTypes";
 import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./operations/AVLOperations";
 import { Button } from "@/components/ui/button";
@@ -213,6 +214,12 @@ const AVLTree = () => {
                 </Button>
               </div>
             </div>
+
+            <AVLPseudocode
+              traversalType={traversalType}
+              currentStep={currentStep}
+              currentLine={visitedNodes.length - 1}
+            />
 
             {visitedNodes.length > 0 && (
               <div className="mt-4">
