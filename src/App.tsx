@@ -7,7 +7,7 @@ import Index from "./pages/Index";
 import Tree from "./pages/Tree";
 import BSTTree from "./pages/trees/bst-tree";
 import BinaryTree from "./pages/trees/binary-tree";
-import AVLTree from "./pages/trees/AVLTree";
+import AVLTree from "./pages/trees/avl-tree";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 
