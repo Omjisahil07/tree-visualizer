@@ -1,3 +1,7 @@
+/**
+ * Type definitions for AVL Tree implementation
+ */
+
 // Defines the structure of an AVL Tree node
 export interface AVLNode {
   value: number | null;      // The value stored in the node (null for empty nodes)
