@@ -1,3 +1,6 @@
+/**
+ * Component for visualizing the AVL tree structure using D3
+ */
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { AVLNode } from '../types/AVLTypes';
@@ -22,13 +25,16 @@ export const AVLVisualization = ({
   useEffect(() => {
     if (!svgRef.current) return;
 
+    // Setup SVG dimensions and margins
     const width = 600;
     const height = 300;
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
-    const nodeRadius = 35; // Increased from 25 to 35
+    const nodeRadius = 35;
 
+    // Clear existing SVG content
     d3.select(svgRef.current).selectAll("*").remove();
 
+    // Create SVG container
     const svg = d3.select(svgRef.current)
       .attr("width", width)
       .attr("height", height);
@@ -36,6 +42,7 @@ export const AVLVisualization = ({
     const g = svg.append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // Process tree data for D3 visualization
     const processTreeForVisualization = (node: AVLNode): any => {
       if (!node || !node.value) return null;
       return {
@@ -50,10 +57,12 @@ export const AVLVisualization = ({
     const visualTree = processTreeForVisualization(tree);
     if (!visualTree) return;
 
+    // Create D3 tree layout
     const hierarchy = d3.hierarchy(visualTree);
     const treeLayout = d3.tree().size([width - 100, height - 100]);
     const treeData = treeLayout(hierarchy);
 
+    // Setup node dragging behavior
     const drag = d3.drag<SVGGElement, any>()
       .on("drag", (event, d: any) => {
         d.x = event.x;
@@ -61,12 +70,14 @@ export const AVLVisualization = ({
         d3.select(event.sourceEvent.target.parentNode)
           .attr("transform", `translate(${d.x},${d.y})`);
         
+        // Update links when nodes are dragged
         g.selectAll(".link")
           .attr("d", d3.linkVertical()
             .x((d: any) => d.x)
             .y((d: any) => d.y));
       });
 
+    // Draw tree links
     g.selectAll(".link")
       .data(treeData.links())
       .join("path")
@@ -82,13 +93,14 @@ export const AVLVisualization = ({
       .duration(500)
       .style("opacity", 1);
 
+    // Create node groups
     const nodes = g.selectAll(".node")
       .data(treeData.descendants())
       .join("g")
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
-    // Node circles
+    // Draw node circles
     nodes.append("circle")
       .attr("r", 0)
       .attr("fill", (d: any) => {
@@ -103,7 +115,7 @@ export const AVLVisualization = ({
       .duration(500)
       .attr("r", nodeRadius);
 
-    // Node values
+    // Add node values
     nodes.append("text")
       .attr("dy", "-0.3em")
       .attr("text-anchor", "middle")
@@ -114,7 +126,7 @@ export const AVLVisualization = ({
       .duration(500)
       .style("opacity", 1);
 
-    // Balance factors (now inside the node)
+    // Add balance factors
     nodes.append("text")
       .attr("dy", "1em")
       .attr("text-anchor", "middle")
@@ -125,8 +137,10 @@ export const AVLVisualization = ({
       .duration(500)
       .style("opacity", 1);
 
+    // Enable node dragging
     nodes.call(drag as any);
 
+    // Add click handlers
     nodes.on("click", (event, d: any) => {
       event.preventDefault();
       if (d.data.value !== null) {

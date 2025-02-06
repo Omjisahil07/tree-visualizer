@@ -1,133 +1,38 @@
-import { useState, useCallback } from "react";
+/**
+ * Main AVL Tree visualization component
+ */
+import { useState } from "react";
 import { AVLVisualization } from "./components/AVLVisualization";
 import { AVLPseudocode } from "./components/AVLPseudocode";
 import { AVLControls } from "./components/AVLControls";
 import { AVLTraversalControls } from "./components/AVLTraversalControls";
-import { AVLNode, TraversalType } from "./types/AVLTypes";
-import { 
-  insertNode, 
-  deleteNode, 
-  updateNode, 
-  traverseInOrder, 
-  traversePreOrder, 
-  traversePostOrder, 
-  traverseLevelOrder 
-} from "./operations/AVLOperations";
+import { TraversalType } from "./types/AVLTypes";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
-import { toast } from "sonner";
 import { Footer } from "@/components/Footer";
+import { useAVLTree } from "./hooks/useAVLTree";
 
 const AVLTree = () => {
-  const [tree, setTree] = useState<AVLNode>({
-    value: null,
-    children: [],
-    height: 0,
-    balanceFactor: 0
-  });
-  const [inputValue, setInputValue] = useState("");
-  const [updateValue, setUpdateValue] = useState("");
-  const [selectedNode, setSelectedNode] = useState<number | null>(null);
-  const [currentNode, setCurrentNode] = useState<number | null>(null);
-  const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
-  const [isTraversing, setIsTraversing] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const [traversalType, setTraversalType] = useState<TraversalType>("inorder");
-  const [currentStep, setCurrentStep] = useState("");
-
-  const handleInsert = (e: React.FormEvent) => {
-    e.preventDefault();
-    const value = parseInt(inputValue);
-    if (isNaN(value)) {
-      toast.error("Please enter a valid number");
-      return;
-    }
-    setTree(prevTree => insertNode(prevTree, value));
-    setInputValue("");
-    toast.success(`Node ${value} inserted successfully`);
-  };
-
-  const handleNodeClick = (value: number) => {
-    setSelectedNode(value);
-    setUpdateValue(value.toString());
-  };
-
-  const handleUpdate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedNode === null) {
-      toast.error("Please select a node to update");
-      return;
-    }
-    const newValue = parseInt(updateValue);
-    if (isNaN(newValue)) {
-      toast.error("Please enter a valid number");
-      return;
-    }
-    setTree(prevTree => updateNode(prevTree, selectedNode, newValue));
-    setUpdateValue("");
-    setSelectedNode(null);
-    toast.success(`Node updated from ${selectedNode} to ${newValue}`);
-  };
-
-  const handleDelete = (value: number) => {
-    setTree(prevTree => deleteNode(prevTree, value));
-    if (selectedNode === value) {
-      setSelectedNode(null);
-      setUpdateValue("");
-    }
-    toast.success(`Node ${value} deleted successfully`);
-  };
-
-  const handleTraversalStep = useCallback(async (value: number | null, step: string) => {
-    if (isPaused) return;
-    setCurrentNode(value);
-    setCurrentStep(step);
-    setVisitedNodes(prev =>
-      value !== null && !prev.includes(value) ? [...prev, value] : prev
-    );
-    await new Promise(resolve => setTimeout(resolve, 500));
-  }, [isPaused]);
-
-  const startTraversal = async () => {
-    setIsTraversing(true);
-    setIsPaused(false);
-    setVisitedNodes([]);
-    setCurrentNode(null);
-    setCurrentStep("");
-
-    const traversalFunction = {
-      inorder: traverseInOrder,
-      preorder: traversePreOrder,
-      postorder: traversePostOrder,
-      levelorder: traverseLevelOrder,
-    }[traversalType];
-
-    if (!traversalFunction) return;
-
-    await traversalFunction(tree, handleTraversalStep);
-    
-    if (!isPaused) {
-      setIsTraversing(false);
-      setCurrentStep("Traversal complete");
-    }
-  };
-
-  const generateRandomAVL = () => {
-    let newTree: AVLNode = { value: null, children: [], height: 0, balanceFactor: 0 };
-    const numberOfNodes = Math.floor(Math.random() * 5) + 3;
-    const usedValues = new Set<number>();
-    
-    while (usedValues.size < numberOfNodes) {
-      const value = Math.floor(Math.random() * 50) + 1;
-      if (!usedValues.has(value)) {
-        usedValues.add(value);
-        newTree = insertNode(newTree, value);
-      }
-    }
-    
-    setTree(newTree);
-    toast.success(`Generated a random AVL tree with ${numberOfNodes} nodes`);
-  };
+  const {
+    tree,
+    selectedNode,
+    inputValue,
+    updateValue,
+    currentNode,
+    visitedNodes,
+    isTraversing,
+    currentStep,
+    setInputValue,
+    setUpdateValue,
+    setIsTraversing,
+    handleInsert,
+    handleNodeClick,
+    handleUpdate,
+    handleDelete,
+    startTraversal,
+    generateRandomTree
+  } = useAVLTree();
 
   return (
     <div className="container mx-auto py-12">
@@ -150,7 +55,7 @@ const AVLTree = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex justify-end mb-4">
             <Button
-              onClick={generateRandomAVL}
+              onClick={generateRandomTree}
               variant="outline"
               className="gap-2"
             >
@@ -172,14 +77,10 @@ const AVLTree = () => {
               traversalType={traversalType}
               setTraversalType={setTraversalType}
               isTraversing={isTraversing}
-              startTraversal={startTraversal}
-              stopTraversal={() => {
-                setIsPaused(true);
-                setIsTraversing(false);
-              }}
+              startTraversal={() => startTraversal(traversalType)}
+              stopTraversal={() => setIsTraversing(false)}
               resetTraversal={() => {
                 setIsTraversing(false);
-                setIsPaused(false);
                 setVisitedNodes([]);
                 setCurrentNode(null);
                 setCurrentStep("");
