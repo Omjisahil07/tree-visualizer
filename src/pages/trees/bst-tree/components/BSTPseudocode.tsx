@@ -5,44 +5,53 @@ interface BSTPseudocodeProps {
 }
 
 const pseudocodeMap = {
-  inorder: [
-    "function inorderTraversal(node):",
-    "  if (node === null)",
-    "    return",
-    "  inorderTraversal(node.left)",
-    "  visit(node)",
-    "  inorderTraversal(node.right)"
-  ],
-  preorder: [
-    "function preorderTraversal(node):",
-    "  if (node === null)",
-    "    return",
-    "  visit(node)",
-    "  preorderTraversal(node.left)",
-    "  preorderTraversal(node.right)"
-  ],
-  postorder: [
-    "function postorderTraversal(node):",
-    "  if (node === null)",
-    "    return",
-    "  postorderTraversal(node.left)",
-    "  postorderTraversal(node.right)",
-    "  visit(node)"
-  ],
-  levelorder: [
-    "function levelOrderTraversal(root):",
-    "  if (root === null)",
-    "    return",
-    "  queue = new Queue()",
-    "  queue.enqueue(root)",
-    "  while (!queue.isEmpty())",
-    "    node = queue.dequeue()",
-    "    visit(node)",
-    "    if (node.left !== null)",
-    "      queue.enqueue(node.left)",
-    "    if (node.right !== null)",
-    "      queue.enqueue(node.right)"
-  ]
+  inorder: {
+    code: [
+      "InorderTraversal(Node):",
+      "  If Node is NOT NULL:",
+      "    InorderTraversal(Node.Left)",
+      "    Print(Node.Value)",
+      "    InorderTraversal(Node.Right)"
+    ],
+    usage: "✅ Usage: Returns elements in sorted order for a BST."
+  },
+  preorder: {
+    code: [
+      "PreorderTraversal(Node):",
+      "  If Node is NOT NULL:",
+      "    Print(Node.Value)",
+      "    PreorderTraversal(Node.Left)",
+      "    PreorderTraversal(Node.Right)"
+    ],
+    usage: "✅ Usage: Used to copy BST structures."
+  },
+  postorder: {
+    code: [
+      "PostorderTraversal(Node):",
+      "  If Node is NOT NULL:",
+      "    PostorderTraversal(Node.Left)",
+      "    PostorderTraversal(Node.Right)",
+      "    Print(Node.Value)"
+    ],
+    usage: "✅ Usage: Used when deleting nodes (bottom-up approach)."
+  },
+  levelorder: {
+    code: [
+      "LevelOrderTraversal(Node):",
+      "  If Node is NULL:",
+      "    Return",
+      "  Queue Q",
+      "  Enqueue(Node, Q)",
+      "  While Q is NOT Empty:",
+      "    Current = Dequeue(Q)",
+      "    Print(Current.Value)",
+      "    If Current.Left is NOT NULL:",
+      "      Enqueue(Current.Left, Q)",
+      "    If Current.Right is NOT NULL:",
+      "      Enqueue(Current.Right, Q)"
+    ],
+    usage: "✅ Usage: Used for finding height, shortest path, etc."
+  }
 };
 
 export const BSTPseudocode = ({ 
@@ -50,7 +59,7 @@ export const BSTPseudocode = ({
   currentLine,
   traversalType
 }: BSTPseudocodeProps) => {
-  const pseudocode = pseudocodeMap[traversalType as keyof typeof pseudocodeMap] || pseudocodeMap.inorder;
+  const traversalInfo = pseudocodeMap[traversalType as keyof typeof pseudocodeMap] || pseudocodeMap.inorder;
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
@@ -58,7 +67,7 @@ export const BSTPseudocode = ({
         {traversalType.charAt(0).toUpperCase() + traversalType.slice(1)} Traversal Algorithm
       </h3>
       <div className="font-mono text-sm">
-        {pseudocode.map((line, index) => (
+        {traversalInfo.code.map((line, index) => (
           <div
             key={index}
             className={`py-1 px-2 ${
@@ -70,6 +79,9 @@ export const BSTPseudocode = ({
             {line}
           </div>
         ))}
+      </div>
+      <div className="mt-2 text-sm text-muted-foreground">
+        {traversalInfo.usage}
       </div>
       {currentStep && (
         <div className="mt-4 p-2 bg-primary/10 border border-primary rounded">
