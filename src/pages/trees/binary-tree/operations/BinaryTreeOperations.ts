@@ -37,32 +37,30 @@ export const insertNode = (
       if (!node || node.value === null) return node;
 
       if (node.value === parentValue) {
-        if (position === 'left') {
-          if (node.children[0].value === null) {
-            node.children[0] = {
-              value,
-              children: [
-                { value: null, children: [] },
-                { value: null, children: [] }
-              ]
-            };
-          }
-        } else if (position === 'right') {
-          if (node.children[1].value === null) {
-            node.children[1] = {
-              value,
-              children: [
-                { value: null, children: [] },
-                { value: null, children: [] }
-              ]
-            };
-          }
+        if (position === 'left' && node.children[0].value === null) {
+          node.children[0] = {
+            value,
+            children: [
+              { value: null, children: [] },
+              { value: null, children: [] }
+            ]
+          };
+        } else if (position === 'right' && node.children[1].value === null) {
+          node.children[1] = {
+            value,
+            children: [
+              { value: null, children: [] },
+              { value: null, children: [] }
+            ]
+          };
         }
         return node;
       }
 
-      node.children = node.children.map(child => findAndInsert({ ...child }));
-      return node;
+      return {
+        ...node,
+        children: node.children.map(child => findAndInsert({ ...child }))
+      };
     };
 
     return findAndInsert({ ...tree });
