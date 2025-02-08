@@ -34,64 +34,90 @@ export const insertNode = (
 
   if (parentValue !== undefined) {
     const findAndInsert = (node: BinaryTreeNode): BinaryTreeNode => {
-      if (!node || node.value === null) return node;
+      if (!node || node.value === null) {
+        return node;
+      }
 
       if (node.value === parentValue) {
-        if (position === 'left' && node.children[0].value === null) {
-          node.children[0] = {
-            value,
+        const leftChild = node.children[0];
+        const rightChild = node.children[1];
+
+        if (position === 'left' && leftChild.value === null) {
+          return {
+            ...node,
             children: [
-              { value: null, children: [] },
-              { value: null, children: [] }
+              {
+                value,
+                children: [
+                  { value: null, children: [] },
+                  { value: null, children: [] }
+                ]
+              },
+              rightChild
             ]
           };
-        } else if (position === 'right' && node.children[1].value === null) {
-          node.children[1] = {
-            value,
+        } else if (position === 'right' && rightChild.value === null) {
+          return {
+            ...node,
             children: [
-              { value: null, children: [] },
-              { value: null, children: [] }
+              leftChild,
+              {
+                value,
+                children: [
+                  { value: null, children: [] },
+                  { value: null, children: [] }
+                ]
+              }
             ]
           };
         }
         return node;
       }
 
+      const newChildren = node.children.map(child => findAndInsert({ ...child }));
       return {
         ...node,
-        children: node.children.map(child => findAndInsert({ ...child }))
+        children: newChildren
       };
     };
 
-    return findAndInsert({ ...tree });
+    const newTree = findAndInsert({ ...tree });
+    return newTree;
   }
 
-  const autoInsert = (node: BinaryTreeNode): BinaryTreeNode => {
-    if (node.children[0].value === null) {
-      node.children[0] = {
-        value,
-        children: [
-          { value: null, children: [] },
-          { value: null, children: [] }
-        ]
-      };
-    } else if (node.children[1].value === null) {
-      node.children[1] = {
-        value,
-        children: [
-          { value: null, children: [] },
-          { value: null, children: [] }
-        ]
-      };
-    } else {
-      node.children[0] = autoInsert(node.children[0]);
-    }
-    return node;
-  };
+  const queue = new Queue<BinaryTreeNode>();
+  queue.enqueue({ ...tree });
+  
+  while (queue.length > 0) {
+    const current = queue.dequeue();
+    if (!current) continue;
 
-  return position === 'auto' 
-    ? { ...autoInsert({ ...tree }) }
-    : { ...tree };
+    if (current.children[0].value === null) {
+      current.children[0] = {
+        value,
+        children: [
+          { value: null, children: [] },
+          { value: null, children: [] }
+        ]
+      };
+      return tree;
+    }
+    queue.enqueue(current.children[0]);
+
+    if (current.children[1].value === null) {
+      current.children[1] = {
+        value,
+        children: [
+          { value: null, children: [] },
+          { value: null, children: [] }
+        ]
+      };
+      return tree;
+    }
+    queue.enqueue(current.children[1]);
+  }
+
+  return tree;
 };
 
 export const deleteNode = (tree: BinaryTreeNode, value: number): BinaryTreeNode => {
