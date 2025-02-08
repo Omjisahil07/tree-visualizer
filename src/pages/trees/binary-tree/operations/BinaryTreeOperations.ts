@@ -16,7 +16,12 @@ class Queue<T> {
   }
 }
 
-export const insertNode = (tree: BinaryTreeNode, value: number, position: InsertPosition = 'auto'): BinaryTreeNode => {
+export const insertNode = (
+  tree: BinaryTreeNode,
+  value: number,
+  position: InsertPosition = 'auto',
+  parentValue?: number
+): BinaryTreeNode => {
   if (tree.value === null) {
     return {
       value,
@@ -28,6 +33,32 @@ export const insertNode = (tree: BinaryTreeNode, value: number, position: Insert
   }
 
   const insert = (node: BinaryTreeNode): BinaryTreeNode => {
+    if (parentValue !== undefined && node.value === parentValue) {
+      if (position === 'left' && node.children[0].value === null) {
+        node.children[0] = {
+          value,
+          children: [
+            { value: null, children: [] },
+            { value: null, children: [] }
+          ]
+        };
+        return node;
+      }
+      
+      if (position === 'right' && node.children[1].value === null) {
+        node.children[1] = {
+          value,
+          children: [
+            { value: null, children: [] },
+            { value: null, children: [] }
+          ]
+        };
+        return node;
+      }
+      
+      return node;
+    }
+
     if (position === 'left' && node.children[0].value === null) {
       node.children[0] = {
         value,
@@ -50,7 +81,6 @@ export const insertNode = (tree: BinaryTreeNode, value: number, position: Insert
       return node;
     }
 
-    // For 'auto' position or if the preferred position is full
     if (node.children[0].value === null) {
       node.children[0] = {
         value,
@@ -68,7 +98,6 @@ export const insertNode = (tree: BinaryTreeNode, value: number, position: Insert
         ]
       };
     } else {
-      // If both children are full, try inserting in the left subtree
       node.children[0] = insert(node.children[0]);
     }
     return node;

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,7 @@ import { toast } from "sonner";
 import { InsertPosition } from "../types/BinaryTreeTypes";
 
 interface TreeFormProps {
-  onInsert: (value: number, position: InsertPosition) => void;
+  onInsert: (value: number, position: InsertPosition, parentValue?: number) => void;
   onUpdate: (oldValue: number, newValue: number) => void;
   selectedNode: number | null;
 }
@@ -25,7 +26,7 @@ export const TreeForm = ({ onInsert, onUpdate, selectedNode }: TreeFormProps) =>
       toast.error("Please enter a valid number");
       return;
     }
-    onInsert(value, insertPosition);
+    onInsert(value, insertPosition, selectedNode || undefined);
     setInputValue("");
     toast.success(`Node ${value} inserted successfully`);
   };
@@ -74,10 +75,15 @@ export const TreeForm = ({ onInsert, onUpdate, selectedNode }: TreeFormProps) =>
                 <SelectItem value="right">Right</SelectItem>
               </SelectContent>
             </Select>
+            {selectedNode !== null && (
+              <p className="text-sm text-gray-600 mt-1">
+                Selected parent node: {selectedNode}
+              </p>
+            )}
           </div>
           <Button type="submit" className="w-full gap-2">
             <Plus className="h-4 w-4" />
-            Insert Node
+            {selectedNode !== null ? `Insert Node as Child of ${selectedNode}` : 'Insert Node'}
           </Button>
         </form>
       </div>
