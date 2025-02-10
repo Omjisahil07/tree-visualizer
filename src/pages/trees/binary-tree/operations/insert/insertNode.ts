@@ -32,6 +32,7 @@ const insertAtSpecificPosition = (
             { value: null, children: [] }
           ]
         };
+        return node;
       } else if (position === 'right' && (!rightChild || rightChild.value === null)) {
         node.children[1] = {
           value,
@@ -40,12 +41,12 @@ const insertAtSpecificPosition = (
             { value: null, children: [] }
           ]
         };
+        return node;
       }
-      return node;
     }
 
-    node.children = node.children.map(child => findAndInsert({ ...child }));
-    return node;
+    const updatedChildren = node.children.map(child => findAndInsert({ ...child }));
+    return { ...node, children: updatedChildren };
   };
 
   return findAndInsert(newTree);
@@ -108,13 +109,16 @@ export const insertNode = (
   position: InsertPosition = 'auto',
   parentValue?: number
 ): BinaryTreeNode => {
+  // Always create a new tree instance to ensure state updates
+  const newTree = JSON.parse(JSON.stringify(tree));
+
   if (position === 'auto') {
-    return insertAutomatic(tree, value);
+    return insertAutomatic(newTree, value);
   }
 
   if (parentValue !== undefined) {
-    return insertAtSpecificPosition(tree, value, parentValue, position);
+    return insertAtSpecificPosition(newTree, value, parentValue, position);
   }
 
-  return tree;
+  return newTree;
 };
