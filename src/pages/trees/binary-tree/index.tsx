@@ -1,7 +1,15 @@
+
 import { useState, useCallback } from "react";
 import { TreeVisualization } from "./TreeVisualization";
 import { BinaryTreeNode, InsertPosition } from "./types/BinaryTreeTypes";
-import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder } from "./operations/BinaryTreeOperations";
+import { insertNode } from "./operations/insert/insertNode";
+import { deleteNode } from "./operations/delete/deleteNode";
+import { updateNode } from "./operations/update/updateNode";
+import { 
+  traverseInOrder,
+  traversePreOrder,
+  traversePostOrder 
+} from "./operations/traversal/traversalOperations";
 import { TraversalPseudocode } from "./components/TraversalPseudocode";
 import { VisitationSequence } from "./components/VisitationSequence";
 import { TraversalControls } from "./components/TraversalControls";
