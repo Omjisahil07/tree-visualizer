@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { TreeNode } from './TreeNode';
@@ -28,6 +29,7 @@ export const TreeVisualization = ({
     const height = 300;
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 
+    // Clear previous visualization
     d3.select(svgRef.current).selectAll("*").remove();
 
     const svg = d3.select(svgRef.current)
@@ -54,20 +56,7 @@ export const TreeVisualization = ({
     const treeLayout = d3.tree().size([width - 100, height - 100]);
     const treeData = treeLayout(hierarchy);
 
-    const drag = d3.drag<SVGGElement, any>()
-      .on("drag", (event, d: any) => {
-        d.x = event.x;
-        d.y = event.y;
-        d3.select(event.sourceEvent.target.parentNode)
-          .attr("transform", `translate(${d.x},${d.y})`);
-        
-        g.selectAll(".link")
-          .attr("d", d3.linkVertical()
-            .x((d: any) => d.x)
-            .y((d: any) => d.y));
-      });
-
-    // Draw links with primary color and animation
+    // Draw links
     g.selectAll(".link")
       .data(treeData.links())
       .join("path")
@@ -83,13 +72,14 @@ export const TreeVisualization = ({
       .duration(500)
       .style("opacity", 1);
 
+    // Create node groups
     const nodes = g.selectAll(".node")
       .data(treeData.descendants())
       .join("g")
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
-    // Add circles to nodes with dynamic colors and animation
+    // Add circles to nodes
     nodes.append("circle")
       .attr("r", 0)
       .attr("fill", (d: any) => {
@@ -104,7 +94,7 @@ export const TreeVisualization = ({
       .duration(500)
       .attr("r", 25);
 
-    // Add text to nodes with animation
+    // Add text to nodes
     nodes.append("text")
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
@@ -115,10 +105,7 @@ export const TreeVisualization = ({
       .duration(500)
       .style("opacity", 1);
 
-    // Add drag behavior to nodes
-    nodes.call(drag as any);
-
-    // Add click handler for node update
+    // Add click handlers
     nodes.on("click", (event, d: any) => {
       event.preventDefault();
       if (d.data.value !== null) {
@@ -126,7 +113,6 @@ export const TreeVisualization = ({
       }
     });
 
-    // Add delete functionality on double click
     nodes.on("dblclick", (event, d: any) => {
       event.preventDefault();
       if (d.data.value !== null) {
