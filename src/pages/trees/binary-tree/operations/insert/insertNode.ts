@@ -8,68 +8,60 @@ const insertAtSpecificPosition = (
   parentValue: number,
   position: InsertPosition
 ): BinaryTreeNode => {
-  // Create a deep copy of the tree to ensure immutability
-  const newTree = JSON.parse(JSON.stringify(tree));
-
   const findAndInsert = (node: BinaryTreeNode): BinaryTreeNode => {
     if (!node || node.value === null) {
       return node;
     }
 
-    // Found the parent node where we want to insert
     if (node.value === parentValue) {
-      // Insert as left child if position is left and the spot is available
-      if (position === 'left' && (!node.children[0] || node.children[0].value === null)) {
-        node.children[0] = {
-          value,
+      const leftChild = node.children[0];
+      const rightChild = node.children[1];
+
+      if (position === 'left' && leftChild.value === null) {
+        return {
+          ...node,
           children: [
-            { value: null, children: [] },
-            { value: null, children: [] }
+            {
+              value,
+              children: [
+                { value: null, children: [] },
+                { value: null, children: [] }
+              ]
+            },
+            rightChild
           ]
         };
-        return { ...node }; // Return new reference for the modified node
-      }
-      // Insert as right child if position is right and the spot is available
-      else if (position === 'right' && (!node.children[1] || node.children[1].value === null)) {
-        node.children[1] = {
-          value,
+      } else if (position === 'right' && rightChild.value === null) {
+        return {
+          ...node,
           children: [
-            { value: null, children: [] },
-            { value: null, children: [] }
+            leftChild,
+            {
+              value,
+              children: [
+                { value: null, children: [] },
+                { value: null, children: [] }
+              ]
+            }
           ]
         };
-        return { ...node }; // Return new reference for the modified node
       }
+      return node;
     }
 
-    // Continue searching in children and create new references
-    const updatedChildren = node.children.map(child => findAndInsert({ ...child }));
+    const newChildren = node.children.map(child => findAndInsert({ ...child }));
     return {
       ...node,
-      children: updatedChildren
+      children: newChildren
     };
   };
 
-  const updatedTree = findAndInsert(newTree);
-  return { ...updatedTree }; // Return a new reference for the entire tree
+  return findAndInsert({ ...tree });
 };
 
 const insertAutomatic = (tree: BinaryTreeNode, value: number): BinaryTreeNode => {
-  // Create a deep copy of the tree
-  const newTree = JSON.parse(JSON.stringify(tree));
-  
-  if (newTree.value === null) {
-    return {
-      value,
-      children: [
-        { value: null, children: [] },
-        { value: null, children: [] }
-      ]
-    };
-  }
-
   const queue = new Queue<BinaryTreeNode>();
-  queue.enqueue(newTree);
+  queue.enqueue({ ...tree });
   
   while (queue.length > 0) {
     const current = queue.dequeue();
@@ -83,7 +75,7 @@ const insertAutomatic = (tree: BinaryTreeNode, value: number): BinaryTreeNode =>
           { value: null, children: [] }
         ]
       };
-      return { ...newTree }; // Return new reference
+      return tree;
     }
     queue.enqueue(current.children[0]);
 
@@ -95,12 +87,12 @@ const insertAutomatic = (tree: BinaryTreeNode, value: number): BinaryTreeNode =>
           { value: null, children: [] }
         ]
       };
-      return { ...newTree }; // Return new reference
+      return tree;
     }
     queue.enqueue(current.children[1]);
   }
 
-  return { ...newTree }; // Return new reference
+  return tree;
 };
 
 export const insertNode = (
@@ -109,10 +101,7 @@ export const insertNode = (
   position: InsertPosition = 'auto',
   parentValue?: number
 ): BinaryTreeNode => {
-  // Create a deep copy of the tree to ensure immutability
-  const newTree = JSON.parse(JSON.stringify(tree));
-
-  if (newTree.value === null) {
+  if (tree.value === null) {
     return {
       value,
       children: [
@@ -122,15 +111,9 @@ export const insertNode = (
     };
   }
 
-  if (position === 'auto') {
-    return insertAutomatic(newTree, value);
+  if (parentValue !== undefined) {
+    return insertAtSpecificPosition(tree, value, parentValue, position);
   }
 
-  if (parentValue !== undefined && (position === 'left' || position === 'right')) {
-    const updatedTree = insertAtSpecificPosition(newTree, value, parentValue, position);
-    // Return a completely new reference to ensure React detects the change
-    return JSON.parse(JSON.stringify(updatedTree));
-  }
-
-  return { ...newTree };
+  return insertAutomatic(tree, value);
 };
