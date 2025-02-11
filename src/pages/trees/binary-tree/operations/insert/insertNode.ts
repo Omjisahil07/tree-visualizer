@@ -8,6 +8,9 @@ const insertAtSpecificPosition = (
   parentValue: number,
   position: InsertPosition
 ): BinaryTreeNode => {
+  // Create a deep copy of the tree to ensure immutability
+  const newTree = JSON.parse(JSON.stringify(tree));
+
   const findAndInsert = (node: BinaryTreeNode): BinaryTreeNode => {
     if (!node || node.value === null) {
       return node;
@@ -17,51 +20,52 @@ const insertAtSpecificPosition = (
       const leftChild = node.children[0];
       const rightChild = node.children[1];
 
-      if (position === 'left' && leftChild.value === null) {
-        return {
-          ...node,
+      if (position === 'left' && (!leftChild || leftChild.value === null)) {
+        const newNode = {
+          value,
           children: [
-            {
-              value,
-              children: [
-                { value: null, children: [] },
-                { value: null, children: [] }
-              ]
-            },
-            rightChild
+            { value: null, children: [] },
+            { value: null, children: [] }
           ]
         };
-      } else if (position === 'right' && rightChild.value === null) {
-        return {
-          ...node,
+        node.children[0] = newNode;
+        return node;
+      } else if (position === 'right' && (!rightChild || rightChild.value === null)) {
+        const newNode = {
+          value,
           children: [
-            leftChild,
-            {
-              value,
-              children: [
-                { value: null, children: [] },
-                { value: null, children: [] }
-              ]
-            }
+            { value: null, children: [] },
+            { value: null, children: [] }
           ]
         };
+        node.children[1] = newNode;
+        return node;
       }
-      return node;
     }
 
-    const newChildren = node.children.map(child => findAndInsert({ ...child }));
-    return {
-      ...node,
-      children: newChildren
-    };
+    const updatedChildren = node.children.map(child => findAndInsert({ ...child }));
+    return { ...node, children: updatedChildren };
   };
 
-  return findAndInsert({ ...tree });
+  return findAndInsert(newTree);
 };
 
 const insertAutomatic = (tree: BinaryTreeNode, value: number): BinaryTreeNode => {
+  // Create a deep copy of the tree
+  const newTree = JSON.parse(JSON.stringify(tree));
+  
+  if (newTree.value === null) {
+    return {
+      value,
+      children: [
+        { value: null, children: [] },
+        { value: null, children: [] }
+      ]
+    };
+  }
+
   const queue = new Queue<BinaryTreeNode>();
-  queue.enqueue({ ...tree });
+  queue.enqueue(newTree);
   
   while (queue.length > 0) {
     const current = queue.dequeue();
@@ -75,7 +79,7 @@ const insertAutomatic = (tree: BinaryTreeNode, value: number): BinaryTreeNode =>
           { value: null, children: [] }
         ]
       };
-      return tree;
+      return newTree;
     }
     queue.enqueue(current.children[0]);
 
@@ -87,12 +91,12 @@ const insertAutomatic = (tree: BinaryTreeNode, value: number): BinaryTreeNode =>
           { value: null, children: [] }
         ]
       };
-      return tree;
+      return newTree;
     }
     queue.enqueue(current.children[1]);
   }
 
-  return tree;
+  return newTree;
 };
 
 export const insertNode = (
@@ -101,7 +105,10 @@ export const insertNode = (
   position: InsertPosition = 'auto',
   parentValue?: number
 ): BinaryTreeNode => {
-  if (tree.value === null) {
+  // Create a new tree instance to ensure state updates
+  const newTree = JSON.parse(JSON.stringify(tree));
+
+  if (newTree.value === null) {
     return {
       value,
       children: [
@@ -111,9 +118,13 @@ export const insertNode = (
     };
   }
 
-  if (parentValue !== undefined) {
-    return insertAtSpecificPosition(tree, value, parentValue, position);
+  if (position === 'auto') {
+    return insertAutomatic(newTree, value);
   }
 
-  return insertAutomatic(tree, value);
+  if (parentValue !== undefined) {
+    return insertAtSpecificPosition(newTree, value, parentValue, position);
+  }
+
+  return newTree;
 };
