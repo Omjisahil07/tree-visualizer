@@ -18,8 +18,8 @@ const insertAtSpecificPosition = (
 
     // Found the parent node where we want to insert
     if (node.value === parentValue) {
-      // Insert as left child
-      if (position === 'left') {
+      // Insert as left child if position is left and the spot is available
+      if (position === 'left' && (!node.children[0] || node.children[0].value === null)) {
         node.children[0] = {
           value,
           children: [
@@ -28,8 +28,8 @@ const insertAtSpecificPosition = (
           ]
         };
       }
-      // Insert as right child
-      else if (position === 'right') {
+      // Insert as right child if position is right and the spot is available
+      else if (position === 'right' && (!node.children[1] || node.children[1].value === null)) {
         node.children[1] = {
           value,
           children: [
@@ -41,9 +41,9 @@ const insertAtSpecificPosition = (
       return node;
     }
 
-    // Continue searching in children
+    // Continue searching in children and create new references
     node.children = node.children.map(child => findAndInsert({ ...child }));
-    return node;
+    return { ...node };
   };
 
   return findAndInsert(newTree);
@@ -122,8 +122,10 @@ export const insertNode = (
   }
 
   if (parentValue !== undefined && (position === 'left' || position === 'right')) {
-    return insertAtSpecificPosition(newTree, value, parentValue, position);
+    const updatedTree = insertAtSpecificPosition(newTree, value, parentValue, position);
+    return { ...updatedTree }; // Return a new reference to trigger re-render
   }
 
   return newTree;
 };
+
