@@ -16,35 +16,34 @@ const insertAtSpecificPosition = (
       return node;
     }
 
+    // Found the parent node where we want to insert
     if (node.value === parentValue) {
-      const leftChild = node.children[0];
-      const rightChild = node.children[1];
-
-      if (position === 'left' && (!leftChild || leftChild.value === null)) {
-        const newNode = {
+      // Insert as left child
+      if (position === 'left') {
+        node.children[0] = {
           value,
           children: [
             { value: null, children: [] },
             { value: null, children: [] }
           ]
         };
-        node.children[0] = newNode;
-        return node;
-      } else if (position === 'right' && (!rightChild || rightChild.value === null)) {
-        const newNode = {
-          value,
-          children: [
-            { value: null, children: [] },
-            { value: null, children: [] }
-          ]
-        };
-        node.children[1] = newNode;
-        return node;
       }
+      // Insert as right child
+      else if (position === 'right') {
+        node.children[1] = {
+          value,
+          children: [
+            { value: null, children: [] },
+            { value: null, children: [] }
+          ]
+        };
+      }
+      return node;
     }
 
-    const updatedChildren = node.children.map(child => findAndInsert({ ...child }));
-    return { ...node, children: updatedChildren };
+    // Continue searching in children
+    node.children = node.children.map(child => findAndInsert({ ...child }));
+    return node;
   };
 
   return findAndInsert(newTree);
@@ -122,7 +121,7 @@ export const insertNode = (
     return insertAutomatic(newTree, value);
   }
 
-  if (parentValue !== undefined) {
+  if (parentValue !== undefined && (position === 'left' || position === 'right')) {
     return insertAtSpecificPosition(newTree, value, parentValue, position);
   }
 
