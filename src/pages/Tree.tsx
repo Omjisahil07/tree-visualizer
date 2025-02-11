@@ -1,8 +1,9 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GitFork, TreePine } from "lucide-react";
+import { GitFork, TreePine, Database } from "lucide-react";
 import { Link } from "react-router-dom";
-import {Footer }from "@/components/Footer";
+import { Footer } from "@/components/Footer";
 
 const treeTypes = [
   {
@@ -22,6 +23,18 @@ const treeTypes = [
     title: "AVL Tree",
     description: "Self-balancing binary search tree where the difference between heights of left and right subtrees cannot be more than one for all nodes.",
     link: "/tree/avl-tree"
+  },
+  {
+    icon: <Database className="w-12 h-12" />,
+    title: "B-Tree",
+    description: "A self-balancing tree data structure that maintains sorted data and allows searches, sequential access, insertions, and deletions in logarithmic time.",
+    link: "/tree/btree"
+  },
+  {
+    icon: <Database className="w-12 h-12" />,
+    title: "B+ Tree",
+    description: "A variant of B-tree that stores all data in leaf nodes and maintains all leaf nodes at the same level, optimized for systems that read and write large blocks of data.",
+    link: "/tree/bplustree"
   }
 ];
 
