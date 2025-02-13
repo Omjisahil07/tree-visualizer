@@ -1,4 +1,3 @@
-
 import { BPlusTreePseudocode } from "./components/BPlusTreePseudocode";
 import { BPlusTreeVisualization } from "./components/BPlusTreeVisualization";
 import { BPlusTreeTraversalControls } from "./components/BPlusTreeTraversalControls";
@@ -12,49 +11,10 @@ import { toast } from "sonner";
 
 const BPlusTree = () => {
   const [tree, setTree] = useState<BPlusTreeNode>({
-    keys: [10],
-    isLeaf: false,
-    next: null,
-    children: [
-      {
-        keys: [5],
-        isLeaf: false,
-        next: null,
-        children: [
-          {
-            keys: [3, 4],
-            isLeaf: true,
-            next: null,
-            children: []
-          },
-          {
-            keys: [6, 7],
-            isLeaf: true,
-            next: null,
-            children: []
-          }
-        ]
-      },
-      {
-        keys: [15],
-        isLeaf: false,
-        next: null,
-        children: [
-          {
-            keys: [11, 12],
-            isLeaf: true,
-            next: null,
-            children: []
-          },
-          {
-            keys: [16, 17],
-            isLeaf: true,
-            next: null,
-            children: []
-          }
-        ]
-      }
-    ]
+    keys: [],
+    isLeaf: true,
+    children: [],
+    next: null
   });
   const [currentStep, setCurrentStep] = useState("");
   const [currentLine, setCurrentLine] = useState(-1);

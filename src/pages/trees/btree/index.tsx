@@ -1,4 +1,3 @@
-
 import { BTreePseudocode } from "./components/BTreePseudocode";
 import { BTreeVisualization } from "./components/BTreeVisualization";
 import { BTreeTraversalControls } from "./components/BTreeTraversalControls";
@@ -12,42 +11,9 @@ import { toast } from "sonner";
 
 const BTree = () => {
   const [tree, setTree] = useState<BTreeNode>({
-    keys: [10],
-    isLeaf: false,
-    children: [
-      {
-        keys: [5],
-        isLeaf: false,
-        children: [
-          {
-            keys: [3, 4],
-            isLeaf: true,
-            children: []
-          },
-          {
-            keys: [6, 7],
-            isLeaf: true,
-            children: []
-          }
-        ]
-      },
-      {
-        keys: [15],
-        isLeaf: false,
-        children: [
-          {
-            keys: [11, 12],
-            isLeaf: true,
-            children: []
-          },
-          {
-            keys: [16, 17],
-            isLeaf: true,
-            children: []
-          }
-        ]
-      }
-    ]
+    keys: [],
+    isLeaf: true,
+    children: []
   });
   const [currentStep, setCurrentStep] = useState("");
   const [currentLine, setCurrentLine] = useState(-1);
