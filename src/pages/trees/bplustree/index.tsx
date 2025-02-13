@@ -1,15 +1,13 @@
 import { BPlusTreePseudocode } from "./components/BPlusTreePseudocode";
 import { BPlusTreeVisualization } from "./components/BPlusTreeVisualization";
 import { BPlusTreeTraversalControls } from "./components/BPlusTreeTraversalControls";
+import { BPlusTreeControls } from "./components/BPlusTreeControls";
+import { BPlusTreeHeader } from "./components/BPlusTreeHeader";
 import { useState, useCallback } from "react";
 import { Footer } from "@/components/Footer";
 import { BPlusTreeNode, TraversalType } from "./types/BPlusTreeTypes";
 import { traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./operations/BPlusTreeOperations";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus, Wand2 } from "lucide-react";
 
 const BPlusTree = () => {
   const [tree, setTree] = useState<BPlusTreeNode>({
@@ -114,23 +112,23 @@ const BPlusTree = () => {
     toast.info("Random B+ tree generation would require complex balancing rules");
   };
 
+  const handleInsert = (e: React.FormEvent) => {
+    e.preventDefault();
+    const value = parseInt(inputValue);
+    if (isNaN(value)) {
+      toast.error("Please enter a valid number");
+      return;
+    }
+    toast.info("B+ tree insertion requires rebalancing which is not implemented in this demo");
+    setInputValue("");
+  };
+
   return (
     <div className="container mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-6">B+ Tree Visualization</h1>
+      <BPlusTreeHeader onGenerateRandom={generateRandomBPlusTree} />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={generateRandomBPlusTree}
-              variant="outline"
-              className="gap-2"
-            >
-              <Wand2 className="w-4 h-4" />
-              Generate Random Tree
-            </Button>
-          </div>
-          
           <BPlusTreeVisualization
             tree={tree}
             currentNode={currentNode}
@@ -160,25 +158,11 @@ const BPlusTree = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4">Controls</h2>
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="nodeValue">Node Value</Label>
-                <Input
-                  id="nodeValue"
-                  type="number"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Enter a number"
-                />
-              </div>
-              <Button type="submit" className="w-full gap-2" disabled>
-                <Plus className="h-4 w-4" />
-                Insert Node
-              </Button>
-            </form>
-          </div>
+          <BPlusTreeControls
+            inputValue={inputValue}
+            onInputChange={setInputValue}
+            onSubmit={handleInsert}
+          />
 
           <BPlusTreePseudocode
             currentStep={currentStep}

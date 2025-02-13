@@ -1,15 +1,13 @@
 import { BTreePseudocode } from "./components/BTreePseudocode";
 import { BTreeVisualization } from "./components/BTreeVisualization";
 import { BTreeTraversalControls } from "./components/BTreeTraversalControls";
+import { BTreeControls } from "./components/BTreeControls";
+import { BTreeHeader } from "./components/BTreeHeader";
 import { useState, useCallback } from "react";
 import { Footer } from "@/components/Footer";
 import { BTreeNode, TraversalType } from "./types/BTreeTypes";
 import { traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./operations/BTreeOperations";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus, Wand2 } from "lucide-react";
 
 const BTree = () => {
   const [tree, setTree] = useState<BTreeNode>({
@@ -104,32 +102,30 @@ const BTree = () => {
   };
 
   const handleDelete = (value: number) => {
-    // Since full B-tree deletion is complex, we'll just show a toast for now
     toast.info("B-tree deletion requires rebalancing which is not implemented in this demo");
   };
 
   const generateRandomBTree = () => {
-    // For demo purposes, we'll keep the current tree structure
     toast.info("Random B-tree generation would require complex balancing rules");
+  };
+
+  const handleInsert = (e: React.FormEvent) => {
+    e.preventDefault();
+    const value = parseInt(inputValue);
+    if (isNaN(value)) {
+      toast.error("Please enter a valid number");
+      return;
+    }
+    toast.info("B-tree insertion requires rebalancing which is not implemented in this demo");
+    setInputValue("");
   };
 
   return (
     <div className="container mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-6">B-Tree Visualization</h1>
+      <BTreeHeader onGenerateRandom={generateRandomBTree} />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={generateRandomBTree}
-              variant="outline"
-              className="gap-2"
-            >
-              <Wand2 className="w-4 h-4" />
-              Generate Random Tree
-            </Button>
-          </div>
-          
           <BTreeVisualization
             tree={tree}
             currentNode={currentNode}
@@ -159,25 +155,11 @@ const BTree = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4">Controls</h2>
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="nodeValue">Node Value</Label>
-                <Input
-                  id="nodeValue"
-                  type="number"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Enter a number"
-                />
-              </div>
-              <Button type="submit" className="w-full gap-2" disabled>
-                <Plus className="h-4 w-4" />
-                Insert Node
-              </Button>
-            </form>
-          </div>
+          <BTreeControls
+            inputValue={inputValue}
+            onInputChange={setInputValue}
+            onSubmit={handleInsert}
+          />
 
           <BTreePseudocode
             currentStep={currentStep}
