@@ -1,3 +1,4 @@
+
 import { BPlusTreePseudocode } from "./components/BPlusTreePseudocode";
 import { BPlusTreeVisualization } from "./components/BPlusTreeVisualization";
 import { BPlusTreeTraversalControls } from "./components/BPlusTreeTraversalControls";
@@ -6,7 +7,7 @@ import { BPlusTreeHeader } from "./components/BPlusTreeHeader";
 import { useState, useCallback } from "react";
 import { Footer } from "@/components/Footer";
 import { BPlusTreeNode, TraversalType } from "./types/BPlusTreeTypes";
-import { traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./operations/BPlusTreeOperations";
+import { traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder, insertNode } from "./operations/BPlusTreeOperations";
 import { toast } from "sonner";
 
 const BPlusTree = () => {
@@ -109,7 +110,30 @@ const BPlusTree = () => {
   };
 
   const generateRandomBPlusTree = () => {
-    toast.info("Random B+ tree generation would require complex balancing rules");
+    const newTree: BPlusTreeNode = {
+      keys: [],
+      children: [],
+      isLeaf: true,
+      next: null
+    };
+
+    // Generate random numbers between 1 and 100
+    const numNodes = Math.floor(Math.random() * 8) + 3; // 3 to 10 nodes
+    const numbers = new Set<number>();
+    
+    while (numbers.size < numNodes) {
+      numbers.add(Math.floor(Math.random() * 100) + 1);
+    }
+
+    const sortedNumbers = Array.from(numbers).sort((a, b) => a - b);
+    let currentTree = newTree;
+
+    sortedNumbers.forEach(num => {
+      currentTree = insertNode(currentTree, num) as BPlusTreeNode;
+    });
+
+    setTree(currentTree);
+    toast.success("Generated new random B+ tree");
   };
 
   const handleInsert = (e: React.FormEvent) => {
@@ -119,8 +143,15 @@ const BPlusTree = () => {
       toast.error("Please enter a valid number");
       return;
     }
-    toast.info("B+ tree insertion requires rebalancing which is not implemented in this demo");
-    setInputValue("");
+
+    try {
+      const updatedTree = insertNode(tree, value);
+      setTree(updatedTree as BPlusTreeNode);
+      toast.success(`Inserted node with value ${value}`);
+      setInputValue("");
+    } catch (error) {
+      toast.error("Failed to insert node");
+    }
   };
 
   return (
