@@ -1,5 +1,3 @@
-
-// Similar to BFS index.tsx but with DFS-specific line mapping
 import { useState, useCallback } from "react";
 import { Graph, GraphNode } from "../types/GraphTypes";
 import { DFSVisualization } from "./components/DFSVisualization";
@@ -84,22 +82,31 @@ const DFS = () => {
       ...prev,
       nodes: [...prev.nodes, newNode]
     }));
-    toast.success(`Added node with value ${value}`);
+    toast.success(`Added node with value ${value}. Node ID: ${newNode.id}`);
   };
 
   const addEdge = (from: number, to: number) => {
+    // Validate that nodes exist
+    if (!graph.nodes.find(n => n.id === from) || !graph.nodes.find(n => n.id === to)) {
+      toast.error(`Invalid node IDs. Available IDs: ${graph.nodes.map(n => n.id).join(', ')}`);
+      return;
+    }
+
     if (from === to) {
       toast.error("Cannot create self-loop");
       return;
     }
+
+    // Check if edge already exists
     if (graph.edges.some(([f, t]) => (f === from && t === to) || (f === to && t === from))) {
       toast.error("Edge already exists");
       return;
     }
-    setGraph(prev => ({
-      ...prev,
-      edges: [...prev.edges, [from, to]],
-      nodes: prev.nodes.map(node => {
+
+    // Add edge safely
+    setGraph(prev => {
+      const newEdges = [...prev.edges, [from, to]];
+      const newNodes = prev.nodes.map(node => {
         if (node.id === from) {
           return { ...node, neighbors: [...node.neighbors, to] };
         }
@@ -107,9 +114,14 @@ const DFS = () => {
           return { ...node, neighbors: [...node.neighbors, from] };
         }
         return node;
-      })
-    }));
-    toast.success(`Added edge from ${from} to ${to}`);
+      });
+      return {
+        edges: newEdges,
+        nodes: newNodes
+      };
+    });
+
+    toast.success(`Added edge from node ${from} to node ${to}`);
   };
 
   const startTraversal = async () => {
