@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { Graph, GraphNode } from "../types/GraphTypes";
 import { BFSVisualization } from "./components/BFSVisualization";
@@ -62,8 +63,14 @@ const BFS = () => {
     setCurrentNode(nodeId);
     setCurrentStep(step);
     setVisitedNodes(prev => !prev.includes(nodeId) ? [...prev, nodeId] : prev);
-    setCurrentLine(prev => prev + 1);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    setCurrentLine(prev => {
+      // Map steps to pseudocode lines
+      if (step.includes("Starting BFS")) return 0;
+      if (step.includes("Processing node")) return 5;
+      if (step.includes("Discovered node")) return 8;
+      return prev;
+    });
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Slower animation
   }, []);
 
   const addNode = (value: number) => {
@@ -112,8 +119,13 @@ const BFS = () => {
     setIsTraversing(true);
     setVisitedNodes([]);
     setCurrentNode(null);
-    setCurrentLine(0);
-    await bfsTraversal(graph, startNode || 0, handleTraversalStep);
+    setCurrentLine(-1);
+    try {
+      await bfsTraversal(graph, startNode || 0, handleTraversalStep);
+      toast.success("Traversal complete!");
+    } catch (error) {
+      toast.error("An error occurred during traversal");
+    }
     setIsTraversing(false);
     setCurrentLine(-1);
     setCurrentStep("Traversal complete");

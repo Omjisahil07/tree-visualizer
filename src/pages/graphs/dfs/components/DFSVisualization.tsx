@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { Graph } from '../../types/GraphTypes';
@@ -15,9 +14,10 @@ export const DFSVisualization = ({ graph, currentNode, visitedNodes }: DFSVisual
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const width = 800;
-    const height = 400;
-    const nodeRadius = 20;
+    const containerWidth = svgRef.current.parentElement?.clientWidth || 800;
+    const width = containerWidth;
+    const height = 600;
+    const nodeRadius = 25;
 
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -39,9 +39,10 @@ export const DFSVisualization = ({ graph, currentNode, visitedNodes }: DFSVisual
     const simulation = d3.forceSimulation(graph.nodes)
       .force("link", d3.forceLink(graph.edges)
         .id((d: any) => d.id)
-        .distance(100))
-      .force("charge", d3.forceManyBody().strength(-500))
-      .force("center", d3.forceCenter(width / 2, height / 2));
+        .distance(120))
+      .force("charge", d3.forceManyBody().strength(-800))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("collision", d3.forceCollide().radius(nodeRadius * 2));
 
     // Draw edges
     const edges = svg.selectAll("line")
@@ -77,7 +78,8 @@ export const DFSVisualization = ({ graph, currentNode, visitedNodes }: DFSVisual
         d.id === currentNode || visitedNodes.includes(d.id) 
           ? "white" 
           : "currentColor"
-      );
+      )
+      .style("font-size", "16px");
 
     simulation.on("tick", () => {
       edges
@@ -112,9 +114,11 @@ export const DFSVisualization = ({ graph, currentNode, visitedNodes }: DFSVisual
   }, [graph, currentNode, visitedNodes]);
 
   return (
-    <svg
-      ref={svgRef}
-      className="w-full h-[400px] border border-gray-200 rounded-lg bg-white shadow-lg"
-    />
+    <div className="relative w-full border border-border rounded-lg bg-white shadow-sm p-4">
+      <svg
+        ref={svgRef}
+        className="w-full h-[600px]"
+      />
+    </div>
   );
 };

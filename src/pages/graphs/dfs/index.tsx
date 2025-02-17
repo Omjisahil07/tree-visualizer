@@ -1,3 +1,5 @@
+
+// Similar to BFS index.tsx but with DFS-specific line mapping
 import { useState, useCallback } from "react";
 import { Graph, GraphNode } from "../types/GraphTypes";
 import { DFSVisualization } from "./components/DFSVisualization";
@@ -62,8 +64,14 @@ const DFS = () => {
     setCurrentNode(nodeId);
     setCurrentStep(step);
     setVisitedNodes(prev => !prev.includes(nodeId) ? [...prev, nodeId] : prev);
-    setCurrentLine(prev => prev + 1);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    setCurrentLine(prev => {
+      // Map steps to pseudocode lines
+      if (step.includes("Visiting node")) return 1;
+      if (step.includes("Moving to neighbor")) return 3;
+      if (step.includes("Backtracking")) return 4;
+      return prev;
+    });
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Slower animation
   }, []);
 
   const addNode = (value: number) => {
