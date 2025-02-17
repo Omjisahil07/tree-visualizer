@@ -35,9 +35,15 @@ export const DFSVisualization = ({ graph, currentNode, visitedNodes }: DFSVisual
       return;
     }
 
+    // Convert edges to objects with source and target properties
+    const links = graph.edges.map(edge => ({
+      source: graph.nodes.find(n => n.id === edge[0]),
+      target: graph.nodes.find(n => n.id === edge[1])
+    }));
+
     // Create force simulation
     const simulation = d3.forceSimulation(graph.nodes)
-      .force("link", d3.forceLink(graph.edges)
+      .force("link", d3.forceLink(links)
         .id((d: any) => d.id)
         .distance(120))
       .force("charge", d3.forceManyBody().strength(-800))
@@ -46,7 +52,7 @@ export const DFSVisualization = ({ graph, currentNode, visitedNodes }: DFSVisual
 
     // Draw edges
     const edges = svg.selectAll("line")
-      .data(graph.edges)
+      .data(links)
       .join("line")
       .attr("stroke", "hsl(var(--primary))")
       .attr("stroke-width", 2);
@@ -83,10 +89,10 @@ export const DFSVisualization = ({ graph, currentNode, visitedNodes }: DFSVisual
 
     simulation.on("tick", () => {
       edges
-        .attr("x1", d => (d[0] as any).x)
-        .attr("y1", d => (d[0] as any).y)
-        .attr("x2", d => (d[1] as any).x)
-        .attr("y2", d => (d[1] as any).y);
+        .attr("x1", d => (d.source as any).x)
+        .attr("y1", d => (d.source as any).y)
+        .attr("x2", d => (d.target as any).x)
+        .attr("y2", d => (d.target as any).y);
 
       nodes.attr("transform", d => `translate(${d.x},${d.y})`);
     });
