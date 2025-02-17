@@ -6,11 +6,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Tree from "./pages/Tree";
+import Graph from "./pages/Graph";
 import BSTTree from "./pages/trees/bst-tree";
 import BinaryTree from "./pages/trees/binary-tree";
 import AVLTree from "./pages/trees/avl-tree";
-import BTree from "./pages/trees/btree";
 import BPlusTree from "./pages/trees/bplustree";
+import DFS from "./pages/graphs/dfs";
+import BFS from "./pages/graphs/bfs";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 
@@ -28,8 +30,10 @@ const App = () => (
           <Route path="/tree/binary-tree" element={<BinaryTree />} />
           <Route path="/tree/bst-tree" element={<BSTTree/>} />
           <Route path="/tree/avl-tree" element={<AVLTree />} />
-          <Route path="/tree/btree" element={<BTree />} />
           <Route path="/tree/bplustree" element={<BPlusTree />} />
+          <Route path="/graph" element={<Graph />} />
+          <Route path="/graph/dfs" element={<DFS />} />
+          <Route path="/graph/bfs" element={<BFS />} />
           <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
