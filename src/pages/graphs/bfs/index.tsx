@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { Graph, GraphNode } from "../types/GraphTypes";
 import { BFSVisualization } from "./components/BFSVisualization";
@@ -7,6 +6,8 @@ import { BFSPseudocode } from "./components/BFSPseudocode";
 import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
 import { bfsTraversal } from "./operations/BFSOperations";
+import { Button } from "@/components/ui/button";
+import { Wand2 } from "lucide-react";
 
 const BFS = () => {
   const [graph, setGraph] = useState<Graph>({ nodes: [], edges: [] });
@@ -17,6 +18,45 @@ const BFS = () => {
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [startNode, setStartNode] = useState<number | null>(null);
+
+  const generateRandomGraph = () => {
+    const numNodes = Math.floor(Math.random() * 4) + 3; // 3-6 nodes
+    const newNodes: GraphNode[] = [];
+    const newEdges: [number, number][] = [];
+    
+    // Create nodes
+    for (let i = 0; i < numNodes; i++) {
+      newNodes.push({
+        id: i,
+        value: Math.floor(Math.random() * 100),
+        neighbors: []
+      });
+    }
+    
+    // Create random edges (ensuring connected graph)
+    for (let i = 1; i < numNodes; i++) {
+      const targetNode = Math.floor(Math.random() * i);
+      newEdges.push([i, targetNode]);
+      newNodes[i].neighbors.push(targetNode);
+      newNodes[targetNode].neighbors.push(i);
+    }
+    
+    // Add a few more random edges
+    for (let i = 0; i < numNodes; i++) {
+      if (Math.random() < 0.3) {
+        let target = Math.floor(Math.random() * numNodes);
+        if (target !== i && !newNodes[i].neighbors.includes(target)) {
+          newEdges.push([i, target]);
+          newNodes[i].neighbors.push(target);
+          newNodes[target].neighbors.push(i);
+        }
+      }
+    }
+    
+    setGraph({ nodes: newNodes, edges: newEdges });
+    setStartNode(0);
+    toast.success("Generated random graph");
+  };
 
   const handleTraversalStep = useCallback(async (nodeId: number, step: string) => {
     setCurrentNode(nodeId);
@@ -65,15 +105,15 @@ const BFS = () => {
   };
 
   const startTraversal = async () => {
-    if (startNode === null) {
-      toast.error("Please select a start node");
+    if (graph.nodes.length === 0) {
+      toast.error("Please add nodes to the graph first");
       return;
     }
     setIsTraversing(true);
     setVisitedNodes([]);
     setCurrentNode(null);
     setCurrentLine(0);
-    await bfsTraversal(graph, startNode, handleTraversalStep);
+    await bfsTraversal(graph, startNode || 0, handleTraversalStep);
     setIsTraversing(false);
     setCurrentLine(-1);
     setCurrentStep("Traversal complete");
@@ -81,10 +121,34 @@ const BFS = () => {
 
   return (
     <div className="container mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-6">Breadth First Search (BFS)</h1>
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4">Breadth First Search (BFS)</h1>
+        <p className="text-muted-foreground text-lg mb-4">
+          BFS explores all vertices at the current depth before moving to vertices at the next depth level.
+        </p>
+        <div className="bg-muted p-4 rounded-lg max-w-2xl mx-auto text-sm">
+          <strong>Instructions:</strong>
+          <ul className="list-disc list-inside mt-2 space-y-1 text-left">
+            <li>Add nodes to the graph using the controls</li>
+            <li>Connect nodes by adding edges between them</li>
+            <li>Click "Start BFS" to visualize the traversal</li>
+            <li>Or use "Generate Random Graph" for a quick demo</li>
+          </ul>
+        </div>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
+          <div className="flex justify-end mb-4">
+            <Button
+              onClick={generateRandomGraph}
+              variant="outline"
+              className="gap-2"
+            >
+              <Wand2 className="w-4 h-4" />
+              Generate Random Graph
+            </Button>
+          </div>
           <BFSVisualization
             graph={graph}
             currentNode={currentNode}

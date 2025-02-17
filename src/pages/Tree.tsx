@@ -26,12 +26,6 @@ const treeTypes = [
   },
   {
     icon: <Database className="w-12 h-12" />,
-    title: "B-Tree",
-    description: "A self-balancing tree data structure that maintains sorted data and allows searches, sequential access, insertions, and deletions in logarithmic time.",
-    link: "/tree/btree"
-  },
-  {
-    icon: <Database className="w-12 h-12" />,
     title: "B+ Tree",
     description: "A variant of B-tree that stores all data in leaf nodes and maintains all leaf nodes at the same level, optimized for systems that read and write large blocks of data.",
     link: "/tree/bplustree"
