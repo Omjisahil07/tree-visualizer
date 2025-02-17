@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { Graph, GraphNode } from "../types/GraphTypes";
 import { BFSVisualization } from "./components/BFSVisualization";
@@ -103,9 +104,9 @@ const BFS = () => {
       return;
     }
 
-    // Add edge safely
+    // Add edge safely with proper tuple type
     setGraph(prev => {
-      const newEdges = [...prev.edges, [from, to]];
+      const newEdge: [number, number] = [from, to];
       const newNodes = prev.nodes.map(node => {
         if (node.id === from) {
           return { ...node, neighbors: [...node.neighbors, to] };
@@ -116,8 +117,8 @@ const BFS = () => {
         return node;
       });
       return {
-        edges: newEdges,
-        nodes: newNodes
+        nodes: newNodes,
+        edges: [...prev.edges, newEdge]
       };
     });
 
