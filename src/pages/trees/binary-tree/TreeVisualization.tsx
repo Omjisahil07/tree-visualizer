@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { TreeNode } from './TreeNode';
@@ -67,7 +68,7 @@ export const TreeVisualization = ({
             .y((d: any) => d.y));
       });
 
-    // Draw links with primary color and animation
+    // Draw links with slower animation
     g.selectAll(".link")
       .data(treeData.links())
       .join("path")
@@ -80,7 +81,7 @@ export const TreeVisualization = ({
         .y((d: any) => d.y))
       .style("opacity", 0)
       .transition()
-      .duration(500)
+      .duration(1000)
       .style("opacity", 1);
 
     const nodes = g.selectAll(".node")
@@ -89,7 +90,7 @@ export const TreeVisualization = ({
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
-    // Add circles to nodes with dynamic colors and animation
+    // Add circles to nodes with slower animation
     nodes.append("circle")
       .attr("r", 0)
       .attr("fill", (d: any) => {
@@ -99,12 +100,12 @@ export const TreeVisualization = ({
       })
       .attr("stroke", "hsl(var(--primary))")
       .attr("stroke-width", 2)
-      .attr("class", "transition-colors duration-300")
+      .attr("class", "transition-colors duration-500")
       .transition()
-      .duration(500)
+      .duration(1000)
       .attr("r", 25);
 
-    // Add text to nodes with animation
+    // Add text to nodes with slower animation
     nodes.append("text")
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
@@ -112,27 +113,11 @@ export const TreeVisualization = ({
       .style("opacity", 0)
       .text((d: any) => d.data.value)
       .transition()
-      .duration(500)
+      .duration(1000)
       .style("opacity", 1);
 
     // Add drag behavior to nodes
     nodes.call(drag as any);
-
-    // Add click handler for node update
-    nodes.on("click", (event, d: any) => {
-      event.preventDefault();
-      if (d.data.value !== null) {
-        onNodeClick(d.data.value);
-      }
-    });
-
-    // Add delete functionality on double click
-    nodes.on("dblclick", (event, d: any) => {
-      event.preventDefault();
-      if (d.data.value !== null) {
-        onNodeDelete(d.data.value);
-      }
-    });
 
   }, [tree, onNodeDelete, onNodeClick, onNodeHighlight, currentNode, visitedNodes]);
 
