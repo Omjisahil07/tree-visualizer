@@ -90,7 +90,7 @@ export const AVLVisualization = ({
         .y((d: any) => d.y))
       .style("opacity", 0)
       .transition()
-      .duration(500)
+      .duration(300)
       .style("opacity", 1);
 
     // Create node groups
@@ -104,26 +104,40 @@ export const AVLVisualization = ({
     nodes.append("circle")
       .attr("r", 0)
       .attr("fill", (d: any) => {
-        if (d.data.value === currentNode) return "hsl(var(--primary))";
-        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary) / 0.8)";
+        if (d.data.value === currentNode) return "white";
+        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary))";
         return "white";
       })
       .attr("stroke", "hsl(var(--primary))")
-      .attr("stroke-width", 2)
-      .attr("class", "transition-colors duration-300")
+      .attr("stroke-width", (d: any) => {
+        if (d.data.value === currentNode) return 3;
+        return 2;
+      })
+      .attr("class", (d: any) => {
+        if (d.data.value === currentNode) {
+          return "transition-all duration-300 animate-[pulse_1.5s_ease-in-out_infinite]";
+        }
+        return "transition-colors duration-300";
+      })
+      .style("filter", (d: any) => {
+        if (d.data.value === currentNode) {
+          return "drop-shadow(0 0 6px hsl(var(--primary)))";
+        }
+        return "none";
+      })
       .transition()
-      .duration(500)
-      .attr("r", nodeRadius);
+      .duration(300)
+      .attr("r", 35);
 
     // Add node values
     nodes.append("text")
-      .attr("dy", "-0.3em")
+      .attr("dy", ".35em")
       .attr("text-anchor", "middle")
       .attr("class", "text-sm font-medium")
       .style("opacity", 0)
       .text((d: any) => d.data.value)
       .transition()
-      .duration(500)
+      .duration(300)
       .style("opacity", 1);
 
     // Add balance factors
@@ -134,7 +148,7 @@ export const AVLVisualization = ({
       .style("opacity", 0)
       .text((d: any) => `BF: ${d.data.balanceFactor || 0}`)
       .transition()
-      .duration(500)
+      .duration(300)
       .style("opacity", 1);
 
     // Enable node dragging
