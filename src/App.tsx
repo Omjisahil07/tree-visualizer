@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Tree from "./pages/Tree";
 import Graph from "./pages/Graph";
+import LinkedList from "./pages/LinkedList";
 import BSTTree from "./pages/trees/bst-tree";
 import BinaryTree from "./pages/trees/binary-tree";
 import AVLTree from "./pages/trees/avl-tree";
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/graph" element={<Graph />} />
           <Route path="/graph/dfs" element={<DFS />} />
           <Route path="/graph/bfs" element={<BFS />} />
+          <Route path="/linked-list" element={<LinkedList />} />
           <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

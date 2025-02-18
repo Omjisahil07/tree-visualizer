@@ -1,6 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
 
 export const Hero = () => {
   return (
@@ -13,16 +10,6 @@ export const Hero = () => {
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
           Build, visualize, and understand complex data structures through an intuitive interface. Perfect for learning and teaching.
         </p>
-        <div className="flex gap-4 justify-center">
-          <Button size="lg" className="gap-2" asChild>
-            <Link to="/tree">
-              Get Started <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Button>
-          <Button size="lg" variant="outline">
-            View Demo
-          </Button>
-        </div>
       </div>
     </div>
   );
