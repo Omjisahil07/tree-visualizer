@@ -1,7 +1,7 @@
 
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { TreeNode } from './TreeNode';
+import { TreeNode, createNode } from '@/pages/trees/binary-tree/TreeNode';
 
 interface TreeVisualizationProps {
   tree: TreeNode;
