@@ -68,7 +68,7 @@ export const TreeVisualization = ({
             .y((d: any) => d.y));
       });
 
-    // Draw links
+    // Draw links with slower animation
     g.selectAll(".link")
       .data(treeData.links())
       .join("path")
@@ -90,40 +90,22 @@ export const TreeVisualization = ({
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
-    // Add circles to nodes with updated highlighting logic
+    // Add circles to nodes with slower animation
     nodes.append("circle")
       .attr("r", 0)
       .attr("fill", (d: any) => {
-        if (d.data.value === currentNode) return "white"; // Currently traversing node
-        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary))"; // Traversed nodes
-        return "white"; // Non-traversed nodes
-      })
-      .attr("stroke", (d: any) => {
         if (d.data.value === currentNode) return "hsl(var(--primary))";
-        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary))";
-        return "hsl(var(--primary))";
+        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary) / 0.8)";
+        return "white";
       })
-      .attr("stroke-width", (d: any) => {
-        if (d.data.value === currentNode) return 3; // Thicker border for current node
-        return 2;
-      })
-      .attr("class", (d: any) => {
-        if (d.data.value === currentNode) {
-          return "transition-all duration-500 animate-pulse"; // Add glow effect to current node
-        }
-        return "transition-colors duration-500";
-      })
-      .style("filter", (d: any) => {
-        if (d.data.value === currentNode) {
-          return "drop-shadow(0 0 8px hsl(var(--primary)))"; // Add glow effect
-        }
-        return "none";
-      })
+      .attr("stroke", "hsl(var(--primary))")
+      .attr("stroke-width", 2)
+      .attr("class", "transition-colors duration-500")
       .transition()
       .duration(1000)
       .attr("r", 25);
 
-    // Add text to nodes
+    // Add text to nodes with slower animation
     nodes.append("text")
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
