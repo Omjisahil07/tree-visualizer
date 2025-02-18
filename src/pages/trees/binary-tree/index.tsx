@@ -3,8 +3,6 @@ import { useState, useCallback } from "react";
 import { TreeVisualization } from "./TreeVisualization";
 import { BinaryTreeNode, InsertPosition } from "./types/BinaryTreeTypes";
 import { insertNode } from "./operations/insert/insertNode";
-import { deleteNode } from "./operations/delete/deleteNode";
-import { updateNode } from "./operations/update/updateNode";
 import { 
   traverseInOrder,
   traversePreOrder,
@@ -13,8 +11,6 @@ import {
 import { TraversalPseudocode } from "./components/TraversalPseudocode";
 import { VisitationSequence } from "./components/VisitationSequence";
 import { TraversalControls } from "./components/TraversalControls";
-import { Instructions } from "./components/Instructions";
-import { TreeForm } from "./components/TreeForm";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
@@ -22,7 +18,6 @@ import { toast } from "sonner";
 
 const BinaryTree = () => {
   const [tree, setTree] = useState<BinaryTreeNode>({ value: null, children: [] });
-  const [selectedNode, setSelectedNode] = useState<number | null>(null);
   const [currentNode, setCurrentNode] = useState<number | null>(null);
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [isTraversing, setIsTraversing] = useState(false);
@@ -63,17 +58,6 @@ const BinaryTree = () => {
     }
   };
 
-  const handleNodeClick = (value: number) => {
-    setSelectedNode(value);
-  };
-
-  const handleDelete = (value: number) => {
-    setTree(prevTree => deleteNode(prevTree, value));
-    if (selectedNode === value) {
-      setSelectedNode(null);
-    }
-  };
-
   const pauseTraversal = () => {
     setIsPaused(true);
     setIsTraversing(false);
@@ -110,8 +94,6 @@ const BinaryTree = () => {
     <div className="container mx-auto py-12">
       <h1 className="text-4xl font-bold mb-6">Binary Tree Visualization</h1>
       
-      <Instructions />
-      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <div className="flex justify-end mb-4">
@@ -126,8 +108,8 @@ const BinaryTree = () => {
           </div>
           <TreeVisualization
             tree={tree}
-            onNodeDelete={handleDelete}
-            onNodeClick={handleNodeClick}
+            onNodeDelete={() => {}}
+            onNodeClick={() => {}}
             onNodeHighlight={setCurrentNode}
             currentNode={currentNode}
             visitedNodes={visitedNodes}
@@ -150,15 +132,6 @@ const BinaryTree = () => {
         </div>
         
         <div className="space-y-6">
-          <TreeForm
-            onInsert={(value, position) => setTree(prevTree => insertNode(prevTree, value, position))}
-            onUpdate={(oldValue, newValue) => {
-              setTree(prevTree => updateNode(prevTree, oldValue, newValue));
-              setSelectedNode(null);
-            }}
-            selectedNode={selectedNode}
-          />
-
           <TraversalPseudocode
             currentStep={currentStep}
             currentLine={currentLine}
