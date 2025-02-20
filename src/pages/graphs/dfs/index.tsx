@@ -14,10 +14,12 @@ const DFS = () => {
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [isTraversing, setIsTraversing] = useState(false);
   const [currentStep, setCurrentStep] = useState("");
+  const [currentLine, setCurrentLine] = useState(0);
 
-  const handleTraversalStep = async (nodeId: number, step: string) => {
+  const handleTraversalStep = async (nodeId: number, step: string, line: number) => {
     setCurrentNode(nodeId);
     setCurrentStep(step);
+    setCurrentLine(line);
     setVisitedNodes(prev => [...prev, nodeId]);
     await new Promise(resolve => setTimeout(resolve, 1000));
   };
@@ -26,6 +28,7 @@ const DFS = () => {
     setIsTraversing(true);
     setVisitedNodes([]);
     setCurrentNode(null);
+    setCurrentLine(0);
     await dfsTraversal(graph, startNodeId, handleTraversalStep);
     setIsTraversing(false);
     setCurrentNode(null);
@@ -45,7 +48,7 @@ const DFS = () => {
           
           <div className="space-y-4">
             <DFSControls
-              onStartTraversal={startTraversal}
+              onStartTraversal={(value) => startTraversal(value)}
               isTraversing={isTraversing}
               graph={graph}
               setGraph={setGraph}
@@ -57,6 +60,7 @@ const DFS = () => {
         <div>
           <DFSPseudocode
             currentStep={currentStep}
+            currentLine={currentLine}
           />
         </div>
       </div>
