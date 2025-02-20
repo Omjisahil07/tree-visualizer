@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { Graph, GraphNode } from "../types/GraphTypes";
 import { BFSVisualization } from "./components/BFSVisualization";
@@ -125,6 +124,47 @@ const BFS = () => {
     toast.success(`Added edge from node ${from} to node ${to}`);
   };
 
+  const deleteNode = (nodeId: number) => {
+    setGraph(prev => {
+      // Remove all edges connected to this node
+      const newEdges = prev.edges.filter(([from, to]) => 
+        from !== nodeId && to !== nodeId
+      );
+
+      // Remove the node and update neighbors of remaining nodes
+      const newNodes = prev.nodes
+        .filter(node => node.id !== nodeId)
+        .map(node => ({
+          ...node,
+          neighbors: node.neighbors.filter(n => n !== nodeId)
+        }));
+
+      return {
+        nodes: newNodes,
+        edges: newEdges
+      };
+    });
+
+    // Reset start node if it was deleted
+    if (startNode === nodeId) {
+      setStartNode(null);
+    }
+
+    toast.success(`Deleted node ${nodeId}`);
+  };
+
+  const updateNode = (nodeId: number, newValue: number) => {
+    setGraph(prev => ({
+      ...prev,
+      nodes: prev.nodes.map(node =>
+        node.id === nodeId
+          ? { ...node, value: newValue }
+          : node
+      )
+    }));
+    toast.success(`Updated node ${nodeId} to value ${newValue}`);
+  };
+
   const startTraversal = async () => {
     if (graph.nodes.length === 0) {
       toast.error("Please add nodes to the graph first");
@@ -190,6 +230,8 @@ const BFS = () => {
           <BFSControls
             onAddNode={(value) => addNode(parseInt(value))}
             onAddEdge={(from, to) => addEdge(parseInt(from), parseInt(to))}
+            onDeleteNode={deleteNode}
+            onUpdateNode={updateNode}
             onStartTraversal={startTraversal}
             isTraversing={isTraversing}
             nodes={graph.nodes}

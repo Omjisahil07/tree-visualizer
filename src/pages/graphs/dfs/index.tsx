@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { Graph, GraphNode } from "../types/GraphTypes";
 import { DFSVisualization } from "./components/DFSVisualization";
@@ -140,6 +139,47 @@ const DFS = () => {
     setCurrentStep("Traversal complete");
   };
 
+  const deleteNode = (nodeId: number) => {
+    setGraph(prev => {
+      // Remove all edges connected to this node
+      const newEdges = prev.edges.filter(([from, to]) => 
+        from !== nodeId && to !== nodeId
+      );
+
+      // Remove the node and update neighbors of remaining nodes
+      const newNodes = prev.nodes
+        .filter(node => node.id !== nodeId)
+        .map(node => ({
+          ...node,
+          neighbors: node.neighbors.filter(n => n !== nodeId)
+        }));
+
+      return {
+        nodes: newNodes,
+        edges: newEdges
+      };
+    });
+
+    // Reset start node if it was deleted
+    if (startNode === nodeId) {
+      setStartNode(null);
+    }
+
+    toast.success(`Deleted node ${nodeId}`);
+  };
+
+  const updateNode = (nodeId: number, newValue: number) => {
+    setGraph(prev => ({
+      ...prev,
+      nodes: prev.nodes.map(node =>
+        node.id === nodeId
+          ? { ...node, value: newValue }
+          : node
+      )
+    }));
+    toast.success(`Updated node ${nodeId} to value ${newValue}`);
+  };
+
   return (
     <div className="container mx-auto py-12">
       <div className="text-center mb-12">
@@ -185,6 +225,8 @@ const DFS = () => {
           <DFSControls
             onAddNode={(value) => addNode(parseInt(value))}
             onAddEdge={(from, to) => addEdge(parseInt(from), parseInt(to))}
+            onDeleteNode={deleteNode}
+            onUpdateNode={updateNode}
             onStartTraversal={startTraversal}
             isTraversing={isTraversing}
             nodes={graph.nodes}

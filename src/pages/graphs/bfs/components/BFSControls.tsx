@@ -1,12 +1,16 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GraphNode } from "../../types/GraphTypes";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface BFSControlsProps {
   onAddNode: (value: string) => void;
   onAddEdge: (from: string, to: string) => void;
+  onDeleteNode: (id: number) => void;
+  onUpdateNode: (id: number, newValue: number) => void;
   onStartTraversal: () => void;
   isTraversing: boolean;
   nodes: GraphNode[];
@@ -17,6 +21,8 @@ interface BFSControlsProps {
 export const BFSControls = ({
   onAddNode,
   onAddEdge,
+  onDeleteNode,
+  onUpdateNode,
   onStartTraversal,
   isTraversing,
   nodes,
@@ -26,6 +32,8 @@ export const BFSControls = ({
   const [nodeValue, setNodeValue] = useState("");
   const [fromNode, setFromNode] = useState("");
   const [toNode, setToNode] = useState("");
+  const [selectedNode, setSelectedNode] = useState<string>("");
+  const [newValue, setNewValue] = useState("");
 
   const handleAddNode = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +49,23 @@ export const BFSControls = ({
       onAddEdge(fromNode, toNode);
       setFromNode("");
       setToNode("");
+    }
+  };
+
+  const handleDeleteNode = () => {
+    if (selectedNode) {
+      onDeleteNode(parseInt(selectedNode));
+      setSelectedNode("");
+      toast.success("Node deleted successfully");
+    }
+  };
+
+  const handleUpdateNode = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedNode && newValue) {
+      onUpdateNode(parseInt(selectedNode), parseInt(newValue));
+      setNewValue("");
+      toast.success("Node updated successfully");
     }
   };
 
@@ -78,6 +103,69 @@ export const BFSControls = ({
           </div>
           <Button type="submit" className="w-full">Add Edge</Button>
         </form>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-medium mb-4">Delete Node</h3>
+        <div className="space-y-2">
+          <Select
+            value={selectedNode}
+            onValueChange={setSelectedNode}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select node to delete" />
+            </SelectTrigger>
+            <SelectContent>
+              {nodes.map((node) => (
+                <SelectItem key={node.id} value={node.id.toString()}>
+                  Node {node.value}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button 
+            onClick={handleDeleteNode} 
+            className="w-full"
+            variant="destructive"
+            disabled={!selectedNode}
+          >
+            Delete Node
+          </Button>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-medium mb-4">Update Node</h3>
+        <form onSubmit={handleUpdateNode} className="space-y-2">
+          <Select
+            value={selectedNode}
+            onValueChange={setSelectedNode}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select node to update" />
+            </SelectTrigger>
+            <SelectContent>
+              {nodes.map((node) => (
+                <SelectItem key={node.id} value={node.id.toString()}>
+                  Node {node.value}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            type="number"
+            placeholder="New value"
+            value={newValue}
+            onChange={(e) => setNewValue(e.target.value)}
+          />
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={!selectedNode || !newValue}
+          >
+            Update Node
+          </Button>
+        </div>
       </div>
 
       <div>
