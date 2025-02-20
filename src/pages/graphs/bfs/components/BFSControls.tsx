@@ -1,40 +1,36 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Graph, GraphNode } from "../../types/GraphTypes";
+import { GraphNode } from "../../types/GraphTypes";
 import { useState } from "react";
 
 interface BFSControlsProps {
-  onStartTraversal: (value: number) => void;
+  onAddNode: (value: string) => void;
+  onAddEdge: (from: string, to: string) => void;
+  onStartTraversal: () => void;
   isTraversing: boolean;
-  graph: Graph;
-  setGraph: React.Dispatch<React.SetStateAction<Graph>>;
+  nodes: GraphNode[];
+  startNode: number | null;
+  onStartNodeChange: (value: number) => void;
 }
 
 export const BFSControls = ({
+  onAddNode,
+  onAddEdge,
   onStartTraversal,
   isTraversing,
-  graph,
-  setGraph
+  nodes,
+  startNode,
+  onStartNodeChange
 }: BFSControlsProps) => {
   const [nodeValue, setNodeValue] = useState("");
   const [fromNode, setFromNode] = useState("");
   const [toNode, setToNode] = useState("");
-  const [startNode, setStartNode] = useState<number | null>(null);
 
   const handleAddNode = (e: React.FormEvent) => {
     e.preventDefault();
     if (nodeValue) {
-      const newNode: GraphNode = {
-        id: graph.nodes.length,
-        value: parseInt(nodeValue),
-        neighbors: []
-      };
-      setGraph(prev => ({
-        ...prev,
-        nodes: [...prev.nodes, newNode]
-      }));
+      onAddNode(nodeValue);
       setNodeValue("");
     }
   };
@@ -42,18 +38,7 @@ export const BFSControls = ({
   const handleAddEdge = (e: React.FormEvent) => {
     e.preventDefault();
     if (fromNode && toNode) {
-      const from = parseInt(fromNode);
-      const to = parseInt(toNode);
-      setGraph(prev => ({
-        ...prev,
-        edges: [...prev.edges, [from, to]],
-        nodes: prev.nodes.map(node => {
-          if (node.id === from) {
-            return { ...node, neighbors: [...node.neighbors, to] };
-          }
-          return node;
-        })
-      }));
+      onAddEdge(fromNode, toNode);
       setFromNode("");
       setToNode("");
     }
@@ -100,13 +85,13 @@ export const BFSControls = ({
         <div className="space-y-2">
           <Select
             value={startNode?.toString()}
-            onValueChange={(value) => setStartNode(parseInt(value))}
+            onValueChange={(value) => onStartNodeChange(parseInt(value))}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select start node" />
             </SelectTrigger>
             <SelectContent>
-              {graph.nodes.map((node) => (
+              {nodes.map((node) => (
                 <SelectItem key={node.id} value={node.id.toString()}>
                   Node {node.value}
                 </SelectItem>
@@ -115,7 +100,7 @@ export const BFSControls = ({
           </Select>
           <Button 
             className="w-full" 
-            onClick={() => startNode !== null && onStartTraversal(startNode)}
+            onClick={onStartTraversal}
             disabled={isTraversing || startNode === null}
           >
             {isTraversing ? "Traversing..." : "Start BFS"}

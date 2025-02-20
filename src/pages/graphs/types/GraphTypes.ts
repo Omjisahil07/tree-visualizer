@@ -14,5 +14,4 @@ export interface Graph {
 }
 
 export type TraversalType = 'dfs' | 'bfs';
-export type TraversalCallback = (nodeId: number, step: string, line: number) => Promise<void>;
-
+export type TraversalCallback = (nodeId: number, step: string) => Promise<void>;
