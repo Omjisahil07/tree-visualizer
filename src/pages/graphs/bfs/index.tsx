@@ -4,6 +4,7 @@ import { Graph, GraphNode } from "../types/GraphTypes";
 import { BFSVisualization } from "./components/BFSVisualization";
 import { BFSControls } from "./components/BFSControls";
 import { BFSPseudocode } from "./components/BFSPseudocode";
+import { VisitationSequence } from "../components/VisitationSequence";
 import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
 import { bfsTraversal } from "./operations/BFSOperations";
@@ -64,13 +65,12 @@ const BFS = () => {
     setCurrentStep(step);
     setVisitedNodes(prev => !prev.includes(nodeId) ? [...prev, nodeId] : prev);
     setCurrentLine(prev => {
-      // Map steps to pseudocode lines
       if (step.includes("Starting BFS")) return 0;
       if (step.includes("Processing node")) return 5;
       if (step.includes("Discovered node")) return 8;
       return prev;
     });
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Slower animation
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }, []);
 
   const addNode = (value: number) => {
@@ -180,6 +180,10 @@ const BFS = () => {
             currentNode={currentNode}
             visitedNodes={visitedNodes}
           />
+          <VisitationSequence sequence={visitedNodes.map(nodeId => {
+            const node = graph.nodes.find(n => n.id === nodeId);
+            return node?.value || nodeId;
+          })} />
         </div>
 
         <div className="space-y-6">

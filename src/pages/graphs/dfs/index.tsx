@@ -4,6 +4,7 @@ import { Graph, GraphNode } from "../types/GraphTypes";
 import { DFSVisualization } from "./components/DFSVisualization";
 import { DFSControls } from "./components/DFSControls";
 import { DFSPseudocode } from "./components/DFSPseudocode";
+import { VisitationSequence } from "../components/VisitationSequence";
 import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
 import { dfsTraversal } from "./operations/DFSOperations";
@@ -64,13 +65,12 @@ const DFS = () => {
     setCurrentStep(step);
     setVisitedNodes(prev => !prev.includes(nodeId) ? [...prev, nodeId] : prev);
     setCurrentLine(prev => {
-      // Map steps to pseudocode lines
       if (step.includes("Visiting node")) return 1;
       if (step.includes("Moving to neighbor")) return 3;
       if (step.includes("Backtracking")) return 4;
       return prev;
     });
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Slower animation
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }, []);
 
   const addNode = (value: number) => {
@@ -133,7 +133,7 @@ const DFS = () => {
     setIsTraversing(true);
     setVisitedNodes([]);
     setCurrentNode(null);
-    setCurrentLine(0);
+    setCurrentLine(-1);
     await dfsTraversal(graph, startNode || 0, handleTraversalStep);
     setIsTraversing(false);
     setCurrentLine(-1);
@@ -175,6 +175,10 @@ const DFS = () => {
             currentNode={currentNode}
             visitedNodes={visitedNodes}
           />
+          <VisitationSequence sequence={visitedNodes.map(nodeId => {
+            const node = graph.nodes.find(n => n.id === nodeId);
+            return node?.value || nodeId;
+          })} />
         </div>
 
         <div className="space-y-6">
