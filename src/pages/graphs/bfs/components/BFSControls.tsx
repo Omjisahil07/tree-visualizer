@@ -165,7 +165,7 @@ export const BFSControls = ({
           >
             Update Node
           </Button>
-        </div>
+        </form>
       </div>
 
       <div>
