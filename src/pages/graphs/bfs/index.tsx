@@ -34,6 +34,10 @@ const BFS = () => {
     setCurrentNode(null);
   };
 
+  const handleStartTraversal = (value: number) => {
+    void startTraversal(value);
+  };
+
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-4xl font-bold mb-8">Breadth First Search (BFS)</h1>
@@ -48,7 +52,7 @@ const BFS = () => {
           
           <div className="space-y-4">
             <BFSControls
-              onStartTraversal={(value) => startTraversal(value)}
+              onStartTraversal={handleStartTraversal}
               isTraversing={isTraversing}
               graph={graph}
               setGraph={setGraph}
