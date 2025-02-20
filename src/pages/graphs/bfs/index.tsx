@@ -64,9 +64,9 @@ const BFS = () => {
     setCurrentStep(step);
     setVisitedNodes(prev => !prev.includes(nodeId) ? [...prev, nodeId] : prev);
     setCurrentLine(prev => {
-      if (step.includes("Visiting node")) return 1;
-      if (step.includes("Moving to neighbor")) return 3;
-      if (step.includes("Backtracking")) return 4;
+      if (step.includes("Starting BFS")) return 0;
+      if (step.includes("Processing node")) return 5;
+      if (step.includes("Discovered node")) return 8;
       return prev;
     });
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -124,21 +124,6 @@ const BFS = () => {
     toast.success(`Added edge from node ${from} to node ${to}`);
   };
 
-  const startTraversal = async () => {
-    if (graph.nodes.length === 0) {
-      toast.error("Please add nodes to the graph first");
-      return;
-    }
-    setIsTraversing(true);
-    setVisitedNodes([]);
-    setCurrentNode(null);
-    setCurrentLine(-1);
-    await bfsTraversal(graph, startNode || 0, handleTraversalStep);
-    setIsTraversing(false);
-    setCurrentLine(-1);
-    setCurrentStep("Traversal complete");
-  };
-
   const deleteNode = (nodeId: number) => {
     setGraph(prev => {
       // Remove all edges connected to this node
@@ -168,24 +153,36 @@ const BFS = () => {
     toast.success(`Deleted node ${nodeId}`);
   };
 
-  const handleNodeClick = (nodeId: number) => {
-    const newValue = window.prompt("Enter new value for the node:");
-    if (newValue !== null) {
-      const numValue = parseInt(newValue);
-      if (!isNaN(numValue)) {
-        setGraph(prev => ({
-          ...prev,
-          nodes: prev.nodes.map(node =>
-            node.id === nodeId
-              ? { ...node, value: numValue }
-              : node
-          )
-        }));
-        toast.success(`Updated node ${nodeId} to value ${numValue}`);
-      } else {
-        toast.error("Please enter a valid number");
-      }
+  const updateNode = (nodeId: number, newValue: number) => {
+    setGraph(prev => ({
+      ...prev,
+      nodes: prev.nodes.map(node =>
+        node.id === nodeId
+          ? { ...node, value: newValue }
+          : node
+      )
+    }));
+    toast.success(`Updated node ${nodeId} to value ${newValue}`);
+  };
+
+  const startTraversal = async () => {
+    if (graph.nodes.length === 0) {
+      toast.error("Please add nodes to the graph first");
+      return;
     }
+    setIsTraversing(true);
+    setVisitedNodes([]);
+    setCurrentNode(null);
+    setCurrentLine(-1);
+    try {
+      await bfsTraversal(graph, startNode || 0, handleTraversalStep);
+      toast.success("Traversal complete!");
+    } catch (error) {
+      toast.error("An error occurred during traversal");
+    }
+    setIsTraversing(false);
+    setCurrentLine(-1);
+    setCurrentStep("Traversal complete");
   };
 
   return (
@@ -193,15 +190,13 @@ const BFS = () => {
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Breadth First Search (BFS)</h1>
         <p className="text-muted-foreground text-lg mb-4">
-          BFS explores all neighbors at the present depth prior to moving on to nodes at the next depth level.
+          BFS explores all vertices at the current depth before moving to vertices at the next depth level.
         </p>
         <div className="bg-muted p-4 rounded-lg max-w-2xl mx-auto text-sm">
           <strong>Instructions:</strong>
           <ul className="list-disc list-inside mt-2 space-y-1 text-left">
             <li>Add nodes to the graph using the controls</li>
             <li>Connect nodes by adding edges between them</li>
-            <li>Single click a node to update its value</li>
-            <li>Double click a node to delete it</li>
             <li>Click "Start BFS" to visualize the traversal</li>
             <li>Or use "Generate Random Graph" for a quick demo</li>
           </ul>
@@ -224,8 +219,6 @@ const BFS = () => {
             graph={graph}
             currentNode={currentNode}
             visitedNodes={visitedNodes}
-            onDeleteNode={deleteNode}
-            onNodeClick={handleNodeClick}
           />
           <VisitationSequence sequence={visitedNodes.map(nodeId => {
             const node = graph.nodes.find(n => n.id === nodeId);
@@ -238,7 +231,7 @@ const BFS = () => {
             onAddNode={(value) => addNode(parseInt(value))}
             onAddEdge={(from, to) => addEdge(parseInt(from), parseInt(to))}
             onDeleteNode={deleteNode}
-            onUpdateNode={(id, value) => handleNodeClick(id)}
+            onUpdateNode={updateNode}
             onStartTraversal={startTraversal}
             isTraversing={isTraversing}
             nodes={graph.nodes}

@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { Graph } from '../../types/GraphTypes';
@@ -7,17 +6,9 @@ interface DFSVisualizationProps {
   graph: Graph;
   currentNode: number | null;
   visitedNodes: number[];
-  onDeleteNode?: (id: number) => void;
-  onNodeClick?: (id: number) => void;
 }
 
-export const DFSVisualization = ({ 
-  graph, 
-  currentNode, 
-  visitedNodes,
-  onDeleteNode,
-  onNodeClick 
-}: DFSVisualizationProps) => {
+export const DFSVisualization = ({ graph, currentNode, visitedNodes }: DFSVisualizationProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -83,18 +74,7 @@ export const DFSVisualization = ({
         return "white";
       })
       .attr("stroke", "hsl(var(--primary))")
-      .attr("stroke-width", 2)
-      .on("click", (event, d) => {
-        if (onNodeClick) {
-          onNodeClick(d.id);
-        }
-      })
-      .on("dblclick", (event, d) => {
-        if (onDeleteNode) {
-          event.preventDefault();
-          onDeleteNode(d.id);
-        }
-      });
+      .attr("stroke-width", 2);
 
     nodes.append("text")
       .text(d => d.value)
@@ -137,7 +117,7 @@ export const DFSVisualization = ({
     return () => {
       simulation.stop();
     };
-  }, [graph, currentNode, visitedNodes, onDeleteNode, onNodeClick]);
+  }, [graph, currentNode, visitedNodes]);
 
   return (
     <div className="relative w-full border border-border rounded-lg bg-white shadow-sm p-4">
