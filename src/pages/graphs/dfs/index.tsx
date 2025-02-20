@@ -19,6 +19,7 @@ const DFS = () => {
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [startNode, setStartNode] = useState<number | null>(null);
+  const [selectedNodeForUpdate, setSelectedNodeForUpdate] = useState<number | null>(null);
 
   const generateRandomGraph = () => {
     const numNodes = Math.floor(Math.random() * 4) + 3; // 3-6 nodes
@@ -168,16 +169,24 @@ const DFS = () => {
     toast.success(`Deleted node ${nodeId}`);
   };
 
-  const updateNode = (nodeId: number, newValue: number) => {
-    setGraph(prev => ({
-      ...prev,
-      nodes: prev.nodes.map(node =>
-        node.id === nodeId
-          ? { ...node, value: newValue }
-          : node
-      )
-    }));
-    toast.success(`Updated node ${nodeId} to value ${newValue}`);
+  const handleNodeClick = (nodeId: number) => {
+    const newValue = window.prompt("Enter new value for the node:");
+    if (newValue !== null) {
+      const numValue = parseInt(newValue);
+      if (!isNaN(numValue)) {
+        setGraph(prev => ({
+          ...prev,
+          nodes: prev.nodes.map(node =>
+            node.id === nodeId
+              ? { ...node, value: numValue }
+              : node
+          )
+        }));
+        toast.success(`Updated node ${nodeId} to value ${numValue}`);
+      } else {
+        toast.error("Please enter a valid number");
+      }
+    }
   };
 
   return (
@@ -192,6 +201,8 @@ const DFS = () => {
           <ul className="list-disc list-inside mt-2 space-y-1 text-left">
             <li>Add nodes to the graph using the controls</li>
             <li>Connect nodes by adding edges between them</li>
+            <li>Single click a node to update its value</li>
+            <li>Double click a node to delete it</li>
             <li>Click "Start DFS" to visualize the traversal</li>
             <li>Or use "Generate Random Graph" for a quick demo</li>
           </ul>
@@ -214,6 +225,8 @@ const DFS = () => {
             graph={graph}
             currentNode={currentNode}
             visitedNodes={visitedNodes}
+            onDeleteNode={deleteNode}
+            onNodeClick={handleNodeClick}
           />
           <VisitationSequence sequence={visitedNodes.map(nodeId => {
             const node = graph.nodes.find(n => n.id === nodeId);
@@ -226,7 +239,7 @@ const DFS = () => {
             onAddNode={(value) => addNode(parseInt(value))}
             onAddEdge={(from, to) => addEdge(parseInt(from), parseInt(to))}
             onDeleteNode={deleteNode}
-            onUpdateNode={updateNode}
+            onUpdateNode={(id, value) => handleNodeClick(id)}
             onStartTraversal={startTraversal}
             isTraversing={isTraversing}
             nodes={graph.nodes}
