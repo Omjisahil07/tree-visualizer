@@ -13,7 +13,7 @@ export const dfsTraversal = async (
 
     // Mark current node as visited
     visited.add(nodeId);
-    await callback(nodeId, `Visiting node ${nodeId}`);
+    await callback(nodeId, `Visiting node ${nodeId}`, 1);
 
     const node = graph.nodes.find(n => n.id === nodeId);
     if (!node) return;
@@ -21,12 +21,12 @@ export const dfsTraversal = async (
     // Visit neighbors in order
     for (const neighborId of node.neighbors.sort((a, b) => a - b)) {
       if (!visited.has(neighborId)) {
-        await callback(nodeId, `Moving to neighbor ${neighborId}`);
+        await callback(nodeId, `Moving to neighbor ${neighborId}`, 2);
         await dfs(neighborId);
       }
     }
 
-    await callback(nodeId, `Backtracking from node ${nodeId}`);
+    await callback(nodeId, `Backtracking from node ${nodeId}`, 3);
   };
 
   await dfs(startNodeId);
