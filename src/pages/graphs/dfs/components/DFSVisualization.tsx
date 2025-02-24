@@ -1,29 +1,69 @@
+
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { Graph } from '../../types/GraphTypes';
+
 interface DFSVisualizationProps {
   graph: Graph;
   currentNode: number | null;
   visitedNodes: number[];
 }
+
 export const DFSVisualization = ({
   graph,
   currentNode,
   visitedNodes
 }: DFSVisualizationProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
+
   useEffect(() => {
     if (!svgRef.current) return;
+
     const containerWidth = svgRef.current.parentElement?.clientWidth || 800;
     const width = containerWidth;
-    const height = 600;
+    const height = 400; // Reduced height
     const nodeRadius = 25;
+    const nodeSpacing = 100; // Fixed spacing between nodes
+
     d3.select(svgRef.current).selectAll("*").remove();
-    const svg = d3.select(svgRef.current).attr("width", width).attr("height", height);
+
+    const svg = d3.select(svgRef.current)
+      .attr("width", width)
+      .attr("height", height);
+
+    // Add arrow marker definition
+    svg.append("defs").append("marker")
+      .attr("id", "arrowhead")
+      .attr("viewBox", "-0 -5 10 10")
+      .attr("refX", 35) // Adjusted to position arrow just before the node
+      .attr("refY", 0)
+      .attr("orient", "auto")
+      .attr("markerWidth", 8)
+      .attr("markerHeight", 8)
+      .append("path")
+      .attr("d", "M 0,-5 L 10,0 L 0,5")
+      .attr("fill", "hsl(var(--primary))");
+
     if (graph.nodes.length === 0) {
-      svg.append("text").attr("x", width / 2).attr("y", height / 2).attr("text-anchor", "middle").attr("fill", "currentColor").text("Add nodes to start visualization");
+      svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height / 2)
+        .attr("text-anchor", "middle")
+        .attr("fill", "currentColor")
+        .text("Add nodes to start visualization");
       return;
     }
+
+    // Position nodes in a grid layout
+    graph.nodes.forEach((node, i) => {
+      const row = Math.floor(i / 4); // 4 nodes per row
+      const col = i % 4;
+      node.x = col * nodeSpacing + nodeSpacing;
+      node.y = row * nodeSpacing + nodeSpacing;
+      // Fix the position
+      node.fx = node.x;
+      node.fy = node.y;
+    });
 
     // Convert edges to objects with source and target properties
     const links = graph.edges.map(edge => ({
@@ -31,43 +71,53 @@ export const DFSVisualization = ({
       target: graph.nodes.find(n => n.id === edge[1])
     }));
 
-    // Create force simulation
-    const simulation = d3.forceSimulation(graph.nodes).force("link", d3.forceLink(links).id((d: any) => d.id).distance(120)).force("charge", d3.forceManyBody().strength(-800)).force("center", d3.forceCenter(width / 2, height / 2)).force("collision", d3.forceCollide().radius(nodeRadius * 2));
-
-    // Draw edges
-    const edges = svg.selectAll("line").data(links).join("line").attr("stroke", "hsl(var(--primary))").attr("stroke-width", 2);
+    // Draw edges with arrows
+    const edges = svg.selectAll("line")
+      .data(links)
+      .join("line")
+      .attr("stroke", "hsl(var(--primary))")
+      .attr("stroke-width", 2)
+      .attr("marker-end", "url(#arrowhead)")
+      .attr("x1", d => (d.source as any).x)
+      .attr("y1", d => (d.source as any).y)
+      .attr("x2", d => (d.target as any).x)
+      .attr("y2", d => (d.target as any).y);
 
     // Draw nodes
-    const nodes = svg.selectAll("g").data(graph.nodes).join("g").call(d3.drag<SVGGElement, any>().on("start", dragstarted).on("drag", dragged).on("end", dragended));
-    nodes.append("circle").attr("r", nodeRadius).attr("fill", d => {
-      if (d.id === currentNode) return "hsl(var(--primary))";
-      if (visitedNodes.includes(d.id)) return "hsl(var(--primary) / 0.2)";
-      return "white";
-    }).attr("stroke", "hsl(var(--primary))").attr("stroke-width", 2);
-    nodes.append("text").text(d => d.value).attr("text-anchor", "middle").attr("dy", "0.3em").attr("fill", d => d.id === currentNode || visitedNodes.includes(d.id) ? "white" : "currentColor").style("font-size", "16px");
-    simulation.on("tick", () => {
-      edges.attr("x1", d => (d.source as any).x).attr("y1", d => (d.source as any).y).attr("x2", d => (d.target as any).x).attr("y2", d => (d.target as any).y);
-      nodes.attr("transform", d => `translate(${d.x},${d.y})`);
-    });
-    function dragstarted(event: any) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      event.subject.fx = event.subject.x;
-      event.subject.fy = event.subject.y;
-    }
-    function dragged(event: any) {
-      event.subject.fx = event.x;
-      event.subject.fy = event.y;
-    }
-    function dragended(event: any) {
-      if (!event.active) simulation.alphaTarget(0);
-      event.subject.fx = null;
-      event.subject.fy = null;
-    }
-    return () => {
-      simulation.stop();
-    };
+    const nodes = svg.selectAll("g")
+      .data(graph.nodes)
+      .join("g")
+      .attr("transform", d => `translate(${d.x},${d.y})`);
+
+    nodes.append("circle")
+      .attr("r", nodeRadius)
+      .attr("fill", d => {
+        if (d.id === currentNode) return "hsl(var(--primary))";
+        if (visitedNodes.includes(d.id)) return "hsl(var(--primary) / 0.2)";
+        return "white";
+      })
+      .attr("stroke", "hsl(var(--primary))")
+      .attr("stroke-width", 2);
+
+    nodes.append("text")
+      .text(d => d.value)
+      .attr("text-anchor", "middle")
+      .attr("dy", "0.3em")
+      .attr("fill", d => 
+        d.id === currentNode || visitedNodes.includes(d.id) 
+          ? "white" 
+          : "currentColor"
+      )
+      .style("font-size", "16px");
+
   }, [graph, currentNode, visitedNodes]);
-  return <div className="relative w-full border border-border rounded-lg bg-white shadow-sm p-4">
-      <svg ref={svgRef} className="w-mid h-[600px]" />
-    </div>;
+
+  return (
+    <div className="relative w-full border border-border rounded-lg bg-white shadow-sm p-4">
+      <svg
+        ref={svgRef}
+        className="w-full h-[400px]"
+      />
+    </div>
+  );
 };
