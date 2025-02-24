@@ -86,7 +86,18 @@ export const DFSVisualization = ({
     }
 
     // Position nodes based on their level and relative position within level
-    const updatedNodes = graph.nodes.map(node => {
+    const updatedNodes = graph.nodes.map((node, index) => {
+      if (index === 0) {
+        // Center the root node
+        return {
+          ...node,
+          x: width / 2,
+          y: nodeRadius * 2,
+          fx: width / 2,
+          fy: nodeRadius * 2
+        };
+      }
+
       const level = nodeLevels.get(node.id) || 0;
       const levelNodes = Array.from(childrenCount.get(level) || []);
       const nodeIndex = levelNodes.indexOf(node.id);
