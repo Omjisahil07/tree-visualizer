@@ -22,8 +22,9 @@ export const DFSVisualization = ({
     const containerWidth = svgRef.current.parentElement?.clientWidth || 800;
     const width = containerWidth;
     const height = 400;
-    const nodeRadius = 25;
-    const levelHeight = 100; // Vertical spacing between levels
+    const nodeRadius = 20; // Reduced node radius
+    const levelHeight = 60; // Reduced vertical spacing between levels
+    const horizontalSpacing = 80; // Reduced horizontal spacing between nodes
 
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -35,11 +36,11 @@ export const DFSVisualization = ({
     svg.append("defs").append("marker")
       .attr("id", "arrowhead")
       .attr("viewBox", "-0 -5 10 10")
-      .attr("refX", 35)
+      .attr("refX", 28) // Adjusted to account for smaller node radius
       .attr("refY", 0)
       .attr("orient", "auto")
-      .attr("markerWidth", 8)
-      .attr("markerHeight", 8)
+      .attr("markerWidth", 6) // Smaller arrow
+      .attr("markerHeight", 6) // Smaller arrow
       .append("path")
       .attr("d", "M 0,-5 L 10,0 L 0,5")
       .attr("fill", "hsl(var(--primary))");
@@ -54,9 +55,9 @@ export const DFSVisualization = ({
       return;
     }
 
-    // Calculate levels for each node
+    // Calculate levels and children for each node
     const nodeLevels = new Map<number, number>();
-    const childrenCount = new Map<number, number[]>();
+    const childrenByParent = new Map<number, number[]>();
     const visited = new Set<number>();
 
     function calculateLevels(nodeId: number, level: number) {
@@ -64,47 +65,55 @@ export const DFSVisualization = ({
       visited.add(nodeId);
       nodeLevels.set(nodeId, level);
 
-      const node = graph.nodes.find(n => n.id === nodeId);
-      if (!node) return;
-
       const children = graph.edges
         .filter(([from, _]) => from === nodeId)
         .map(([_, to]) => to);
 
+      childrenByParent.set(nodeId, children);
       children.forEach(childId => {
-        if (!childrenCount.has(level)) {
-          childrenCount.set(level, []);
-        }
-        childrenCount.get(level)?.push(childId);
         calculateLevels(childId, level + 1);
       });
     }
 
-    // Start from the first node (root)
+    // Start from the root node
     if (graph.nodes.length > 0) {
       calculateLevels(graph.nodes[0].id, 0);
     }
 
-    // Position nodes based on their level and relative position within level
+    // Get max level depth
+    const maxLevel = Math.max(...Array.from(nodeLevels.values()), 0);
+
+    // Position nodes
     const updatedNodes = graph.nodes.map((node, index) => {
       if (index === 0) {
-        // Center the root node
+        // Center root node at top
         return {
           ...node,
           x: width / 2,
-          y: nodeRadius * 2,
+          y: nodeRadius,
           fx: width / 2,
-          fy: nodeRadius * 2
+          fy: nodeRadius
         };
       }
 
       const level = nodeLevels.get(node.id) || 0;
-      const levelNodes = Array.from(childrenCount.get(level) || []);
-      const nodeIndex = levelNodes.indexOf(node.id);
-      const nodesInLevel = levelNodes.length || 1;
+      const siblings = Array.from(childrenByParent.values())
+        .find(children => children.includes(node.id)) || [];
+      const siblingIndex = siblings.indexOf(node.id);
+      const parentNode = graph.nodes.find(n => 
+        childrenByParent.get(n.id)?.includes(node.id)
+      );
       
-      const x = (nodeIndex + 1) * (width / (nodesInLevel + 1));
-      const y = level * levelHeight + nodeRadius * 2;
+      let x;
+      if (parentNode) {
+        const parentX = updatedNodes.find(n => n.id === parentNode.id)?.x || width / 2;
+        const offset = (siblingIndex - (siblings.length - 1) / 2) * horizontalSpacing;
+        x = parentX + offset;
+      } else {
+        x = (width / (graph.nodes.length + 1)) * (index + 1);
+      }
+
+      const y = (level + 1) * levelHeight;
 
       return {
         ...node,
@@ -115,23 +124,28 @@ export const DFSVisualization = ({
       };
     });
 
-    // Convert edges to objects with source and target properties
-    const links = graph.edges.map(edge => ({
-      source: updatedNodes.find(n => n.id === edge[0]),
-      target: updatedNodes.find(n => n.id === edge[1])
-    }));
-
-    // Draw edges with arrows
-    const edges = svg.selectAll("line")
-      .data(links)
-      .join("line")
+    // Draw curved edges
+    const links = svg.selectAll(".link")
+      .data(graph.edges)
+      .join("path")
+      .attr("class", "link")
+      .attr("fill", "none")
       .attr("stroke", "hsl(var(--primary))")
-      .attr("stroke-width", 2)
+      .attr("stroke-width", 1.5)
       .attr("marker-end", "url(#arrowhead)")
-      .attr("x1", d => (d.source as any).x)
-      .attr("y1", d => (d.source as any).y)
-      .attr("x2", d => (d.target as any).x)
-      .attr("y2", d => (d.target as any).y);
+      .attr("d", (edge) => {
+        const source = updatedNodes.find(n => n.id === edge[0]);
+        const target = updatedNodes.find(n => n.id === edge[1]);
+        if (!source || !target) return "";
+        
+        // Create a curved path
+        const dx = target.x - source.x;
+        const dy = target.y - source.y;
+        const dr = Math.sqrt(dx * dx + dy * dy);
+        
+        return `M ${source.x},${source.y} 
+                L ${target.x},${target.y}`;
+      });
 
     // Draw nodes
     const nodes = svg.selectAll("g")
@@ -158,7 +172,7 @@ export const DFSVisualization = ({
           ? "white" 
           : "currentColor"
       )
-      .style("font-size", "16px");
+      .style("font-size", "14px"); // Smaller font size
 
   }, [graph, currentNode, visitedNodes]);
 
