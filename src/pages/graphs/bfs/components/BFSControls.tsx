@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -34,12 +33,40 @@ export const BFSControls = ({
   const [toNode, setToNode] = useState("");
   const [selectedNode, setSelectedNode] = useState<string>("");
   const [newValue, setNewValue] = useState("");
+  const [childCount, setChildCount] = useState("");
 
-  const handleAddNode = (e: React.FormEvent) => {
+  const handleAddNode = async (e: React.FormEvent) => {
     e.preventDefault();
     if (nodeValue) {
-      onAddNode(nodeValue);
-      setNodeValue("");
+      // If this is the first node, just add it
+      if (nodes.length === 0) {
+        onAddNode(nodeValue);
+        setNodeValue("");
+        
+        // Ask for number of children
+        const count = window.prompt("How many children nodes for this root node?");
+        if (count) {
+          setChildCount(count);
+        }
+      } else {
+        // Add node and create edge from parent
+        onAddNode(nodeValue);
+        if (nodes.length > 0) {
+          // Find appropriate parent node based on current structure
+          const parentId = Math.floor((nodes.length - 1) / parseInt(childCount || "2"));
+          onAddEdge(nodes[parentId].id.toString(), (nodes.length).toString());
+        }
+        setNodeValue("");
+
+        // Ask for children if needed
+        const level = Math.floor(Math.log2(nodes.length + 1));
+        if (nodes.length === Math.pow(2, level) - 1) {
+          const count = window.prompt(`How many children for each node at level ${level}?`);
+          if (count) {
+            setChildCount(count);
+          }
+        }
+      }
     }
   };
 

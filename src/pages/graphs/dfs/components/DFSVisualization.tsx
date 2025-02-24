@@ -21,9 +21,9 @@ export const DFSVisualization = ({
 
     const containerWidth = svgRef.current.parentElement?.clientWidth || 800;
     const width = containerWidth;
-    const height = 400; // Reduced height
+    const height = 400;
     const nodeRadius = 25;
-    const nodeSpacing = 100; // Fixed spacing between nodes
+    const levelHeight = 100; // Vertical spacing between levels
 
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -35,7 +35,7 @@ export const DFSVisualization = ({
     svg.append("defs").append("marker")
       .attr("id", "arrowhead")
       .attr("viewBox", "-0 -5 10 10")
-      .attr("refX", 35) // Adjusted to position arrow just before the node
+      .attr("refX", 35)
       .attr("refY", 0)
       .attr("orient", "auto")
       .attr("markerWidth", 8)
@@ -54,16 +54,53 @@ export const DFSVisualization = ({
       return;
     }
 
-    // Position nodes in a grid layout
-    const updatedNodes = graph.nodes.map((node, i) => {
-      const row = Math.floor(i / 4); // 4 nodes per row
-      const col = i % 4;
+    // Calculate levels for each node
+    const nodeLevels = new Map<number, number>();
+    const childrenCount = new Map<number, number[]>();
+    const visited = new Set<number>();
+
+    function calculateLevels(nodeId: number, level: number) {
+      if (visited.has(nodeId)) return;
+      visited.add(nodeId);
+      nodeLevels.set(nodeId, level);
+
+      const node = graph.nodes.find(n => n.id === nodeId);
+      if (!node) return;
+
+      const children = graph.edges
+        .filter(([from, _]) => from === nodeId)
+        .map(([_, to]) => to);
+
+      children.forEach(childId => {
+        if (!childrenCount.has(level)) {
+          childrenCount.set(level, []);
+        }
+        childrenCount.get(level)?.push(childId);
+        calculateLevels(childId, level + 1);
+      });
+    }
+
+    // Start from the first node (root)
+    if (graph.nodes.length > 0) {
+      calculateLevels(graph.nodes[0].id, 0);
+    }
+
+    // Position nodes based on their level and relative position within level
+    const updatedNodes = graph.nodes.map(node => {
+      const level = nodeLevels.get(node.id) || 0;
+      const levelNodes = Array.from(childrenCount.get(level) || []);
+      const nodeIndex = levelNodes.indexOf(node.id);
+      const nodesInLevel = levelNodes.length || 1;
+      
+      const x = (nodeIndex + 1) * (width / (nodesInLevel + 1));
+      const y = level * levelHeight + nodeRadius * 2;
+
       return {
         ...node,
-        x: col * nodeSpacing + nodeSpacing,
-        y: row * nodeSpacing + nodeSpacing,
-        fx: col * nodeSpacing + nodeSpacing,
-        fy: row * nodeSpacing + nodeSpacing
+        x,
+        y,
+        fx: x,
+        fy: y
       };
     });
 
