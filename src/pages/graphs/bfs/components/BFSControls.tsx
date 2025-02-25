@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -30,8 +29,8 @@ export const BFSControls = ({
   onStartNodeChange
 }: BFSControlsProps) => {
   const [nodeValue, setNodeValue] = useState("");
-  const [fromNode, setFromNode] = useState("");
-  const [toNode, setToNode] = useState("");
+  const [fromNodeValue, setFromNodeValue] = useState("");
+  const [toNodeValue, setToNodeValue] = useState("");
   const [selectedNode, setSelectedNode] = useState<string>("");
   const [newValue, setNewValue] = useState("");
 
@@ -45,10 +44,19 @@ export const BFSControls = ({
 
   const handleAddEdge = (e: React.FormEvent) => {
     e.preventDefault();
-    if (fromNode && toNode) {
-      onAddEdge(fromNode, toNode);
-      setFromNode("");
-      setToNode("");
+    if (fromNodeValue && toNodeValue) {
+      const fromNode = nodes.find(n => n.value === parseInt(fromNodeValue));
+      const toNode = nodes.find(n => n.value === parseInt(toNodeValue));
+      
+      if (!fromNode || !toNode) {
+        toast.error("One or both nodes not found");
+        return;
+      }
+
+      onAddEdge(fromNode.id.toString(), toNode.id.toString());
+      setFromNodeValue("");
+      setToNodeValue("");
+      toast.success(`Added edge from node value ${fromNode.value} to node value ${toNode.value}`);
     }
   };
 
@@ -90,15 +98,15 @@ export const BFSControls = ({
           <div className="flex gap-2">
             <Input
               type="number"
-              placeholder="From node"
-              value={fromNode}
-              onChange={(e) => setFromNode(e.target.value)}
+              placeholder="From node value"
+              value={fromNodeValue}
+              onChange={(e) => setFromNodeValue(e.target.value)}
             />
             <Input
               type="number"
-              placeholder="To node"
-              value={toNode}
-              onChange={(e) => setToNode(e.target.value)}
+              placeholder="To node value"
+              value={toNodeValue}
+              onChange={(e) => setToNodeValue(e.target.value)}
             />
           </div>
           <Button type="submit" className="w-full">Add Edge</Button>

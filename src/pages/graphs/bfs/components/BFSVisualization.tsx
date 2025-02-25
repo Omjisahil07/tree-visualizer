@@ -21,9 +21,8 @@ export const BFSVisualization = ({
 
     const containerWidth = svgRef.current.parentElement?.clientWidth || 800;
     const width = containerWidth;
-    const height = 400; // Reduced height
+    const height = 400;
     const nodeRadius = 25;
-    const nodeSpacing = 100; // Fixed spacing between nodes
 
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -35,7 +34,7 @@ export const BFSVisualization = ({
     svg.append("defs").append("marker")
       .attr("id", "arrowhead")
       .attr("viewBox", "-0 -5 10 10")
-      .attr("refX", 35) // Adjusted to position arrow just before the node
+      .attr("refX", 35)
       .attr("refY", 0)
       .attr("orient", "auto")
       .attr("markerWidth", 8)
@@ -54,12 +53,38 @@ export const BFSVisualization = ({
       return;
     }
 
-    // Position nodes in a grid layout
+    // Position nodes based on the number of nodes
     const updatedNodes = graph.nodes.map((node, i) => {
-      const row = Math.floor(i / 4); // 4 nodes per row
-      const col = i % 4;
-      const x = col * nodeSpacing + nodeSpacing;
-      const y = row * nodeSpacing + nodeSpacing;
+      let x, y;
+      
+      if (graph.nodes.length === 3) {
+        // Create triangular structure for 3 nodes
+        switch(i) {
+          case 0: // Top node
+            x = width / 2;
+            y = height * 0.2; // 20% from top
+            break;
+          case 1: // Bottom left node
+            x = width * 0.3; // 30% from left
+            y = height * 0.7; // 70% from top
+            break;
+          case 2: // Bottom right node
+            x = width * 0.7; // 70% from left
+            y = height * 0.7; // 70% from top
+            break;
+          default:
+            x = width / 2;
+            y = height / 2;
+        }
+      } else {
+        // Default grid layout for other cases
+        const row = Math.floor(i / 4);
+        const col = i % 4;
+        const nodeSpacing = 100;
+        x = col * nodeSpacing + nodeSpacing;
+        y = row * nodeSpacing + nodeSpacing;
+      }
+
       return {
         ...node,
         x,
