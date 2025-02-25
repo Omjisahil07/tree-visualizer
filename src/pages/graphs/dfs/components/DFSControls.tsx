@@ -34,53 +34,12 @@ export const DFSControls = ({
   const [toNode, setToNode] = useState("");
   const [selectedNode, setSelectedNode] = useState<string>("");
   const [newValue, setNewValue] = useState("");
-  const [childCount, setChildCount] = useState("");
-  const [currentParentIndex, setCurrentParentIndex] = useState(0);
-  const [remainingChildren, setRemainingChildren] = useState(0);
 
-  const handleAddNode = async (e: React.FormEvent) => {
+  const handleAddNode = (e: React.FormEvent) => {
     e.preventDefault();
     if (nodeValue) {
-      // If this is the first node, just add it
-      if (nodes.length === 0) {
-        onAddNode(nodeValue);
-        setNodeValue("");
-        
-        // Ask for number of children
-        const count = window.prompt("How many children nodes for this root node?");
-        if (count) {
-          setChildCount(count);
-          setRemainingChildren(parseInt(count));
-        }
-      } else {
-        // Add node and create edge from parent
-        onAddNode(nodeValue);
-        
-        // Connect to current parent
-        if (currentParentIndex < nodes.length) {
-          onAddEdge(nodes[currentParentIndex].id.toString(), (nodes.length).toString());
-        }
-
-        setNodeValue("");
-
-        // Update remaining children count
-        const remaining = remainingChildren - 1;
-        setRemainingChildren(remaining);
-
-        // If we've added all children for current parent, move to next parent
-        if (remaining === 0) {
-          const nextParentIndex = currentParentIndex + 1;
-          setCurrentParentIndex(nextParentIndex);
-
-          // Ask for children count for next parent if needed
-          const count = window.prompt(`How many children for node ${nodes[nextParentIndex]?.value}?`);
-          if (count) {
-            setRemainingChildren(parseInt(count));
-          }
-        }
-
-        toast.success(`Connected to node ${nodes[currentParentIndex]?.value}`);
-      }
+      onAddNode(nodeValue);
+      setNodeValue("");
     }
   };
 
@@ -90,7 +49,6 @@ export const DFSControls = ({
       onAddEdge(fromNode, toNode);
       setFromNode("");
       setToNode("");
-      toast.success("Edge added successfully");
     }
   };
 

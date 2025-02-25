@@ -5,8 +5,6 @@ export interface GraphNode {
   neighbors: number[];
   x?: number;
   y?: number;
-  fx?: number;  // Add fixed x position
-  fy?: number;  // Add fixed y position
   visited?: boolean;
 }
 
