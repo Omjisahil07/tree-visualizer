@@ -7,12 +7,14 @@ interface BFSVisualizationProps {
   graph: Graph;
   currentNode: number | null;
   visitedNodes: number[];
+  isDirected: boolean;
 }
 
 export const BFSVisualization = ({
   graph,
   currentNode,
-  visitedNodes
+  visitedNodes,
+  isDirected
 }: BFSVisualizationProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -30,18 +32,20 @@ export const BFSVisualization = ({
       .attr("width", width)
       .attr("height", height);
 
-    // Add arrow marker definition
-    svg.append("defs").append("marker")
-      .attr("id", "arrowhead")
-      .attr("viewBox", "-0 -5 10 10")
-      .attr("refX", 35)
-      .attr("refY", 0)
-      .attr("orient", "auto")
-      .attr("markerWidth", 8)
-      .attr("markerHeight", 8)
-      .append("path")
-      .attr("d", "M 0,-5 L 10,0 L 0,5")
-      .attr("fill", "hsl(var(--primary))");
+    // Add arrow marker definition only for directed graphs
+    if (isDirected) {
+      svg.append("defs").append("marker")
+        .attr("id", "arrowhead")
+        .attr("viewBox", "-0 -5 10 10")
+        .attr("refX", 35)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 8)
+        .attr("markerHeight", 8)
+        .append("path")
+        .attr("d", "M 0,-5 L 10,0 L 0,5")
+        .attr("fill", "hsl(var(--primary))");
+    }
 
     if (graph.nodes.length === 0) {
       svg.append("text")
@@ -62,15 +66,15 @@ export const BFSVisualization = ({
         switch(i) {
           case 0: // Top node
             x = width / 2;
-            y = height * 0.2; // 20% from top
+            y = height * 0.2;
             break;
           case 1: // Bottom left node
-            x = width * 0.3; // 30% from left
-            y = height * 0.7; // 70% from top
+            x = width * 0.3;
+            y = height * 0.7;
             break;
           case 2: // Bottom right node
-            x = width * 0.7; // 70% from left
-            y = height * 0.7; // 70% from top
+            x = width * 0.7;
+            y = height * 0.7;
             break;
           default:
             x = width / 2;
@@ -98,13 +102,13 @@ export const BFSVisualization = ({
       target: updatedNodes.find(n => n.id === edge[1])
     }));
 
-    // Draw edges with arrows
+    // Draw edges
     const edges = svg.selectAll("line")
       .data(links)
       .join("line")
       .attr("stroke", "hsl(var(--primary))")
       .attr("stroke-width", 2)
-      .attr("marker-end", "url(#arrowhead)")
+      .attr("marker-end", isDirected ? "url(#arrowhead)" : null) // Only add arrows for directed graphs
       .attr("x1", d => (d.source as any).x)
       .attr("y1", d => (d.source as any).y)
       .attr("x2", d => (d.target as any).x)
@@ -137,7 +141,7 @@ export const BFSVisualization = ({
       )
       .style("font-size", "16px");
 
-  }, [graph, currentNode, visitedNodes]);
+  }, [graph, currentNode, visitedNodes, isDirected]); // Added isDirected to dependencies
 
   return (
     <div className="relative w-full border border-border rounded-lg bg-white shadow-sm p-4">

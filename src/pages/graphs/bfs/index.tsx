@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { bfsTraversal } from "./operations/BFSOperations";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
+import { Toggle } from "@/components/ui/toggle";
 
 const BFS = () => {
   const [graph, setGraph] = useState<Graph>({ nodes: [], edges: [] });
@@ -17,8 +18,8 @@ const BFS = () => {
   const [isTraversing, setIsTraversing] = useState(false);
   const [currentNode, setCurrentNode] = useState<number | null>(null);
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
-  const [inputValue, setInputValue] = useState("");
   const [startNode, setStartNode] = useState<number | null>(null);
+  const [isDirected, setIsDirected] = useState(true);
 
   const generateRandomGraph = () => {
     const numNodes = Math.floor(Math.random() * 4) + 3; // 3-6 nodes
@@ -205,7 +206,14 @@ const BFS = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-between mb-4">
+            <Toggle
+              pressed={isDirected}
+              onPressedChange={setIsDirected}
+              className="gap-2"
+            >
+              {isDirected ? "Directed Graph" : "Undirected Graph"}
+            </Toggle>
             <Button
               onClick={generateRandomGraph}
               variant="outline"
@@ -219,6 +227,7 @@ const BFS = () => {
             graph={graph}
             currentNode={currentNode}
             visitedNodes={visitedNodes}
+            isDirected={isDirected}
           />
           <VisitationSequence sequence={visitedNodes.map(nodeId => {
             const node = graph.nodes.find(n => n.id === nodeId);
