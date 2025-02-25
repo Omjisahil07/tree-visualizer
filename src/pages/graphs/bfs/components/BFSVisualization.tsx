@@ -55,20 +55,22 @@ export const BFSVisualization = ({
     }
 
     // Position nodes in a grid layout
-    graph.nodes.forEach((node, i) => {
+    const updatedNodes = graph.nodes.map((node, i) => {
       const row = Math.floor(i / 4); // 4 nodes per row
       const col = i % 4;
-      node.x = col * nodeSpacing + nodeSpacing;
-      node.y = row * nodeSpacing + nodeSpacing;
-      // Fix the position
-      node.fx = node.x;
-      node.fy = node.y;
+      const x = col * nodeSpacing + nodeSpacing;
+      const y = row * nodeSpacing + nodeSpacing;
+      return {
+        ...node,
+        x,
+        y
+      };
     });
 
     // Convert edges to objects with source and target properties
     const links = graph.edges.map(edge => ({
-      source: graph.nodes.find(n => n.id === edge[0]),
-      target: graph.nodes.find(n => n.id === edge[1])
+      source: updatedNodes.find(n => n.id === edge[0]),
+      target: updatedNodes.find(n => n.id === edge[1])
     }));
 
     // Draw edges with arrows
@@ -85,7 +87,7 @@ export const BFSVisualization = ({
 
     // Draw nodes
     const nodes = svg.selectAll("g")
-      .data(graph.nodes)
+      .data(updatedNodes)
       .join("g")
       .attr("transform", d => `translate(${d.x},${d.y})`);
 
