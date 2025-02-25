@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { dfsTraversal } from "./operations/DFSOperations";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
+import { Toggle } from "@/components/ui/toggle";
 
 const DFS = () => {
   const [graph, setGraph] = useState<Graph>({ nodes: [], edges: [] });
@@ -19,6 +20,7 @@ const DFS = () => {
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [startNode, setStartNode] = useState<number | null>(null);
+  const [isDirected, setIsDirected] = useState(true);
 
   const generateRandomGraph = () => {
     const numNodes = Math.floor(Math.random() * 4) + 3; // 3-6 nodes
@@ -185,7 +187,7 @@ const DFS = () => {
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Depth First Search (DFS)</h1>
         <p className="text-muted-foreground text-lg mb-4">
-          DFS explores as far as possible along each branch before backtracking to explore other branches.
+          DFS explores as far as possible along each branch before backtracking.
         </p>
         <div className="bg-muted p-4 rounded-lg max-w-2xl mx-auto text-sm">
           <strong>Instructions:</strong>
@@ -200,7 +202,14 @@ const DFS = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-between mb-4">
+            <Toggle
+              pressed={isDirected}
+              onPressedChange={setIsDirected}
+              className="gap-2"
+            >
+              {isDirected ? "Directed Graph" : "Undirected Graph"}
+            </Toggle>
             <Button
               onClick={generateRandomGraph}
               variant="outline"
@@ -214,6 +223,7 @@ const DFS = () => {
             graph={graph}
             currentNode={currentNode}
             visitedNodes={visitedNodes}
+            isDirected={isDirected}
           />
           <VisitationSequence sequence={visitedNodes.map(nodeId => {
             const node = graph.nodes.find(n => n.id === nodeId);

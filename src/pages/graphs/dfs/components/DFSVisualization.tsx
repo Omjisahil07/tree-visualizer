@@ -7,12 +7,14 @@ interface DFSVisualizationProps {
   graph: Graph;
   currentNode: number | null;
   visitedNodes: number[];
+  isDirected: boolean;
 }
 
 export const DFSVisualization = ({
   graph,
   currentNode,
-  visitedNodes
+  visitedNodes,
+  isDirected
 }: DFSVisualizationProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -22,8 +24,7 @@ export const DFSVisualization = ({
     const containerWidth = svgRef.current.parentElement?.clientWidth || 800;
     const width = containerWidth;
     const height = 400;
-    const nodeRadius = 20;
-    const levelSpacing = 80; // Vertical spacing between levels
+    const nodeRadius = 25;
 
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -31,18 +32,20 @@ export const DFSVisualization = ({
       .attr("width", width)
       .attr("height", height);
 
-    // Add arrow marker definition
-    svg.append("defs").append("marker")
-      .attr("id", "arrowhead")
-      .attr("viewBox", "-0 -5 10 10")
-      .attr("refX", 28)
-      .attr("refY", 0)
-      .attr("orient", "auto")
-      .attr("markerWidth", 6)
-      .attr("markerHeight", 6)
-      .append("path")
-      .attr("d", "M 0,-5 L 10,0 L 0,5")
-      .attr("fill", "hsl(var(--primary))");
+    // Add arrow marker definition only for directed graphs
+    if (isDirected) {
+      svg.append("defs").append("marker")
+        .attr("id", "arrowhead")
+        .attr("viewBox", "-0 -5 10 10")
+        .attr("refX", 35)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 8)
+        .attr("markerHeight", 8)
+        .append("path")
+        .attr("d", "M 0,-5 L 10,0 L 0,5")
+        .attr("fill", "hsl(var(--primary))");
+    }
 
     if (graph.nodes.length === 0) {
       svg.append("text")
@@ -54,68 +57,66 @@ export const DFSVisualization = ({
       return;
     }
 
-    // Calculate tree structure
-    const nodeMap = new Map(graph.nodes.map(node => [node.id, { 
-      ...node, 
-      children: [] as number[],
-      level: 0
-    }]));
-
-    // Build parent-child relationships
-    graph.edges.forEach(([from, to]) => {
-      const parent = nodeMap.get(from);
-      if (parent) {
-        parent.children.push(to);
-      }
-    });
-
-    // Calculate levels
-    function assignLevels(nodeId: number, level: number) {
-      const node = nodeMap.get(nodeId);
-      if (node) {
-        node.level = level;
-        node.children.forEach(childId => assignLevels(childId, level + 1));
-      }
-    }
-
-    if (graph.nodes.length > 0) {
-      assignLevels(graph.nodes[0].id, 0);
-    }
-
-    // Calculate x positions for nodes at each level
-    const levelNodes = new Map<number, number[]>();
-    nodeMap.forEach((node) => {
-      if (!levelNodes.has(node.level)) {
-        levelNodes.set(node.level, []);
-      }
-      levelNodes.get(node.level)?.push(node.id);
-    });
-
-    // Position nodes
-    nodeMap.forEach((node) => {
-      const nodesAtLevel = levelNodes.get(node.level) || [];
-      const index = nodesAtLevel.indexOf(node.id);
-      const totalNodesAtLevel = nodesAtLevel.length;
+    // Position nodes based on the number of nodes
+    const updatedNodes = graph.nodes.map((node, i) => {
+      let x, y;
       
-      node.x = width * ((index + 1) / (totalNodesAtLevel + 1));
-      node.y = node.level * levelSpacing + 40; // Add padding from top
+      if (graph.nodes.length === 3) {
+        // Create triangular structure for 3 nodes
+        switch(i) {
+          case 0: // Top node
+            x = width / 2;
+            y = height * 0.2;
+            break;
+          case 1: // Bottom left node
+            x = width * 0.3;
+            y = height * 0.7;
+            break;
+          case 2: // Bottom right node
+            x = width * 0.7;
+            y = height * 0.7;
+            break;
+          default:
+            x = width / 2;
+            y = height / 2;
+        }
+      } else {
+        // Default grid layout for other cases
+        const row = Math.floor(i / 4);
+        const col = i % 4;
+        const nodeSpacing = 100;
+        x = col * nodeSpacing + nodeSpacing;
+        y = row * nodeSpacing + nodeSpacing;
+      }
+
+      return {
+        ...node,
+        x,
+        y
+      };
     });
 
-    // Draw edges with arrows
+    // Convert edges to objects with source and target properties
+    const links = graph.edges.map(edge => ({
+      source: updatedNodes.find(n => n.id === edge[0]),
+      target: updatedNodes.find(n => n.id === edge[1])
+    }));
+
+    // Draw edges
     const edges = svg.selectAll("line")
-      .data(graph.edges)
+      .data(links)
       .join("line")
       .attr("stroke", "hsl(var(--primary))")
       .attr("stroke-width", 2)
-      .attr("marker-end", "url(#arrowhead)")
-      .attr("x1", d => nodeMap.get(d[0])?.x || 0)
-      .attr("y1", d => nodeMap.get(d[0])?.y || 0)
-      .attr("x2", d => nodeMap.get(d[1])?.x || 0)
-      .attr("y2", d => nodeMap.get(d[1])?.y || 0);
+      .attr("marker-end", isDirected ? "url(#arrowhead)" : null) // Only add arrows for directed graphs
+      .attr("x1", d => (d.source as any).x)
+      .attr("y1", d => (d.source as any).y)
+      .attr("x2", d => (d.target as any).x)
+      .attr("y2", d => (d.target as any).y);
 
     // Draw nodes
     const nodes = svg.selectAll("g")
-      .data(Array.from(nodeMap.values()))
+      .data(updatedNodes)
       .join("g")
       .attr("transform", d => `translate(${d.x},${d.y})`);
 
@@ -138,9 +139,9 @@ export const DFSVisualization = ({
           ? "white" 
           : "currentColor"
       )
-      .style("font-size", "14px");
+      .style("font-size", "16px");
 
-  }, [graph, currentNode, visitedNodes]);
+  }, [graph, currentNode, visitedNodes, isDirected]);
 
   return (
     <div className="relative w-full border border-border rounded-lg bg-white shadow-sm p-4">
