@@ -21,9 +21,9 @@ export const DFSVisualization = ({
 
     const containerWidth = svgRef.current.parentElement?.clientWidth || 800;
     const width = containerWidth;
-    const height = 400; // Reduced height
-    const nodeRadius = 25;
-    const nodeSpacing = 100; // Fixed spacing between nodes
+    const height = 400;
+    const nodeRadius = 20;
+    const levelSpacing = 80; // Vertical spacing between levels
 
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -35,11 +35,11 @@ export const DFSVisualization = ({
     svg.append("defs").append("marker")
       .attr("id", "arrowhead")
       .attr("viewBox", "-0 -5 10 10")
-      .attr("refX", 35) // Adjusted to position arrow just before the node
+      .attr("refX", 28)
       .attr("refY", 0)
       .attr("orient", "auto")
-      .attr("markerWidth", 8)
-      .attr("markerHeight", 8)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
       .append("path")
       .attr("d", "M 0,-5 L 10,0 L 0,5")
       .attr("fill", "hsl(var(--primary))");
@@ -54,38 +54,68 @@ export const DFSVisualization = ({
       return;
     }
 
-    // Position nodes in a grid layout
-    graph.nodes.forEach((node, i) => {
-      const row = Math.floor(i / 4); // 4 nodes per row
-      const col = i % 4;
-      node.x = col * nodeSpacing + nodeSpacing;
-      node.y = row * nodeSpacing + nodeSpacing;
-      // Fix the position
-      node.fx = node.x;
-      node.fy = node.y;
+    // Calculate tree structure
+    const nodeMap = new Map(graph.nodes.map(node => [node.id, { 
+      ...node, 
+      children: [] as number[],
+      level: 0
+    }]));
+
+    // Build parent-child relationships
+    graph.edges.forEach(([from, to]) => {
+      const parent = nodeMap.get(from);
+      if (parent) {
+        parent.children.push(to);
+      }
     });
 
-    // Convert edges to objects with source and target properties
-    const links = graph.edges.map(edge => ({
-      source: graph.nodes.find(n => n.id === edge[0]),
-      target: graph.nodes.find(n => n.id === edge[1])
-    }));
+    // Calculate levels
+    function assignLevels(nodeId: number, level: number) {
+      const node = nodeMap.get(nodeId);
+      if (node) {
+        node.level = level;
+        node.children.forEach(childId => assignLevels(childId, level + 1));
+      }
+    }
+
+    if (graph.nodes.length > 0) {
+      assignLevels(graph.nodes[0].id, 0);
+    }
+
+    // Calculate x positions for nodes at each level
+    const levelNodes = new Map<number, number[]>();
+    nodeMap.forEach((node) => {
+      if (!levelNodes.has(node.level)) {
+        levelNodes.set(node.level, []);
+      }
+      levelNodes.get(node.level)?.push(node.id);
+    });
+
+    // Position nodes
+    nodeMap.forEach((node) => {
+      const nodesAtLevel = levelNodes.get(node.level) || [];
+      const index = nodesAtLevel.indexOf(node.id);
+      const totalNodesAtLevel = nodesAtLevel.length;
+      
+      node.x = width * ((index + 1) / (totalNodesAtLevel + 1));
+      node.y = node.level * levelSpacing + 40; // Add padding from top
+    });
 
     // Draw edges with arrows
     const edges = svg.selectAll("line")
-      .data(links)
+      .data(graph.edges)
       .join("line")
       .attr("stroke", "hsl(var(--primary))")
       .attr("stroke-width", 2)
       .attr("marker-end", "url(#arrowhead)")
-      .attr("x1", d => (d.source as any).x)
-      .attr("y1", d => (d.source as any).y)
-      .attr("x2", d => (d.target as any).x)
-      .attr("y2", d => (d.target as any).y);
+      .attr("x1", d => nodeMap.get(d[0])?.x || 0)
+      .attr("y1", d => nodeMap.get(d[0])?.y || 0)
+      .attr("x2", d => nodeMap.get(d[1])?.x || 0)
+      .attr("y2", d => nodeMap.get(d[1])?.y || 0);
 
     // Draw nodes
     const nodes = svg.selectAll("g")
-      .data(graph.nodes)
+      .data(Array.from(nodeMap.values()))
       .join("g")
       .attr("transform", d => `translate(${d.x},${d.y})`);
 
@@ -108,7 +138,7 @@ export const DFSVisualization = ({
           ? "white" 
           : "currentColor"
       )
-      .style("font-size", "16px");
+      .style("font-size", "14px");
 
   }, [graph, currentNode, visitedNodes]);
 

@@ -30,8 +30,8 @@ export const DFSControls = ({
   onStartNodeChange
 }: DFSControlsProps) => {
   const [nodeValue, setNodeValue] = useState("");
-  const [fromNode, setFromNode] = useState("");
-  const [toNode, setToNode] = useState("");
+  const [fromNodeValue, setFromNodeValue] = useState("");
+  const [toNodeValue, setToNodeValue] = useState("");
   const [selectedNode, setSelectedNode] = useState<string>("");
   const [newValue, setNewValue] = useState("");
 
@@ -45,27 +45,43 @@ export const DFSControls = ({
 
   const handleAddEdge = (e: React.FormEvent) => {
     e.preventDefault();
-    if (fromNode && toNode) {
-      onAddEdge(fromNode, toNode);
-      setFromNode("");
-      setToNode("");
+    if (fromNodeValue && toNodeValue) {
+      // Find nodes by their values
+      const fromNode = nodes.find(n => n.value === parseInt(fromNodeValue));
+      const toNode = nodes.find(n => n.value === parseInt(toNodeValue));
+      
+      if (!fromNode || !toNode) {
+        toast.error("One or both nodes not found");
+        return;
+      }
+
+      onAddEdge(fromNode.id.toString(), toNode.id.toString());
+      setFromNodeValue("");
+      setToNodeValue("");
+      toast.success(`Added edge from ${fromNodeValue} to ${toNodeValue}`);
     }
   };
 
   const handleDeleteNode = () => {
     if (selectedNode) {
-      onDeleteNode(parseInt(selectedNode));
-      setSelectedNode("");
-      toast.success("Node deleted successfully");
+      const node = nodes.find(n => n.value === parseInt(selectedNode));
+      if (node) {
+        onDeleteNode(node.id);
+        setSelectedNode("");
+        toast.success(`Deleted node with value ${selectedNode}`);
+      }
     }
   };
 
   const handleUpdateNode = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedNode && newValue) {
-      onUpdateNode(parseInt(selectedNode), parseInt(newValue));
-      setNewValue("");
-      toast.success("Node updated successfully");
+      const node = nodes.find(n => n.value === parseInt(selectedNode));
+      if (node) {
+        onUpdateNode(node.id, parseInt(newValue));
+        setNewValue("");
+        toast.success(`Updated node ${selectedNode} to ${newValue}`);
+      }
     }
   };
 
@@ -90,15 +106,15 @@ export const DFSControls = ({
           <div className="flex gap-2">
             <Input
               type="number"
-              placeholder="From node"
-              value={fromNode}
-              onChange={(e) => setFromNode(e.target.value)}
+              placeholder="From node value"
+              value={fromNodeValue}
+              onChange={(e) => setFromNodeValue(e.target.value)}
             />
             <Input
               type="number"
-              placeholder="To node"
-              value={toNode}
-              onChange={(e) => setToNode(e.target.value)}
+              placeholder="To node value"
+              value={toNodeValue}
+              onChange={(e) => setToNodeValue(e.target.value)}
             />
           </div>
           <Button type="submit" className="w-full">Add Edge</Button>
@@ -117,7 +133,7 @@ export const DFSControls = ({
             </SelectTrigger>
             <SelectContent>
               {nodes.map((node) => (
-                <SelectItem key={node.id} value={node.id.toString()}>
+                <SelectItem key={node.id} value={node.value.toString()}>
                   Node {node.value}
                 </SelectItem>
               ))}
@@ -146,7 +162,7 @@ export const DFSControls = ({
             </SelectTrigger>
             <SelectContent>
               {nodes.map((node) => (
-                <SelectItem key={node.id} value={node.id.toString()}>
+                <SelectItem key={node.id} value={node.value.toString()}>
                   Node {node.value}
                 </SelectItem>
               ))}
@@ -172,15 +188,18 @@ export const DFSControls = ({
         <h3 className="text-lg font-medium mb-4">Start Traversal</h3>
         <div className="space-y-2">
           <Select
-            value={startNode?.toString()}
-            onValueChange={(value) => onStartNodeChange(parseInt(value))}
+            value={startNode !== null ? nodes.find(n => n.id === startNode)?.value.toString() : ""}
+            onValueChange={(value) => {
+              const node = nodes.find(n => n.value === parseInt(value));
+              if (node) onStartNodeChange(node.id);
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select start node" />
             </SelectTrigger>
             <SelectContent>
               {nodes.map((node) => (
-                <SelectItem key={node.id} value={node.id.toString()}>
+                <SelectItem key={node.id} value={node.value.toString()}>
                   Node {node.value}
                 </SelectItem>
               ))}
