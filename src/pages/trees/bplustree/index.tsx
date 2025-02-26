@@ -1,3 +1,4 @@
+
 import { BPlusTreePseudocode } from "./components/BPlusTreePseudocode";
 import { BPlusTreeVisualization } from "./components/BPlusTreeVisualization";
 import { BPlusTreeTraversalControls } from "./components/BPlusTreeTraversalControls";
@@ -6,7 +7,7 @@ import { BPlusTreeHeader } from "./components/BPlusTreeHeader";
 import { useState, useCallback } from "react";
 import { Footer } from "@/components/Footer";
 import { BPlusTreeNode, TraversalType } from "./types/BPlusTreeTypes";
-import { traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder, insertNode } from "./operations/BPlusTreeOperations";
+import { BPlusTreeOperations } from "./operations/BPlusTreeOperations";
 import { toast } from "sonner";
 
 const BPlusTree = () => {
@@ -16,6 +17,7 @@ const BPlusTree = () => {
     children: [],
     next: null
   });
+  const [treeOperations, setTreeOperations] = useState<BPlusTreeOperations | null>(null);
   const [currentStep, setCurrentStep] = useState("");
   const [currentLine, setCurrentLine] = useState(-1);
   const [traversalType, setTraversalType] = useState<TraversalType>("inorder");
@@ -26,6 +28,10 @@ const BPlusTree = () => {
   const [updateValue, setUpdateValue] = useState("");
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+
+  const handleSetDegree = (degree: number) => {
+    setTreeOperations(new BPlusTreeOperations(degree));
+  };
 
   const handleTraversalStep = useCallback(async (value: number, step: string) => {
     if (isPaused) return;
@@ -38,47 +44,13 @@ const BPlusTree = () => {
     await new Promise(resolve => setTimeout(resolve, 500));
   }, [isPaused]);
 
-  const startTraversal = async () => {
-    setIsTraversing(true);
-    setIsPaused(false);
-    setVisitedNodes([]);
-    setCurrentNode(null);
-    setCurrentLine(0);
-    setCurrentStep("");
-
-    const traversalFunction = {
-      inorder: traverseInOrder,
-      preorder: traversePreOrder,
-      postorder: traversePostOrder,
-      levelorder: traverseLevelOrder,
-    }[traversalType];
-
-    if (!traversalFunction) return;
-
-    await traversalFunction(tree, handleTraversalStep);
-    
-    if (!isPaused) {
-      setIsTraversing(false);
-      setCurrentLine(-1);
-      setCurrentStep("Traversal complete");
-    }
-  };
-
-  const handleNodeClick = (value: number) => {
-    setSelectedNode(value);
-    setUpdateValue(value.toString());
-  };
-
   const generateRandomBPlusTree = () => {
-    const newTree: BPlusTreeNode = {
-      keys: [],
-      children: [],
-      isLeaf: true,
-      next: null
-    };
+    if (!treeOperations) {
+      toast.error("Please set the B+ tree degree first");
+      return;
+    }
 
-    // Generate random numbers between 1 and 100
-    const numNodes = Math.floor(Math.random() * 8) + 3; // 3 to 10 nodes
+    const numNodes = Math.floor(Math.random() * 8) + 3;
     const numbers = new Set<number>();
     
     while (numbers.size < numNodes) {
@@ -86,10 +58,15 @@ const BPlusTree = () => {
     }
 
     const sortedNumbers = Array.from(numbers).sort((a, b) => a - b);
-    let currentTree = newTree;
+    let currentTree: BPlusTreeNode = {
+      keys: [],
+      children: [],
+      isLeaf: true,
+      next: null
+    };
 
     sortedNumbers.forEach(num => {
-      currentTree = insertNode(currentTree, num) as BPlusTreeNode;
+      currentTree = treeOperations.insertNode(currentTree, num);
     });
 
     setTree(currentTree);
@@ -98,25 +75,30 @@ const BPlusTree = () => {
 
   const handleInsert = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!treeOperations) {
+      toast.error("Please set the B+ tree degree first");
+      return;
+    }
+
     const value = parseInt(inputValue);
     if (isNaN(value)) {
       toast.error("Please enter a valid number");
       return;
     }
 
-    try {
-      const updatedTree = insertNode(tree, value);
-      setTree(updatedTree as BPlusTreeNode);
-      toast.success(`Inserted node with value ${value}`);
-      setInputValue("");
-    } catch (error) {
-      toast.error("Failed to insert node");
-    }
+    const updatedTree = treeOperations.insertNode(tree, value);
+    setTree(updatedTree);
+    toast.success(`Inserted node with value ${value}`);
+    setInputValue("");
   };
 
   return (
     <div className="container mx-auto py-12">
-      <BPlusTreeHeader onGenerateRandom={generateRandomBPlusTree} />
+      <BPlusTreeHeader
+        onGenerateRandom={generateRandomBPlusTree}
+        onSetDegree={handleSetDegree}
+        isConfigured={treeOperations !== null}
+      />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
@@ -128,7 +110,35 @@ const BPlusTree = () => {
           
           <div className="bg-white rounded-lg shadow-lg p-6">
             <BPlusTreeTraversalControls
-              onStart={startTraversal}
+              onStart={() => {
+                if (!treeOperations) {
+                  toast.error("Please set the B+ tree degree first");
+                  return;
+                }
+                setIsTraversing(true);
+                setIsPaused(false);
+                setVisitedNodes([]);
+                setCurrentNode(null);
+                setCurrentLine(0);
+                setCurrentStep("");
+
+                const traversalFunction = {
+                  inorder: treeOperations.traverseInOrder.bind(treeOperations),
+                  preorder: treeOperations.traversePreOrder.bind(treeOperations),
+                  postorder: treeOperations.traversePostOrder.bind(treeOperations),
+                  levelorder: treeOperations.traverseLevelOrder.bind(treeOperations),
+                }[traversalType];
+
+                if (!traversalFunction) return;
+
+                traversalFunction(tree, handleTraversalStep).then(() => {
+                  if (!isPaused) {
+                    setIsTraversing(false);
+                    setCurrentLine(-1);
+                    setCurrentStep("Traversal complete");
+                  }
+                });
+              }}
               onPause={() => {
                 setIsPaused(true);
                 setIsTraversing(false);
@@ -153,6 +163,7 @@ const BPlusTree = () => {
             inputValue={inputValue}
             onInputChange={setInputValue}
             onSubmit={handleInsert}
+            disabled={!treeOperations}
           />
 
           <BPlusTreePseudocode
