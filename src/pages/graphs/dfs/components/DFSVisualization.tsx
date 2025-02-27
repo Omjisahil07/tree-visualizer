@@ -109,13 +109,62 @@ export const DFSVisualization = ({
         }
         return { ...node, x, y };
       });
-    } else if (isDirectPath(graph)) {
-      // If graph is a simple path (each node has at most one outgoing edge),
-      // Use a custom layout that shows the path clearly
-      updatedNodes = layoutDirectPath(graph, width, height, nodeRadius);
     } else {
-      // For more complex graphs, use an improved force-directed layout
-      updatedNodes = layoutComplexGraph(graph, width, height, nodeRadius);
+      // For more nodes, create a grid layout with proper spacing
+      // to avoid overlapping while keeping structure clear
+      const gridSize = Math.ceil(Math.sqrt(graph.nodes.length));
+      const cellWidth = width / (gridSize + 1);
+      const cellHeight = height / (gridSize + 1);
+      
+      updatedNodes = graph.nodes.map((node, i) => {
+        // Calculate grid position
+        const row = Math.floor(i / gridSize);
+        const col = i % gridSize;
+        
+        // Add some random variation to prevent perfect grid alignment
+        // but not so much that nodes could overlap
+        const jitterX = (Math.random() - 0.5) * cellWidth * 0.4;
+        const jitterY = (Math.random() - 0.5) * cellHeight * 0.4;
+        
+        return {
+          ...node,
+          x: cellWidth * (col + 1) + jitterX,
+          y: cellHeight * (row + 1) + jitterY
+        };
+      });
+      
+      // Run overlap prevention algorithm
+      for (let iteration = 0; iteration < 50; iteration++) {
+        let moved = false;
+        for (let i = 0; i < updatedNodes.length; i++) {
+          for (let j = i + 1; j < updatedNodes.length; j++) {
+            const dx = updatedNodes[j].x - updatedNodes[i].x;
+            const dy = updatedNodes[j].y - updatedNodes[i].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDistance = nodeRadius * 2.5; // Minimum acceptable distance
+            
+            if (distance < minDistance) {
+              // Move nodes apart along their axis
+              const moveX = (dx / distance) * (minDistance - distance) * 0.5;
+              const moveY = (dy / distance) * (minDistance - distance) * 0.5;
+              
+              updatedNodes[i].x -= moveX;
+              updatedNodes[i].y -= moveY;
+              updatedNodes[j].x += moveX;
+              updatedNodes[j].y += moveY;
+              
+              moved = true;
+            }
+          }
+        }
+        if (!moved) break; // If no nodes were moved, we're done
+      }
+      
+      // Ensure all nodes are within bounds
+      updatedNodes.forEach(node => {
+        node.x = Math.max(nodeRadius, Math.min(width - nodeRadius, node.x));
+        node.y = Math.max(nodeRadius, Math.min(height - nodeRadius, node.y));
+      });
     }
 
     // Convert edges to objects with source and target properties
@@ -124,54 +173,41 @@ export const DFSVisualization = ({
       target: updatedNodes.find(n => n.id === edge[1])
     }));
 
-    // Draw curved edges for better visualization
-    const edgeOpacity = isDirected ? 0.7 : 0.5;
-    
-    if (isDirected) {
-      // Draw directed edges as curves
-      svg.selectAll(".edge")
-        .data(links)
-        .join("path")
-        .attr("class", "edge")
-        .attr("d", d => {
+    // Draw edges as straight lines
+    const edges = svg.selectAll(".edge")
+      .data(links)
+      .join("line")
+      .attr("class", "edge")
+      .attr("stroke", "hsl(var(--primary))")
+      .attr("stroke-width", 2)
+      .attr("x1", d => (d.source as any).x)
+      .attr("y1", d => (d.source as any).y)
+      .attr("x2", d => {
+        // For directed graphs, make the line stop a bit before the target
+        // to avoid overlap with the arrowhead
+        if (isDirected) {
           const sourceX = (d.source as any).x;
-          const sourceY = (d.source as any).y;
           const targetX = (d.target as any).x;
+          const sourceY = (d.source as any).y;
           const targetY = (d.target as any).y;
-          
-          // Calculate control point for the curve
-          // For horizontal paths, add a slight curve
-          const dx = targetX - sourceX;
-          const dy = targetY - sourceY;
-          const dr = Math.sqrt(dx * dx + dy * dy);
-          
-          // If nodes are approximately at the same level, add a more pronounced curve
-          if (Math.abs(dy) < 50) {
-            return `M${sourceX},${sourceY} A${dr},${dr * 1.5} 0 0,1 ${targetX},${targetY}`;
-          }
-          
-          // Otherwise use a gentler curve
-          return `M${sourceX},${sourceY} Q${(sourceX + targetX) / 2 + 30},${(sourceY + targetY) / 2} ${targetX},${targetY}`;
-        })
-        .attr("fill", "none")
-        .attr("stroke", "hsl(var(--primary))")
-        .attr("stroke-width", 2)
-        .attr("stroke-opacity", edgeOpacity)
-        .attr("marker-end", "url(#arrowhead)");
-    } else {
-      // Draw undirected edges as straight lines
-      svg.selectAll(".edge")
-        .data(links)
-        .join("line")
-        .attr("class", "edge")
-        .attr("stroke", "hsl(var(--primary))")
-        .attr("stroke-width", 2)
-        .attr("stroke-opacity", edgeOpacity)
-        .attr("x1", d => (d.source as any).x)
-        .attr("y1", d => (d.source as any).y)
-        .attr("x2", d => (d.target as any).x)
-        .attr("y2", d => (d.target as any).y);
-    }
+          const angle = Math.atan2(targetY - sourceY, targetX - sourceX);
+          return targetX - (Math.cos(angle) * nodeRadius);
+        }
+        return (d.target as any).x;
+      })
+      .attr("y2", d => {
+        // Same adjustment for y coordinate
+        if (isDirected) {
+          const sourceX = (d.source as any).x;
+          const targetX = (d.target as any).x;
+          const sourceY = (d.source as any).y;
+          const targetY = (d.target as any).y;
+          const angle = Math.atan2(targetY - sourceY, targetX - sourceX);
+          return targetY - (Math.sin(angle) * nodeRadius);
+        }
+        return (d.target as any).y;
+      })
+      .attr("marker-end", isDirected ? "url(#arrowhead)" : null);
 
     // Draw nodes
     const nodes = svg.selectAll(".node")
@@ -239,133 +275,6 @@ export const DFSVisualization = ({
     });
 
   }, [graph, currentNode, visitedNodes, isDirected]);
-
-  // Helper functions for layout
-  
-  // Check if graph is a simple directed path
-  function isDirectPath(graph: Graph): boolean {
-    if (graph.nodes.length <= 1) return true;
-    
-    // Count outgoing edges for each node
-    const outgoingEdges: Record<number, number> = {};
-    graph.nodes.forEach(node => outgoingEdges[node.id] = 0);
-    
-    graph.edges.forEach(edge => {
-      outgoingEdges[edge[0]]++;
-    });
-    
-    // Check if every node has at most one outgoing edge
-    return Object.values(outgoingEdges).every(count => count <= 1);
-  }
-  
-  // Layout for directed paths
-  function layoutDirectPath(graph: Graph, width: number, height: number, nodeRadius: number) {
-    const nodeCount = graph.nodes.length;
-    if (nodeCount <= 1) {
-      return graph.nodes.map(node => ({...node, x: width/2, y: height/2}));
-    }
-    
-    // Find start nodes (nodes with no incoming edges or nodes not referenced as targets)
-    const targets = new Set(graph.edges.map(edge => edge[1]));
-    const startNodes = graph.nodes.filter(node => !targets.has(node.id));
-    
-    // If no clear start node, use the first node
-    const firstNodeId = startNodes.length > 0 ? startNodes[0].id : graph.nodes[0].id;
-    
-    // Build an adjacency list
-    const adjacencyList: Record<number, number[]> = {};
-    graph.nodes.forEach(node => adjacencyList[node.id] = []);
-    graph.edges.forEach(edge => {
-      adjacencyList[edge[0]].push(edge[1]);
-    });
-    
-    // Find the longest path from the start node
-    const visited = new Set<number>();
-    const positions: Record<number, {x: number, y: number}> = {};
-    
-    // For horizontal layout
-    const spacing = Math.min((width - 2 * nodeRadius) / (nodeCount + 1), 120);
-    
-    // Position nodes in a path
-    let currentX = nodeRadius + spacing;
-    let currentY = height / 2;
-    let currentNode = firstNodeId;
-    
-    while (currentNode !== undefined && !visited.has(currentNode)) {
-      visited.add(currentNode);
-      
-      // Position current node
-      positions[currentNode] = { x: currentX, y: currentY };
-      currentX += spacing;
-      
-      // Find next node in path
-      const neighbors = adjacencyList[currentNode];
-      currentNode = neighbors.length > 0 ? neighbors[0] : undefined;
-      
-      // For zigzag pattern, offset Y position
-      if (currentNode !== undefined && !visited.has(currentNode)) {
-        currentY = currentY === height / 2 ? height / 2 - 50 : height / 2;
-      }
-    }
-    
-    // Position any remaining nodes
-    graph.nodes.forEach(node => {
-      if (!positions[node.id]) {
-        positions[node.id] = { 
-          x: Math.random() * (width - 2 * nodeRadius) + nodeRadius,
-          y: Math.random() * (height - 2 * nodeRadius) + nodeRadius
-        };
-      }
-    });
-    
-    // Return nodes with positions
-    return graph.nodes.map(node => ({
-      ...node,
-      x: positions[node.id].x,
-      y: positions[node.id].y
-    }));
-  }
-  
-  // Layout for complex graphs
-  function layoutComplexGraph(graph: Graph, width: number, height: number, nodeRadius: number) {
-    // Make a deep copy of nodes for d3 to manipulate
-    const nodesCopy = graph.nodes.map(node => ({...node}));
-    
-    // Create links array for the simulation
-    const links = graph.edges.map(edge => ({
-      source: edge[0],
-      target: edge[1]
-    }));
-    
-    // Use D3 force simulation for layout
-    const simulation = d3.forceSimulation()
-      .force("link", d3.forceLink().id((d: any) => d.id).distance(100))
-      .force("charge", d3.forceManyBody().strength(-400))
-      .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("x", d3.forceX(width / 2).strength(0.05))
-      .force("y", d3.forceY(height / 2).strength(0.05))
-      .force("collision", d3.forceCollide().radius(nodeRadius * 1.8));
-    
-    // Run the simulation
-    simulation.nodes(nodesCopy);
-    (simulation.force("link") as d3.ForceLink<any, any>).links(links);
-    
-    // Run the simulation synchronously
-    for (let i = 0; i < 300; i++) {
-      simulation.tick();
-    }
-    
-    // Stop the simulation
-    simulation.stop();
-    
-    // Constrain nodes to be within bounds
-    nodesCopy.forEach(node => {
-      node.x = Math.max(nodeRadius, Math.min(width - nodeRadius, node.x || width/2));
-      node.y = Math.max(nodeRadius, Math.min(height - nodeRadius, node.y || height/2));
-    });
-    
-    return nodesCopy;
-  }
 
   return (
     <div className="relative w-full border border-border rounded-lg bg-white shadow-sm p-4">
