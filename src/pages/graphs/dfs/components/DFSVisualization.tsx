@@ -57,12 +57,13 @@ export const DFSVisualization = ({
       return;
     }
 
-    // Position nodes based on the number of nodes
-    const updatedNodes = graph.nodes.map((node, i) => {
-      let x, y;
-      
-      if (graph.nodes.length === 3) {
-        // Create triangular structure for 3 nodes
+    // Position nodes based on the number of nodes and connections
+    let updatedNodes = [];
+    
+    if (graph.nodes.length === 3) {
+      // Create triangular structure for 3 nodes
+      updatedNodes = graph.nodes.map((node, i) => {
+        let x, y;
         switch(i) {
           case 0: // Top node
             x = width / 2;
@@ -80,21 +81,73 @@ export const DFSVisualization = ({
             x = width / 2;
             y = height / 2;
         }
-      } else {
-        // Default grid layout for other cases
-        const row = Math.floor(i / 4);
-        const col = i % 4;
-        const nodeSpacing = 100;
-        x = col * nodeSpacing + nodeSpacing;
-        y = row * nodeSpacing + nodeSpacing;
+        return { ...node, x, y };
+      });
+    } else if (graph.nodes.length <= 4) {
+      // Create square or diamond structure for 4 nodes
+      updatedNodes = graph.nodes.map((node, i) => {
+        let x, y;
+        switch(i) {
+          case 0: // Top node
+            x = width / 2;
+            y = height * 0.15;
+            break;
+          case 1: // Left node
+            x = width * 0.25;
+            y = height * 0.5;
+            break;
+          case 2: // Right node
+            x = width * 0.75;
+            y = height * 0.5;
+            break;
+          case 3: // Bottom node
+            x = width / 2;
+            y = height * 0.85;
+            break;
+          default:
+            x = width / 2;
+            y = height / 2;
+        }
+        return { ...node, x, y };
+      });
+    } else {
+      // For more than 4 nodes, use a force-directed layout
+      // First set initial positions in a logical structure
+      const simulation = d3.forceSimulation()
+        .force("link", d3.forceLink().id((d: any) => d.id).distance(100))
+        .force("charge", d3.forceManyBody().strength(-300))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius(nodeRadius * 1.5));
+
+      // Make a deep copy of nodes for d3 to manipulate
+      const nodesCopy = graph.nodes.map(node => ({...node}));
+      
+      // Create links array for the simulation
+      const links = graph.edges.map(edge => ({
+        source: edge[0],
+        target: edge[1]
+      }));
+
+      // Run the simulation synchronously
+      simulation.nodes(nodesCopy);
+      (simulation.force("link") as d3.ForceLink<any, any>).links(links);
+      
+      // Run the simulation for a fixed number of iterations
+      for (let i = 0; i < 300; i++) {
+        simulation.tick();
       }
 
-      return {
-        ...node,
-        x,
-        y
-      };
-    });
+      // Stop the simulation
+      simulation.stop();
+      
+      // Constrain nodes to be within bounds
+      nodesCopy.forEach(node => {
+        node.x = Math.max(nodeRadius, Math.min(width - nodeRadius, node.x || width/2));
+        node.y = Math.max(nodeRadius, Math.min(height - nodeRadius, node.y || height/2));
+      });
+      
+      updatedNodes = nodesCopy;
+    }
 
     // Convert edges to objects with source and target properties
     const links = graph.edges.map(edge => ({
@@ -140,6 +193,14 @@ export const DFSVisualization = ({
           : "currentColor"
       )
       .style("font-size", "16px");
+
+    // Add node IDs as small labels above nodes
+    nodes.append("text")
+      .text(d => `#${d.id}`)
+      .attr("text-anchor", "middle")
+      .attr("dy", "-1.5em")
+      .attr("fill", "hsl(var(--muted-foreground))")
+      .style("font-size", "12px");
 
   }, [graph, currentNode, visitedNodes, isDirected]);
 
