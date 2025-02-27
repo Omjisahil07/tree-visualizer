@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { Graph, GraphNode } from "../types/GraphTypes";
 import { DFSVisualization } from "./components/DFSVisualization";
@@ -183,10 +184,10 @@ const DFS = () => {
   };
 
   return (
-    <div className="container mx-auto py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Depth First Search (DFS)</h1>
-        <p className="text-muted-foreground text-lg mb-4">
+    <div className="container mx-auto py-8">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-3">Depth First Search (DFS)</h1>
+        <p className="text-muted-foreground text-lg mb-3">
           DFS explores as far as possible along each branch before backtracking.
         </p>
         <div className="bg-muted p-4 rounded-lg max-w-2xl mx-auto text-sm">
@@ -200,38 +201,42 @@ const DFS = () => {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex justify-between mb-4">
-            <Toggle
-              pressed={isDirected}
-              onPressedChange={setIsDirected}
-              className="gap-2"
-            >
-              {isDirected ? "Directed Graph" : "Undirected Graph"}
-            </Toggle>
-            <Button
-              onClick={generateRandomGraph}
-              variant="outline"
-              className="gap-2"
-            >
-              <Wand2 className="w-4 h-4" />
-              Generate Random Graph
-            </Button>
-          </div>
+      <div className="flex justify-between items-center mb-4">
+        <Toggle
+          pressed={isDirected}
+          onPressedChange={setIsDirected}
+          className="gap-2"
+        >
+          {isDirected ? "Directed Graph" : "Undirected Graph"}
+        </Toggle>
+        <Button
+          onClick={generateRandomGraph}
+          variant="outline"
+          className="gap-2"
+        >
+          <Wand2 className="w-4 h-4" />
+          Generate Random Graph
+        </Button>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Main visualization panel - wider */}
+        <div className="lg:col-span-8 space-y-4">
           <DFSVisualization
             graph={graph}
             currentNode={currentNode}
             visitedNodes={visitedNodes}
             isDirected={isDirected}
           />
+          
           <VisitationSequence sequence={visitedNodes.map(nodeId => {
             const node = graph.nodes.find(n => n.id === nodeId);
             return node?.value || nodeId;
           })} />
         </div>
 
-        <div className="space-y-6">
+        {/* Controls and pseudocode panel - narrower */}
+        <div className="lg:col-span-4 space-y-4">
           <DFSControls
             onAddNode={(value) => addNode(parseInt(value))}
             onAddEdge={(from, to) => addEdge(parseInt(from), parseInt(to))}

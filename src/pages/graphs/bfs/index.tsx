@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { Graph, GraphNode } from "../types/GraphTypes";
 import { BFSVisualization } from "./components/BFSVisualization";
@@ -18,6 +19,7 @@ const BFS = () => {
   const [isTraversing, setIsTraversing] = useState(false);
   const [currentNode, setCurrentNode] = useState<number | null>(null);
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
+  const [inputValue, setInputValue] = useState("");
   const [startNode, setStartNode] = useState<number | null>(null);
   const [isDirected, setIsDirected] = useState(true);
 
@@ -65,9 +67,9 @@ const BFS = () => {
     setCurrentStep(step);
     setVisitedNodes(prev => !prev.includes(nodeId) ? [...prev, nodeId] : prev);
     setCurrentLine(prev => {
-      if (step.includes("Starting BFS")) return 0;
-      if (step.includes("Processing node")) return 5;
-      if (step.includes("Discovered node")) return 8;
+      if (step.includes("Visiting node")) return 1;
+      if (step.includes("Exploring neighbors")) return 2;
+      if (step.includes("Adding to queue")) return 3;
       return prev;
     });
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -125,6 +127,21 @@ const BFS = () => {
     toast.success(`Added edge from node ${from} to node ${to}`);
   };
 
+  const startTraversal = async () => {
+    if (graph.nodes.length === 0) {
+      toast.error("Please add nodes to the graph first");
+      return;
+    }
+    setIsTraversing(true);
+    setVisitedNodes([]);
+    setCurrentNode(null);
+    setCurrentLine(-1);
+    await bfsTraversal(graph, startNode || 0, handleTraversalStep);
+    setIsTraversing(false);
+    setCurrentLine(-1);
+    setCurrentStep("Traversal complete");
+  };
+
   const deleteNode = (nodeId: number) => {
     setGraph(prev => {
       // Remove all edges connected to this node
@@ -166,32 +183,12 @@ const BFS = () => {
     toast.success(`Updated node ${nodeId} to value ${newValue}`);
   };
 
-  const startTraversal = async () => {
-    if (graph.nodes.length === 0) {
-      toast.error("Please add nodes to the graph first");
-      return;
-    }
-    setIsTraversing(true);
-    setVisitedNodes([]);
-    setCurrentNode(null);
-    setCurrentLine(-1);
-    try {
-      await bfsTraversal(graph, startNode || 0, handleTraversalStep);
-      toast.success("Traversal complete!");
-    } catch (error) {
-      toast.error("An error occurred during traversal");
-    }
-    setIsTraversing(false);
-    setCurrentLine(-1);
-    setCurrentStep("Traversal complete");
-  };
-
   return (
-    <div className="container mx-auto py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Breadth First Search (BFS)</h1>
-        <p className="text-muted-foreground text-lg mb-4">
-          BFS explores all vertices at the current depth before moving to vertices at the next depth level.
+    <div className="container mx-auto py-8">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-3">Breadth First Search (BFS)</h1>
+        <p className="text-muted-foreground text-lg mb-3">
+          BFS explores all neighbors at the present depth before moving on to nodes at the next depth level.
         </p>
         <div className="bg-muted p-4 rounded-lg max-w-2xl mx-auto text-sm">
           <strong>Instructions:</strong>
@@ -204,38 +201,42 @@ const BFS = () => {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex justify-between mb-4">
-            <Toggle
-              pressed={isDirected}
-              onPressedChange={setIsDirected}
-              className="gap-2"
-            >
-              {isDirected ? "Directed Graph" : "Undirected Graph"}
-            </Toggle>
-            <Button
-              onClick={generateRandomGraph}
-              variant="outline"
-              className="gap-2"
-            >
-              <Wand2 className="w-4 h-4" />
-              Generate Random Graph
-            </Button>
-          </div>
+      <div className="flex justify-between items-center mb-4">
+        <Toggle
+          pressed={isDirected}
+          onPressedChange={setIsDirected}
+          className="gap-2"
+        >
+          {isDirected ? "Directed Graph" : "Undirected Graph"}
+        </Toggle>
+        <Button
+          onClick={generateRandomGraph}
+          variant="outline"
+          className="gap-2"
+        >
+          <Wand2 className="w-4 h-4" />
+          Generate Random Graph
+        </Button>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Main visualization panel - wider */}
+        <div className="lg:col-span-8 space-y-4">
           <BFSVisualization
             graph={graph}
             currentNode={currentNode}
             visitedNodes={visitedNodes}
             isDirected={isDirected}
           />
+          
           <VisitationSequence sequence={visitedNodes.map(nodeId => {
             const node = graph.nodes.find(n => n.id === nodeId);
             return node?.value || nodeId;
           })} />
         </div>
 
-        <div className="space-y-6">
+        {/* Controls and pseudocode panel - narrower */}
+        <div className="lg:col-span-4 space-y-4">
           <BFSControls
             onAddNode={(value) => addNode(parseInt(value))}
             onAddEdge={(from, to) => addEdge(parseInt(from), parseInt(to))}
