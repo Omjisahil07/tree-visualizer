@@ -7,25 +7,25 @@ const linkedListOperations = [
     name: "Singly Linked List",
     description: "A linear data structure where each node points to the next node in the sequence",
     route: "/linked-list/singly",
-    image: "https://images.unsplash.com/photo-1501854140801-50d01698950b"
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80"
   },
   {
     name: "Doubly Linked List",
     description: "Each node contains references to both next and previous nodes",
     route: "/linked-list/doubly",
-    image: "https://images.unsplash.com/photo-1487252665478-49b61b47f302"
+    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&q=80"
   },
   {
     name: "Circular Linked List",
     description: "The last node points back to the first node, creating a circle",
     route: "/linked-list/circular",
-    image: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5"
+    image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80"
   },
   {
     name: "Double Circular Linked List",
     description: "Combines features of doubly linked list and circular linked list",
     route: "/linked-list/double-circular",
-    image: "https://images.unsplash.com/photo-1557683311-eac922347aa1"
+    image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80"
   }
 ];
 
