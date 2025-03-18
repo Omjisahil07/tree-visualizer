@@ -13,8 +13,11 @@ import { VisitationSequence } from "./components/VisitationSequence";
 import { TraversalControls } from "./components/TraversalControls";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Wand2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Wand2, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const BinaryTree = () => {
   const [tree, setTree] = useState<BinaryTreeNode>({ value: null, children: [] });
@@ -25,6 +28,7 @@ const BinaryTree = () => {
   const [currentLine, setCurrentLine] = useState(-1);
   const [isPaused, setIsPaused] = useState(false);
   const [traversalType, setTraversalType] = useState("inorder");
+  const [inputValue, setInputValue] = useState("");
 
   const handleTraversalStep = useCallback(async (value: number | null, step: string) => {
     setCurrentNode(value);
@@ -90,56 +94,124 @@ const BinaryTree = () => {
     toast.success(`Generated a random tree with ${numberOfNodes} nodes`);
   };
 
+  const handleInsertNode = (e: React.FormEvent) => {
+    e.preventDefault();
+    const value = parseInt(inputValue);
+    if (isNaN(value)) {
+      toast.error("Please enter a valid number");
+      return;
+    }
+    setTree(prevTree => insertNode(prevTree, value, "auto"));
+    setInputValue("");
+    toast.success(`Node ${value} inserted successfully`);
+  };
+
   return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-6">Binary Tree Visualization</h1>
+    <div className="container mx-auto py-6">
+      <h1 className="text-2xl font-bold mb-4">Binary Tree Visualization</h1>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={generateRandomTree}
-              variant="outline"
-              className="gap-2"
-            >
-              <Wand2 className="w-4 h-4" />
-              Generate Random Tree
-            </Button>
-          </div>
-          <TreeVisualization
-            tree={tree}
-            onNodeDelete={() => {}}
-            onNodeClick={() => {}}
-            onNodeHighlight={setCurrentNode}
-            currentNode={currentNode}
-            visitedNodes={visitedNodes}
-          />
+      <div className="flex justify-end mb-2">
+        <Button
+          onClick={generateRandomTree}
+          variant="outline"
+          size="sm"
+          className="gap-1"
+        >
+          <Wand2 className="w-4 h-4" />
+          Generate Random Tree
+        </Button>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Main visualization panel - 8 columns */}
+        <div className="lg:col-span-8">
+          <Card className="shadow-sm">
+            <CardContent className="p-4">
+              <TreeVisualization
+                tree={tree}
+                onNodeDelete={() => {}}
+                onNodeClick={() => {}}
+                onNodeHighlight={setCurrentNode}
+                currentNode={currentNode}
+                visitedNodes={visitedNodes}
+              />
+            </CardContent>
+          </Card>
           
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <TraversalControls
-              onStart={startTraversal}
-              onPause={pauseTraversal}
-              onReset={resetTraversal}
-              isTraversing={isTraversing}
-              traversalType={traversalType}
-              onTraversalTypeChange={setTraversalType}
-            />
-            
-            <div className="mt-4">
-              <VisitationSequence sequence={visitedNodes} />
-            </div>
+          <div className="mt-4">
+            <Card className="shadow-sm">
+              <CardContent className="p-4">
+                <TraversalControls
+                  onStart={startTraversal}
+                  onPause={pauseTraversal}
+                  onReset={resetTraversal}
+                  isTraversing={isTraversing}
+                  traversalType={traversalType}
+                  onTraversalTypeChange={setTraversalType}
+                />
+                
+                {visitedNodes.length > 0 && (
+                  <div className="mt-4">
+                    <h3 className="text-sm font-medium mb-2">Visitation Sequence:</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {visitedNodes.map((value, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary"
+                        >
+                          {value}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
         
-        <div className="space-y-6">
-          <TraversalPseudocode
-            currentStep={currentStep}
-            currentLine={currentLine}
-            traversalType={traversalType}
-          />
+        {/* Controls and pseudocode panel - 4 columns */}
+        <div className="lg:col-span-4 space-y-4">
+          <Card className="shadow-sm">
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-lg">Controls</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <form onSubmit={handleInsertNode} className="space-y-3">
+                <div>
+                  <Label htmlFor="nodeValue" className="text-sm">Node Value</Label>
+                  <Input
+                    id="nodeValue"
+                    type="number"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="Enter a number"
+                    className="mt-1"
+                  />
+                </div>
+                <Button type="submit" className="w-full gap-1" size="sm">
+                  <Plus className="w-4 h-4" />
+                  Insert Node
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-sm">
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-lg">{traversalType.charAt(0).toUpperCase() + traversalType.slice(1)} Traversal</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <TraversalPseudocode
+                currentStep={currentStep}
+                currentLine={currentLine}
+                traversalType={traversalType}
+              />
+            </CardContent>
+          </Card>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };

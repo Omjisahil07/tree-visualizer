@@ -31,26 +31,26 @@ const linkedListOperations = [
 
 const LinkedList = () => {
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Linked List Visualizations</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <h1 className="text-2xl font-bold mb-4">Linked List Visualizations</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {linkedListOperations.map((operation, index) => (
             <Link 
               key={index} 
               to={operation.route}
               className="transition-transform hover:scale-105"
             >
-              <Card>
-                <CardHeader>
-                  <CardTitle>{operation.name}</CardTitle>
-                  <CardDescription>{operation.description}</CardDescription>
+              <Card className="h-full shadow-sm">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-lg">{operation.name}</CardTitle>
+                  <CardDescription className="text-xs">{operation.description}</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-3">
                   <img 
                     src={operation.image} 
                     alt={operation.name} 
-                    className="w-full h-48 object-cover rounded-lg"
+                    className="w-full h-32 object-cover rounded-md"
                   />
                 </CardContent>
               </Card>
