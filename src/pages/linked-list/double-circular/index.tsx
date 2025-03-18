@@ -13,10 +13,10 @@ import {
   generateRandomList,
   traverseList,
   traverseListReverse
-} from "./operations/doublyLinkedListOperations";
+} from "./operations/doubleCircularLinkedListOperations";
 import { Footer } from "@/components/Footer";
 
-const DoublyLinkedList = () => {
+const DoubleCircularLinkedList = () => {
   const [list, setList] = useState<LinkedListNode[]>([]);
   const [currentNode, setCurrentNode] = useState<number | null>(null);
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
@@ -65,7 +65,7 @@ const DoublyLinkedList = () => {
     const size = Math.floor(Math.random() * 5) + 3; // 3-7 nodes
     const newList = generateRandomList(size);
     setList(newList);
-    toast.success(`Generated random doubly linked list with ${size} nodes`);
+    toast.success(`Generated random double circular linked list with ${size} nodes`);
   };
 
   const handleTraverse = async () => {
@@ -94,15 +94,15 @@ const DoublyLinkedList = () => {
     
     setIsTraversing(false);
     setCurrentNode(null);
-    toast.success("Traversal completed");
+    toast.success("Traversal completed (1 cycle)");
   };
 
   return (
     <div className="container mx-auto py-8">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-3">Doubly Linked List</h1>
+        <h1 className="text-4xl font-bold mb-3">Double Circular Linked List</h1>
         <p className="text-muted-foreground text-lg mb-3">
-          Each node contains references to both next and previous nodes
+          Combines features of doubly linked list and circular linked list
         </p>
       </div>
       
@@ -139,7 +139,7 @@ const DoublyLinkedList = () => {
             list={list}
             currentNode={currentNode}
             visitedNodes={visitedNodes}
-            type="doubly"
+            type="double-circular"
           />
         </div>
         
@@ -168,4 +168,4 @@ const DoublyLinkedList = () => {
   );
 };
 
-export default DoublyLinkedList;
+export default DoubleCircularLinkedList;

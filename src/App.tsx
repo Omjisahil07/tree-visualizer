@@ -8,6 +8,10 @@ import Index from "./pages/Index";
 import Tree from "./pages/Tree";
 import Graph from "./pages/Graph";
 import LinkedList from "./pages/LinkedList";
+import SinglyLinkedList from "./pages/linked-list/singly";
+import DoublyLinkedList from "./pages/linked-list/doubly";
+import CircularLinkedList from "./pages/linked-list/circular";
+import DoubleCircularLinkedList from "./pages/linked-list/double-circular";
 import BSTTree from "./pages/trees/bst-tree";
 import BinaryTree from "./pages/trees/binary-tree";
 import AVLTree from "./pages/trees/avl-tree";
@@ -36,6 +40,10 @@ const App = () => (
           <Route path="/graph/dfs" element={<DFS />} />
           <Route path="/graph/bfs" element={<BFS />} />
           <Route path="/linked-list" element={<LinkedList />} />
+          <Route path="/linked-list/singly" element={<SinglyLinkedList />} />
+          <Route path="/linked-list/doubly" element={<DoublyLinkedList />} />
+          <Route path="/linked-list/circular" element={<CircularLinkedList />} />
+          <Route path="/linked-list/double-circular" element={<DoubleCircularLinkedList />} />
           <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

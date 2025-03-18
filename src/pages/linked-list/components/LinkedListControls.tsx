@@ -1,307 +1,168 @@
 
-import { FC, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash, Plus, Wand2, Pencil, Play, Pause, SkipForward, RotateCcw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
+import { Play, ChevronRight, ChevronLeft, RotateCcw } from "lucide-react";
+import { LinkedListOperations } from "../types/LinkedListTypes";
 
 interface LinkedListControlsProps {
-  onAddHead: (value: number) => void;
-  onAddTail: (value: number) => void;
-  onAddAt: (value: number, position: number) => void;
-  onRemoveHead: () => void;
-  onRemoveTail: () => void;
-  onRemoveAt: (position: number) => void;
-  onUpdateAt: (position: number, value: number) => void;
-  onGenerate: (length: number) => void;
-  onReset: () => void;
-  onPlayPause: () => void;
-  onNext: () => void;
-  isPlaying: boolean;
-  disabled: boolean;
+  onInsert: (value: number, position: number) => void;
+  onDelete: (position: number) => void;
+  onUpdate: (position: number, value: number) => void;
+  onTraverse: () => void;
+  isTraversing: boolean;
+  listLength: number;
+  operations: LinkedListOperations[];
 }
 
-export const LinkedListControls: FC<LinkedListControlsProps> = ({
-  onAddHead,
-  onAddTail,
-  onAddAt,
-  onRemoveHead,
-  onRemoveTail,
-  onRemoveAt,
-  onUpdateAt,
-  onGenerate,
-  onReset,
-  onPlayPause,
-  onNext,
-  isPlaying,
-  disabled
+export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
+  onInsert,
+  onDelete,
+  onUpdate,
+  onTraverse,
+  isTraversing,
+  listLength,
+  operations
 }) => {
-  const [addValue, setAddValue] = useState<string>("");
-  const [addPosition, setAddPosition] = useState<string>("");
-  const [removePosition, setRemovePosition] = useState<string>("");
-  const [updateValue, setUpdateValue] = useState<string>("");
-  const [updatePosition, setUpdatePosition] = useState<string>("");
-  const [generateLength, setGenerateLength] = useState<string>("5");
-
-  const handleAddHead = () => {
-    if (!addValue) {
-      toast.error("Please enter a value");
-      return;
+  const [value, setValue] = useState("");
+  const [position, setPosition] = useState("");
+  const [operation, setOperation] = useState<LinkedListOperations>(LinkedListOperations.INSERT_AT_END);
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const numValue = parseInt(value);
+    const numPosition = parseInt(position) || 0;
+    
+    if (operation === LinkedListOperations.UPDATE) {
+      if (isNaN(numValue) || numPosition < 0 || numPosition >= listLength) {
+        return;
+      }
+      onUpdate(numPosition, numValue);
+    } else if (
+      operation === LinkedListOperations.DELETE_FROM_BEGINNING ||
+      operation === LinkedListOperations.DELETE_FROM_END ||
+      operation === LinkedListOperations.DELETE_FROM_POSITION
+    ) {
+      let posToDelete = 0;
+      if (operation === LinkedListOperations.DELETE_FROM_END) {
+        posToDelete = listLength - 1;
+      } else if (operation === LinkedListOperations.DELETE_FROM_POSITION) {
+        posToDelete = numPosition;
+      }
+      onDelete(posToDelete);
+    } else {
+      if (isNaN(numValue)) {
+        return;
+      }
+      
+      let posToInsert = 0;
+      if (operation === LinkedListOperations.INSERT_AT_END) {
+        posToInsert = listLength;
+      } else if (operation === LinkedListOperations.INSERT_AT_POSITION) {
+        posToInsert = numPosition;
+      }
+      
+      onInsert(numValue, posToInsert);
     }
-    onAddHead(parseInt(addValue));
-    setAddValue("");
+    
+    setValue("");
+    setPosition("");
   };
-
-  const handleAddTail = () => {
-    if (!addValue) {
-      toast.error("Please enter a value");
-      return;
-    }
-    onAddTail(parseInt(addValue));
-    setAddValue("");
-  };
-
-  const handleAddAt = () => {
-    if (!addValue || !addPosition) {
-      toast.error("Please enter both value and position");
-      return;
-    }
-    onAddAt(parseInt(addValue), parseInt(addPosition));
-    setAddValue("");
-    setAddPosition("");
-  };
-
-  const handleRemoveAt = () => {
-    if (!removePosition) {
-      toast.error("Please enter a position");
-      return;
-    }
-    onRemoveAt(parseInt(removePosition));
-    setRemovePosition("");
-  };
-
-  const handleUpdateAt = () => {
-    if (!updateValue || !updatePosition) {
-      toast.error("Please enter both value and position");
-      return;
-    }
-    onUpdateAt(parseInt(updatePosition), parseInt(updateValue));
-    setUpdateValue("");
-    setUpdatePosition("");
-  };
-
-  const handleGenerate = () => {
-    if (!generateLength || parseInt(generateLength) <= 0) {
-      toast.error("Please enter a valid length (> 0)");
-      return;
-    }
-    onGenerate(parseInt(generateLength));
-  };
-
+  
+  const needsValueInput = operation !== LinkedListOperations.DELETE_FROM_BEGINNING && 
+                         operation !== LinkedListOperations.DELETE_FROM_END;
+  
+  const needsPositionInput = operation === LinkedListOperations.INSERT_AT_POSITION || 
+                           operation === LinkedListOperations.DELETE_FROM_POSITION || 
+                           operation === LinkedListOperations.UPDATE;
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Controls</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Button 
-              onClick={() => onPlayPause()} 
-              variant="outline" 
-              size="icon" 
-              disabled={disabled}
-            >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>List Operations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="operation">Operation</Label>
+              <div className="grid grid-cols-1 gap-2">
+                {operations.map((op) => (
+                  <Button
+                    key={op}
+                    type="button"
+                    variant={operation === op ? "default" : "outline"}
+                    onClick={() => setOperation(op)}
+                    className="justify-start"
+                  >
+                    {op === LinkedListOperations.INSERT_AT_BEGINNING && "Insert at Beginning"}
+                    {op === LinkedListOperations.INSERT_AT_END && "Insert at End"}
+                    {op === LinkedListOperations.INSERT_AT_POSITION && "Insert at Position"}
+                    {op === LinkedListOperations.DELETE_FROM_BEGINNING && "Delete from Beginning"}
+                    {op === LinkedListOperations.DELETE_FROM_END && "Delete from End"}
+                    {op === LinkedListOperations.DELETE_FROM_POSITION && "Delete from Position"}
+                    {op === LinkedListOperations.UPDATE && "Update Node"}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            
+            {needsValueInput && (
+              <div className="space-y-2">
+                <Label htmlFor="value">Value</Label>
+                <Input
+                  id="value"
+                  type="number"
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  placeholder="Enter a number"
+                />
+              </div>
+            )}
+            
+            {needsPositionInput && (
+              <div className="space-y-2">
+                <Label htmlFor="position">Position</Label>
+                <Input
+                  id="position"
+                  type="number"
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  placeholder={`0 - ${listLength > 0 ? listLength - 1 : 0}`}
+                  min={0}
+                  max={operation === LinkedListOperations.INSERT_AT_POSITION ? listLength : listLength - 1}
+                />
+              </div>
+            )}
+            
+            <Button type="submit" className="w-full">
+              {operation.includes("insert") && <ChevronRight className="mr-2 h-4 w-4" />}
+              {operation.includes("delete") && <RotateCcw className="mr-2 h-4 w-4" />}
+              {operation === LinkedListOperations.UPDATE && <ChevronLeft className="mr-2 h-4 w-4" />}
+              Submit
             </Button>
-            <Button 
-              onClick={() => onNext()} 
-              variant="outline" 
-              size="icon" 
-              disabled={disabled || isPlaying}
-            >
-              <SkipForward className="h-4 w-4" />
-            </Button>
-            <Button 
-              onClick={() => onReset()} 
-              variant="outline" 
-              size="icon" 
-              disabled={disabled}
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+          </form>
+        </CardContent>
+      </Card>
 
-        <div className="space-y-2">
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
-              <Label htmlFor="addValue">Value</Label>
-              <Input
-                id="addValue"
-                type="number"
-                value={addValue}
-                onChange={(e) => setAddValue(e.target.value)}
-                placeholder="Value"
-                disabled={disabled}
-              />
-            </div>
-            <Button
-              onClick={handleAddHead}
-              disabled={disabled}
-              variant="secondary"
-              size="sm"
-            >
-              Add Head
-            </Button>
-            <Button
-              onClick={handleAddTail}
-              disabled={disabled}
-              variant="secondary"
-              size="sm"
-            >
-              Add Tail
-            </Button>
-          </div>
-
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
-              <Label htmlFor="addPosition">Position</Label>
-              <Input
-                id="addPosition"
-                type="number"
-                value={addPosition}
-                onChange={(e) => setAddPosition(e.target.value)}
-                placeholder="Position"
-                min="0"
-                disabled={disabled}
-              />
-            </div>
-            <Button
-              onClick={handleAddAt}
-              disabled={disabled}
-              variant="outline"
-              className="gap-1"
-              size="sm"
-            >
-              <Plus className="h-3 w-3" /> Add at Position
-            </Button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Remove</Label>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => onRemoveHead()}
-              disabled={disabled}
-              variant="destructive"
-              size="sm"
-            >
-              Remove Head
-            </Button>
-            <Button
-              onClick={() => onRemoveTail()}
-              disabled={disabled}
-              variant="destructive"
-              size="sm"
-            >
-              Remove Tail
-            </Button>
-          </div>
-          
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
-              <Label htmlFor="removePosition">Position</Label>
-              <Input
-                id="removePosition"
-                type="number"
-                value={removePosition}
-                onChange={(e) => setRemovePosition(e.target.value)}
-                placeholder="Position"
-                min="0"
-                disabled={disabled}
-              />
-            </div>
-            <Button
-              onClick={handleRemoveAt}
-              disabled={disabled}
-              variant="destructive"
-              className="gap-1"
-              size="sm"
-            >
-              <Trash className="h-3 w-3" /> Remove at Position
-            </Button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Update</Label>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Label htmlFor="updatePosition">Position</Label>
-              <Input
-                id="updatePosition"
-                type="number"
-                value={updatePosition}
-                onChange={(e) => setUpdatePosition(e.target.value)}
-                placeholder="Position"
-                min="0"
-                disabled={disabled}
-              />
-            </div>
-            <div>
-              <Label htmlFor="updateValue">New Value</Label>
-              <Input
-                id="updateValue"
-                type="number"
-                value={updateValue}
-                onChange={(e) => setUpdateValue(e.target.value)}
-                placeholder="Value"
-                disabled={disabled}
-              />
-            </div>
-          </div>
-          <Button
-            onClick={handleUpdateAt}
-            disabled={disabled}
-            variant="outline"
-            className="w-full gap-1"
-            size="sm"
+      <Card>
+        <CardHeader>
+          <CardTitle>Traversal</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button 
+            onClick={onTraverse} 
+            disabled={isTraversing || listLength === 0}
+            className="w-full"
           >
-            <Pencil className="h-3 w-3" /> Update Node
+            <Play className="mr-2 h-4 w-4" />
+            Start Traversal
           </Button>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Generate Random List</Label>
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
-              <Label htmlFor="generateLength">Length</Label>
-              <Input
-                id="generateLength"
-                type="number"
-                value={generateLength}
-                onChange={(e) => setGenerateLength(e.target.value)}
-                placeholder="Length"
-                min="1"
-                max="15"
-                disabled={disabled}
-              />
-            </div>
-            <Button
-              onClick={handleGenerate}
-              disabled={disabled}
-              variant="outline"
-              className="gap-1"
-            >
-              <Wand2 className="h-4 w-4" /> Generate
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };

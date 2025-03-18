@@ -1,246 +1,124 @@
 
-import { CircularNode } from "../../types/LinkedListTypes";
+import { LinkedListNode, TraversalCallback } from "../../types/LinkedListTypes";
 
-// Create a new circular linked list node
-export const createNode = <T>(value: T): CircularNode<T> => {
-  const node: CircularNode<T> = {
+export const insertNode = (
+  list: LinkedListNode[],
+  value: number,
+  position: number
+): LinkedListNode[] => {
+  // Validate position
+  if (position < 0 || position > list.length) {
+    position = list.length; // Default to insert at end if position is invalid
+  }
+
+  const newNode: LinkedListNode = {
     value,
-    next: null
+    next: 0 // In circular list, it points back to the first element
   };
-  return node;
-};
 
-// Insert a node at the beginning of the list
-export const insertAtHead = <T>(
-  head: CircularNode<T> | null,
-  value: T
-): CircularNode<T> => {
-  const newNode = createNode(value);
+  const newList = [...list];
 
-  if (!head) {
-    newNode.next = newNode; // Point to itself
-    return newNode;
-  }
-
-  newNode.next = head;
-  
-  // Find the last node (which points back to head)
-  let current = head;
-  while (current.next !== head) {
-    current = current.next!;
-  }
-  current.next = newNode;
-  
-  return newNode;
-};
-
-// Insert a node at the end of the list
-export const insertAtTail = <T>(
-  head: CircularNode<T> | null,
-  value: T
-): CircularNode<T> => {
-  const newNode = createNode(value);
-
-  if (!head) {
-    newNode.next = newNode; // Point to itself
-    return newNode;
-  }
-
-  // Find the last node (which points back to head)
-  let current = head;
-  while (current.next !== head) {
-    current = current.next!;
-  }
-  
-  current.next = newNode;
-  newNode.next = head;
-  
-  return head;
-};
-
-// Insert a node at a specific position (0-based index)
-export const insertAtPosition = <T>(
-  head: CircularNode<T> | null,
-  value: T,
-  position: number
-): CircularNode<T> => {
-  if (position < 0) {
-    throw new Error("Position must be non-negative");
-  }
-
-  if (position === 0 || !head) {
-    return insertAtHead(head, value);
-  }
-
-  let current = head;
-  let index = 0;
-
-  while (current.next !== head && index < position - 1) {
-    current = current.next!;
-    index++;
-  }
-
-  const newNode = createNode(value);
-  newNode.next = current.next;
-  current.next = newNode;
-
-  return head;
-};
-
-// Delete the node at the beginning of the list
-export const deleteHead = <T>(
-  head: CircularNode<T> | null
-): CircularNode<T> | null => {
-  if (!head) {
-    return null;
-  }
-
-  if (head.next === head) {
-    // Only one node in the list
-    return null;
-  }
-
-  // Find the last node (which points back to head)
-  let current = head;
-  while (current.next !== head) {
-    current = current.next!;
-  }
-
-  const newHead = head.next;
-  current.next = newHead;
-  
-  return newHead;
-};
-
-// Delete the node at the end of the list
-export const deleteTail = <T>(
-  head: CircularNode<T> | null
-): CircularNode<T> | null => {
-  if (!head) {
-    return null;
-  }
-
-  if (head.next === head) {
-    // Only one node in the list
-    return null;
-  }
-
-  let current = head;
-  let previous = null;
-  
-  // Find the node before the last node
-  while (current.next !== head) {
-    previous = current;
-    current = current.next!;
-  }
-
-  previous!.next = head;
-  return head;
-};
-
-// Delete a node at a specific position (0-based index)
-export const deleteAtPosition = <T>(
-  head: CircularNode<T> | null,
-  position: number
-): CircularNode<T> | null => {
-  if (!head || position < 0) {
-    return head;
+  if (newList.length === 0) {
+    // Insert into empty list
+    newNode.next = 0; // Points to itself
+    return [newNode];
   }
 
   if (position === 0) {
-    return deleteHead(head);
+    // Insert at beginning
+    newNode.next = 1;
+    newList.unshift(newNode);
+    newList[newList.length - 1].next = 0; // Last node points to head
+  } else if (position === newList.length) {
+    // Insert at end
+    newNode.next = 0; // Points back to head
+    newList.push(newNode);
+  } else {
+    // Insert at position
+    newNode.next = position + 1;
+    newList.splice(position, 0, newNode);
   }
 
-  let current = head;
-  let index = 0;
-
-  while (current.next !== head && index < position - 1) {
-    current = current.next!;
-    index++;
-  }
-
-  if (current.next === head) {
-    return head;
-  }
-
-  current.next = current.next!.next;
-  return head;
-};
-
-// Update the value of a node at a specific position
-export const updateAtPosition = <T>(
-  head: CircularNode<T> | null,
-  position: number,
-  value: T
-): CircularNode<T> | null => {
-  if (!head || position < 0) {
-    return head;
-  }
-
-  let current = head;
-  let index = 0;
-
-  do {
-    if (index === position) {
-      current.value = value;
-      return head;
+  // Update next pointers
+  for (let i = 0; i < newList.length; i++) {
+    if (i < newList.length - 1) {
+      newList[i].next = i + 1;
+    } else {
+      newList[i].next = 0; // Last node points to the first node
     }
-    current = current.next!;
-    index++;
-  } while (current !== head);
+  }
 
-  return head;
+  return newList;
 };
 
-// Convert a list to an array for visualization
-export const toArray = <T>(
-  head: CircularNode<T> | null
-): T[] => {
-  if (!head) {
-    return [];
+export const deleteNode = (
+  list: LinkedListNode[],
+  position: number
+): LinkedListNode[] => {
+  if (list.length === 0 || position < 0 || position >= list.length) {
+    return list;
   }
 
-  const result: T[] = [];
-  let current = head;
+  const newList = [...list];
+  newList.splice(position, 1);
 
-  do {
-    result.push(current.value);
-    current = current.next!;
-  } while (current !== head);
+  if (newList.length === 0) {
+    return newList;
+  }
 
-  return result;
+  // Update next pointers
+  for (let i = 0; i < newList.length; i++) {
+    if (i < newList.length - 1) {
+      newList[i].next = i + 1;
+    } else {
+      newList[i].next = 0; // Last node points to the first node
+    }
+  }
+
+  return newList;
 };
 
-// Convert an array to a linked list
-export const fromArray = <T>(
-  arr: T[]
-): CircularNode<T> | null => {
-  if (arr.length === 0) {
-    return null;
+export const updateNode = (
+  list: LinkedListNode[],
+  position: number,
+  value: number
+): LinkedListNode[] => {
+  if (list.length === 0 || position < 0 || position >= list.length) {
+    return list;
   }
 
-  let head = createNode(arr[0]);
-  let current = head;
+  const newList = [...list];
+  newList[position] = { ...newList[position], value };
 
-  for (let i = 1; i < arr.length; i++) {
-    current.next = createNode(arr[i]);
-    current = current.next;
-  }
-
-  // Make it circular by connecting the last node to the head
-  current.next = head;
-
-  return head;
+  return newList;
 };
 
-// Generate a random linked list
-export const generateRandomList = (
-  length: number
-): CircularNode<number> | null => {
-  if (length <= 0) {
-    return null;
+export const generateRandomList = (size: number): LinkedListNode[] => {
+  const list: LinkedListNode[] = [];
+
+  for (let i = 0; i < size; i++) {
+    list.push({
+      value: Math.floor(Math.random() * 100),
+      next: i < size - 1 ? i + 1 : 0 // Last node points to the first node
+    });
   }
 
-  const values = Array.from({ length }, () => Math.floor(Math.random() * 100));
-  return fromArray(values);
+  return list;
+};
+
+export const traverseList = async (
+  list: LinkedListNode[],
+  callback: TraversalCallback
+) => {
+  if (list.length === 0) return;
+
+  let currentIndex = 0;
+  const visitedIndices = new Set<number>();
+  
+  while (!visitedIndices.has(currentIndex)) {
+    visitedIndices.add(currentIndex);
+    const currentNode = list[currentIndex];
+    await callback(currentNode, currentIndex);
+    currentIndex = currentNode.next!;
+  }
 };

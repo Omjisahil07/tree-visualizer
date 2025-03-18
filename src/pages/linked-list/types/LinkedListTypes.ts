@@ -1,41 +1,20 @@
 
-export interface SinglyNode<T> {
-  value: T;
-  next: SinglyNode<T> | null;
+export interface LinkedListNode {
+  value: number;
+  next: number | null;
+  prev?: number | null;
 }
 
-export interface DoublyNode<T> {
-  value: T;
-  next: DoublyNode<T> | null;
-  prev: DoublyNode<T> | null;
+export enum LinkedListOperations {
+  INSERT_AT_BEGINNING = "insertAtBeginning",
+  INSERT_AT_END = "insertAtEnd",
+  INSERT_AT_POSITION = "insertAtPosition",
+  DELETE_FROM_BEGINNING = "deleteFromBeginning",
+  DELETE_FROM_END = "deleteFromEnd",
+  DELETE_FROM_POSITION = "deleteFromPosition",
+  UPDATE = "update"
 }
 
-export interface CircularNode<T> {
-  value: T;
-  next: CircularNode<T> | null;
-}
+export type LinkedListType = "singly" | "doubly" | "circular" | "double-circular";
 
-export interface DoubleCircularNode<T> {
-  value: T;
-  next: DoubleCircularNode<T> | null;
-  prev: DoubleCircularNode<T> | null;
-}
-
-export interface LinkedListOperation {
-  name: string;
-  description: string;
-  route: string;
-  image: string;
-}
-
-export interface Step {
-  description: string;
-  nodeIndices: number[];
-}
-
-export interface LinkedListState<T> {
-  nodes: T[];
-  steps: Step[];
-  currentStep: number;
-  isPlaying: boolean;
-}
+export type TraversalCallback = (node: LinkedListNode, index: number) => Promise<void>;

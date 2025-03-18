@@ -1,228 +1,161 @@
 
-import { DoublyNode } from "../../types/LinkedListTypes";
+import { LinkedListNode, TraversalCallback } from "../../types/LinkedListTypes";
 
-// Create a new doubly linked list node
-export const createNode = <T>(value: T): DoublyNode<T> => {
-  return {
+export const insertNode = (
+  list: LinkedListNode[],
+  value: number,
+  position: number
+): LinkedListNode[] => {
+  // Validate position
+  if (position < 0 || position > list.length) {
+    position = list.length; // Default to insert at end if position is invalid
+  }
+
+  const newNode: LinkedListNode = {
     value,
     next: null,
     prev: null
   };
-};
 
-// Insert a node at the beginning of the list
-export const insertAtHead = <T>(
-  head: DoublyNode<T> | null,
-  value: T
-): DoublyNode<T> => {
-  const newNode = createNode(value);
+  const newList = [...list];
 
-  if (!head) {
-    return newNode;
-  }
-
-  newNode.next = head;
-  head.prev = newNode;
-  return newNode;
-};
-
-// Insert a node at the end of the list
-export const insertAtTail = <T>(
-  head: DoublyNode<T> | null,
-  value: T
-): DoublyNode<T> => {
-  const newNode = createNode(value);
-
-  if (!head) {
-    return newNode;
-  }
-
-  let current = head;
-  while (current.next) {
-    current = current.next;
-  }
-
-  current.next = newNode;
-  newNode.prev = current;
-  return head;
-};
-
-// Insert a node at a specific position (0-based index)
-export const insertAtPosition = <T>(
-  head: DoublyNode<T> | null,
-  value: T,
-  position: number
-): DoublyNode<T> => {
-  if (position < 0) {
-    throw new Error("Position must be non-negative");
-  }
-
-  if (position === 0 || !head) {
-    return insertAtHead(head, value);
-  }
-
-  let current = head;
-  let index = 0;
-
-  while (current.next && index < position - 1) {
-    current = current.next;
-    index++;
-  }
-
-  const newNode = createNode(value);
-  newNode.next = current.next;
-  newNode.prev = current;
-
-  if (current.next) {
-    current.next.prev = newNode;
-  }
-
-  current.next = newNode;
-  return head;
-};
-
-// Delete the node at the beginning of the list
-export const deleteHead = <T>(
-  head: DoublyNode<T> | null
-): DoublyNode<T> | null => {
-  if (!head) {
-    return null;
-  }
-
-  const newHead = head.next;
-  if (newHead) {
-    newHead.prev = null;
-  }
-
-  return newHead;
-};
-
-// Delete the node at the end of the list
-export const deleteTail = <T>(
-  head: DoublyNode<T> | null
-): DoublyNode<T> | null => {
-  if (!head) {
-    return null;
-  }
-
-  if (!head.next) {
-    return null;
-  }
-
-  let current = head;
-  while (current.next && current.next.next) {
-    current = current.next;
-  }
-
-  current.next = null;
-  return head;
-};
-
-// Delete a node at a specific position (0-based index)
-export const deleteAtPosition = <T>(
-  head: DoublyNode<T> | null,
-  position: number
-): DoublyNode<T> | null => {
-  if (!head || position < 0) {
-    return head;
+  if (newList.length === 0) {
+    // Insert into empty list
+    return [newNode];
   }
 
   if (position === 0) {
-    return deleteHead(head);
+    // Insert at beginning
+    newNode.next = 1;
+    newNode.prev = null;
+    newList.unshift(newNode);
+    if (newList.length > 1) {
+      newList[1].prev = 0;
+    }
+  } else if (position === newList.length) {
+    // Insert at end
+    newNode.next = null;
+    newNode.prev = newList.length - 1;
+    newList.push(newNode);
+  } else {
+    // Insert at position
+    newNode.next = position + 1;
+    newNode.prev = position - 1;
+    newList.splice(position, 0, newNode);
   }
 
-  let current = head;
-  let index = 0;
-
-  while (current.next && index < position - 1) {
-    current = current.next;
-    index++;
+  // Update next and prev pointers
+  for (let i = 0; i < newList.length; i++) {
+    if (i < newList.length - 1) {
+      newList[i].next = i + 1;
+    } else {
+      newList[i].next = null;
+    }
+    
+    if (i > 0) {
+      newList[i].prev = i - 1;
+    } else {
+      newList[i].prev = null;
+    }
   }
 
-  if (!current.next) {
-    return head;
-  }
-
-  const nodeToDelete = current.next;
-  current.next = nodeToDelete.next;
-
-  if (nodeToDelete.next) {
-    nodeToDelete.next.prev = current;
-  }
-
-  return head;
+  return newList;
 };
 
-// Update the value of a node at a specific position
-export const updateAtPosition = <T>(
-  head: DoublyNode<T> | null,
+export const deleteNode = (
+  list: LinkedListNode[],
+  position: number
+): LinkedListNode[] => {
+  if (list.length === 0 || position < 0 || position >= list.length) {
+    return list;
+  }
+
+  const newList = [...list];
+  newList.splice(position, 1);
+
+  // Update next and prev pointers
+  for (let i = 0; i < newList.length; i++) {
+    if (i < newList.length - 1) {
+      newList[i].next = i + 1;
+    } else {
+      newList[i].next = null;
+    }
+    
+    if (i > 0) {
+      newList[i].prev = i - 1;
+    } else {
+      newList[i].prev = null;
+    }
+  }
+
+  return newList;
+};
+
+export const updateNode = (
+  list: LinkedListNode[],
   position: number,
-  value: T
-): DoublyNode<T> | null => {
-  if (!head || position < 0) {
-    return head;
+  value: number
+): LinkedListNode[] => {
+  if (list.length === 0 || position < 0 || position >= list.length) {
+    return list;
   }
 
-  let current = head;
-  let index = 0;
+  const newList = [...list];
+  newList[position] = { ...newList[position], value };
 
-  while (current && index < position) {
-    current = current.next;
-    index++;
-  }
-
-  if (!current) {
-    return head;
-  }
-
-  current.value = value;
-  return head;
+  return newList;
 };
 
-// Convert a list to an array for visualization
-export const toArray = <T>(
-  head: DoublyNode<T> | null
-): T[] => {
-  const result: T[] = [];
-  let current = head;
+export const generateRandomList = (size: number): LinkedListNode[] => {
+  const list: LinkedListNode[] = [];
 
-  while (current) {
-    result.push(current.value);
-    current = current.next;
+  for (let i = 0; i < size; i++) {
+    list.push({
+      value: Math.floor(Math.random() * 100),
+      next: i < size - 1 ? i + 1 : null,
+      prev: i > 0 ? i - 1 : null
+    });
   }
 
-  return result;
+  return list;
 };
 
-// Convert an array to a linked list
-export const fromArray = <T>(
-  arr: T[]
-): DoublyNode<T> | null => {
-  if (arr.length === 0) {
-    return null;
+export const traverseList = async (
+  list: LinkedListNode[],
+  callback: TraversalCallback
+) => {
+  if (list.length === 0) return;
+
+  let currentIndex = 0;
+  
+  while (currentIndex !== null) {
+    const currentNode = list[currentIndex];
+    await callback(currentNode, currentIndex);
+    
+    if (currentNode.next === null) {
+      break;
+    }
+    
+    currentIndex = currentNode.next;
   }
-
-  let head = createNode(arr[0]);
-  let current = head;
-
-  for (let i = 1; i < arr.length; i++) {
-    const newNode = createNode(arr[i]);
-    current.next = newNode;
-    newNode.prev = current;
-    current = newNode;
-  }
-
-  return head;
 };
 
-// Generate a random linked list
-export const generateRandomList = (
-  length: number
-): DoublyNode<number> | null => {
-  if (length <= 0) {
-    return null;
+export const traverseListReverse = async (
+  list: LinkedListNode[],
+  callback: TraversalCallback
+) => {
+  if (list.length === 0) return;
+  
+  let currentIndex = list.length - 1;
+  
+  while (currentIndex !== null && currentIndex >= 0) {
+    const currentNode = list[currentIndex];
+    await callback(currentNode, currentIndex);
+    
+    if (currentNode.prev === null) {
+      break;
+    }
+    
+    currentIndex = currentNode.prev;
   }
-
-  const values = Array.from({ length }, () => Math.floor(Math.random() * 100));
-  return fromArray(values);
 };
