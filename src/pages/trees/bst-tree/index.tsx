@@ -1,17 +1,27 @@
+
 import { useState, useCallback } from "react";
 import { BSTVisualization } from "./components/BSTVisualization";
 import { BSTTraversalControls } from "./components/BSTTraversalControls";
 import { BSTInstructions } from "./components/BSTInstructions";
 import { BSTVisitationSequence } from "./components/BSTVisitationSequence";
 import { BSTPseudocode } from "./components/BSTPseudocode";
+import { BSTNodeInsertForm } from "./components/BSTNodeInsertForm";
+import { BSTNodeUpdateForm } from "./components/BSTNodeUpdateForm";
 import { BSTNode, TraversalType } from "./types/BSTTypes";
-import { insertNode, deleteNode, updateNode, traverseInOrder, traversePreOrder, traversePostOrder, traverseLevelOrder } from "./operations/BSTOperations";
+import { 
+  insertNode, 
+  deleteNode, 
+  updateNode, 
+  traverseInOrder, 
+  traversePreOrder, 
+  traversePostOrder, 
+  traverseLevelOrder 
+} from "./operations/BSTOperations";
 import { toast } from "sonner";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Wand2, Plus } from "lucide-react";
+import { Wand2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const BSTTree = () => {
   const [tree, setTree] = useState<BSTNode>({
@@ -131,99 +141,81 @@ const BSTTree = () => {
   };
 
   return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-6">Binary Search Tree Visualization</h1>
+    <div className="container mx-auto py-6">
+      <h1 className="text-2xl font-bold mb-4">Binary Search Tree Visualization</h1>
       
-      <BSTInstructions />
+      <div className="flex justify-end mb-2">
+        <Button
+          onClick={generateRandomBST}
+          variant="outline"
+          size="sm"
+          className="gap-1"
+        >
+          <Wand2 className="w-4 h-4" />
+          Generate Random Tree
+        </Button>
+      </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={generateRandomBST}
-              variant="outline"
-              className="gap-2"
-            >
-              <Wand2 className="w-4 h-4" />
-              Generate Random Tree
-            </Button>
-          </div>
-          <BSTVisualization
-            tree={tree}
-            onNodeDelete={handleDelete}
-            onNodeClick={handleNodeClick}
-            currentNode={currentNode}
-            visitedNodes={visitedNodes}
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Main visualization panel - 8 columns */}
+        <div className="lg:col-span-8">
+          <Card className="shadow-sm">
+            <CardContent className="p-4">
+              <BSTVisualization
+                tree={tree}
+                onNodeDelete={handleDelete}
+                onNodeClick={handleNodeClick}
+                currentNode={currentNode}
+                visitedNodes={visitedNodes}
+              />
+            </CardContent>
+          </Card>
           
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <BSTTraversalControls
-              onStart={startTraversal}
-              onPause={() => {
-                setIsPaused(true);
-                setIsTraversing(false);
-              }}
-              onReset={() => {
-                setIsTraversing(false);
-                setIsPaused(false);
-                setVisitedNodes([]);
-                setCurrentNode(null);
-                setCurrentLine(-1);
-                setCurrentStep("");
-              }}
-              isTraversing={isTraversing}
-              traversalType={traversalType}
-              onTraversalTypeChange={setTraversalType}
-            />
-
-            <BSTVisitationSequence sequence={visitedNodes} />
+          <div className="mt-4">
+            <Card className="shadow-sm">
+              <CardContent className="p-4">
+                <BSTTraversalControls
+                  onStart={startTraversal}
+                  onPause={() => {
+                    setIsPaused(true);
+                    setIsTraversing(false);
+                  }}
+                  onReset={() => {
+                    setIsTraversing(false);
+                    setIsPaused(false);
+                    setVisitedNodes([]);
+                    setCurrentNode(null);
+                    setCurrentLine(-1);
+                    setCurrentStep("");
+                  }}
+                  isTraversing={isTraversing}
+                  traversalType={traversalType}
+                  onTraversalTypeChange={setTraversalType}
+                />
+                
+                <BSTVisitationSequence sequence={visitedNodes} />
+              </CardContent>
+            </Card>
           </div>
         </div>
-
-        <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4">Controls</h2>
-            <form onSubmit={handleInsert} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="nodeValue">Node Value</Label>
-                <Input
-                  id="nodeValue"
-                  type="number"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Enter a number"
-                />
-              </div>
-              <Button type="submit" className="w-full gap-2">
-                <Plus className="h-4 w-4" />
-                Insert Node
-              </Button>
-            </form>
-          </div>
-
+        
+        {/* Controls and pseudocode panel - 4 columns */}
+        <div className="lg:col-span-4 space-y-4">
+          <BSTNodeInsertForm
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            handleInsert={handleInsert}
+          />
+          
           {selectedNode !== null && (
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-medium mb-4">
-                Update Node {selectedNode}
-              </h3>
-              <form onSubmit={handleUpdate} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="updateValue">New Value</Label>
-                  <Input
-                    id="updateValue"
-                    type="number"
-                    value={updateValue}
-                    onChange={(e) => setUpdateValue(e.target.value)}
-                    placeholder="Enter new value"
-                  />
-                </div>
-                <Button type="submit" className="w-full">
-                  Update Node
-                </Button>
-              </form>
-            </div>
+            <BSTNodeUpdateForm
+              selectedNode={selectedNode}
+              updateValue={updateValue}
+              setUpdateValue={setUpdateValue}
+              handleUpdate={handleUpdate}
+            />
           )}
-
+          
           <BSTPseudocode
             currentStep={currentStep}
             currentLine={currentLine}
@@ -237,4 +229,3 @@ const BSTTree = () => {
 };
 
 export default BSTTree;
-
