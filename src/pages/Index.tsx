@@ -21,7 +21,7 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <img 
-                  src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" 
+                  src="https://images.unsplash.com/photo-1535016120720-40c646be5580?auto=format&fit=crop&q=80" 
                   alt="Graph" 
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -39,7 +39,7 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <img 
-                  src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7" 
+                  src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80" 
                   alt="Tree" 
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -57,7 +57,7 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <img 
-                  src="https://images.unsplash.com/photo-1470813740244-df37b8c1edcb" 
+                  src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&q=80" 
                   alt="Linked List" 
                   className="w-full h-48 object-cover rounded-lg"
                 />
