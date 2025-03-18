@@ -3,9 +3,11 @@ import { useState } from "react";
 import { LinkedListNode, LinkedListOperations } from "../types/LinkedListTypes";
 import { LinkedListVisualization } from "../components/LinkedListVisualization";
 import { LinkedListControls } from "../components/LinkedListControls";
+import { VisitationSequence } from "../components/VisitationSequence";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   insertNode, 
   deleteNode, 
@@ -19,7 +21,9 @@ const SinglyLinkedList = () => {
   const [list, setList] = useState<LinkedListNode[]>([]);
   const [currentNode, setCurrentNode] = useState<number | null>(null);
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
+  const [visitSequence, setVisitSequence] = useState<number[]>([]);
   const [isTraversing, setIsTraversing] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleInsert = (value: number, position: number) => {
     const newList = insertNode(list, value, position);
@@ -63,6 +67,7 @@ const SinglyLinkedList = () => {
     const size = Math.floor(Math.random() * 5) + 3; // 3-7 nodes
     const newList = generateRandomList(size);
     setList(newList);
+    setVisitSequence([]);
     toast.success(`Generated random singly linked list with ${size} nodes`);
   };
 
@@ -74,11 +79,16 @@ const SinglyLinkedList = () => {
     
     setIsTraversing(true);
     setVisitedNodes([]);
+    setVisitSequence([]);
     setCurrentNode(null);
+    
+    const newVisitSequence: number[] = [];
     
     await traverseList(list, async (node, index) => {
       setCurrentNode(index);
       setVisitedNodes(prev => [...prev, index]);
+      newVisitSequence.push(node.value);
+      setVisitSequence([...newVisitSequence]);
       await new Promise(resolve => setTimeout(resolve, 500));
     });
     
@@ -115,6 +125,8 @@ const SinglyLinkedList = () => {
             visitedNodes={visitedNodes}
             type="singly"
           />
+          
+          <VisitationSequence sequence={visitSequence} />
         </div>
         
         <div className="lg:col-span-4 space-y-6">
