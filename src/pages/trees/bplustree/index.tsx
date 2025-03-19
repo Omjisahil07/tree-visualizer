@@ -5,6 +5,7 @@ import { BPlusTreeTraversalControls } from "./components/BPlusTreeTraversalContr
 import { BPlusTreeNodeInsertForm } from "./components/BPlusTreeNodeInsertForm";
 import { BPlusTreeConfigForm } from "./components/BPlusTreeConfigForm";
 import { BPlusTreeActions } from "./components/BPlusTreeActions";
+import { BPlusTreeInstructions } from "./components/BPlusTreeInstructions";
 import { useState, useCallback } from "react";
 import { Footer } from "@/components/Footer";
 import { BPlusTreeNode, TraversalType } from "./types/BPlusTreeTypes";
@@ -13,12 +14,7 @@ import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 
 const BPlusTree = () => {
-  const [tree, setTree] = useState<BPlusTreeNode>({
-    keys: [],
-    isLeaf: true,
-    children: [],
-    next: null
-  });
+  const [tree, setTree] = useState<BPlusTreeNode | null>(null);
   const [treeOperations, setTreeOperations] = useState<BPlusTreeOperations | null>(null);
   const [currentStep, setCurrentStep] = useState("");
   const [currentLine, setCurrentLine] = useState(-1);
@@ -31,6 +27,14 @@ const BPlusTree = () => {
 
   const handleSetDegree = (degree: number) => {
     setTreeOperations(new BPlusTreeOperations(degree));
+    // Initialize an empty tree
+    setTree({
+      keys: [],
+      children: [],
+      isLeaf: true,
+      next: null
+    });
+    toast.success(`B+ Tree initialized with degree ${degree}`);
   };
 
   const handleTraversalStep = useCallback(async (value: number, step: string) => {
@@ -70,12 +74,14 @@ const BPlusTree = () => {
     });
 
     setTree(currentTree);
+    setVisitedNodes([]);
+    setCurrentNode(null);
     toast.success("Generated new random B+ tree");
   };
 
   const handleInsert = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!treeOperations) {
+    if (!treeOperations || !tree) {
       toast.error("Please set the B+ tree degree first");
       return;
     }
@@ -86,15 +92,25 @@ const BPlusTree = () => {
       return;
     }
 
+    if (treeOperations.searchNode(tree, value)) {
+      toast.error(`Value ${value} already exists in the tree`);
+      return;
+    }
+
     const updatedTree = treeOperations.insertNode(tree, value);
     setTree(updatedTree);
+    setVisitedNodes([]);
+    setCurrentNode(null);
     toast.success(`Inserted node with value ${value}`);
     setInputValue("");
   };
 
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-4">B+ Tree Visualization</h1>
+      <h1 className="text-2xl font-bold mb-2">B+ Tree Visualization</h1>
+      <p className="text-gray-600 mb-4">
+        Visualize B+ tree operations and understand how they maintain balance and order.
+      </p>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Main visualization panel - 8 columns */}
@@ -113,8 +129,8 @@ const BPlusTree = () => {
             <CardContent className="p-4">
               <BPlusTreeTraversalControls
                 onStart={() => {
-                  if (!treeOperations) {
-                    toast.error("Please set the B+ tree degree first");
+                  if (!treeOperations || !tree || tree.keys.length === 0) {
+                    toast.error("Please create a B+ tree with at least one node first");
                     return;
                   }
                   setIsTraversing(true);
@@ -163,6 +179,8 @@ const BPlusTree = () => {
         
         {/* Controls and pseudocode panel - 4 columns */}
         <div className="lg:col-span-4 space-y-4">
+          <BPlusTreeInstructions />
+          
           {!treeOperations ? (
             <BPlusTreeConfigForm onSetDegree={handleSetDegree} />
           ) : (

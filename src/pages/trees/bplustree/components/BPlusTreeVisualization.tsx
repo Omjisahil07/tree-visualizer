@@ -21,10 +21,11 @@ export const BPlusTreeVisualization = ({
 
     const width = 1000;
     const height = 600;
-    const margin = { top: 60, right: 40, bottom: 40, left: 40 };
+    const margin = { top: 40, right: 40, bottom: 40, left: 40 };
     const nodeWidth = 40;
     const nodeHeight = 30;
-    const nodeSpacing = 20;
+    const nodeSpacing = 5;
+    const levelHeight = 80;
 
     // Clear previous content
     d3.select(svgRef.current).selectAll("*").remove();
@@ -37,18 +38,55 @@ export const BPlusTreeVisualization = ({
     const g = svg.append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Create hierarchical layout - top-down orientation
-    const hierarchy = d3.hierarchy(tree, d => d.children);
-    
-    // Center the tree and use top-down layout
-    const treeLayout = d3.tree()
-      .size([width - margin.left - margin.right, height - margin.top - margin.bottom])
-      .nodeSize([100, 80]); // Increased spacing between nodes
+    // Prepare the data for visualization
+    // Convert B+ tree to hierarchical structure for d3
+    const convertToHierarchy = (node: BPlusTreeNode | null, depth = 0): any => {
+      if (!node) return null;
+      
+      const result: any = {
+        name: 'node',
+        data: node,
+        depth,
+        children: []
+      };
+      
+      if (!node.isLeaf && node.children.length > 0) {
+        result.children = node.children.map(child => 
+          convertToHierarchy(child, depth + 1)
+        ).filter(Boolean);
+      }
+      
+      return result;
+    };
 
-    const root = treeLayout(hierarchy);
+    const hierarchyData = convertToHierarchy(tree);
+    
+    // Use d3's tree layout with fixed node sizes
+    const root = d3.hierarchy(hierarchyData);
+    
+    // Count max depth of the tree
+    const maxDepth = root.height;
+    
+    // Calculate the tree width based on the number of leaf nodes
+    const leafCount = root.leaves().length;
+    const treeWidth = Math.max(width - margin.left - margin.right - 100, leafCount * 100);
+    
+    // Set up the tree layout
+    const treeLayout = d3.tree()
+      .size([treeWidth, maxDepth * levelHeight])
+      .nodeSize([80, levelHeight]);
+    
+    treeLayout(root);
 
     // Center the root node
-    root.x = width / 2;
+    const rootX = width / 2;
+    const xOffset = rootX - root.x;
+    
+    // Adjust all node positions
+    root.descendants().forEach(d => {
+      d.x += xOffset;
+      d.y = d.depth * levelHeight + margin.top;
+    });
 
     // Draw links between nodes with curved paths
     g.selectAll(".link")
@@ -57,10 +95,31 @@ export const BPlusTreeVisualization = ({
       .attr("class", "link")
       .attr("fill", "none")
       .attr("stroke", "hsl(var(--primary))")
-      .attr("stroke-width", 2)
+      .attr("stroke-width", 1.5)
       .attr("d", d3.linkVertical()
         .x((d: any) => d.x)
         .y((d: any) => d.y));
+
+    // Draw leaf node connections (next pointers)
+    const leafNodes = root.leaves().map(l => l.data.data).filter(n => n.isLeaf);
+    for (let i = 0; i < leafNodes.length - 1; i++) {
+      if (leafNodes[i].next === leafNodes[i+1]) {
+        const sourceNode = root.leaves()[i];
+        const targetNode = root.leaves()[i+1];
+        
+        g.append("path")
+          .attr("class", "next-pointer")
+          .attr("fill", "none")
+          .attr("stroke", "hsl(var(--primary))")
+          .attr("stroke-width", 1.5)
+          .attr("stroke-dasharray", "4")
+          .attr("marker-end", "url(#arrowhead)")
+          .attr("d", `M ${sourceNode.x + nodeWidth/2} ${sourceNode.y + nodeHeight} 
+                      C ${sourceNode.x + nodeWidth/2} ${sourceNode.y + nodeHeight + 20} 
+                        ${targetNode.x - nodeWidth/2} ${targetNode.y + nodeHeight + 20} 
+                        ${targetNode.x - nodeWidth/2} ${targetNode.y + nodeHeight}`);
+      }
+    }
 
     // Create node groups
     const nodes = g.selectAll(".node")
@@ -71,27 +130,28 @@ export const BPlusTreeVisualization = ({
 
     // Add rectangles for nodes with animation
     nodes.each(function(d: any) {
+      const nodeData = d.data.data;
       const nodeGroup = d3.select(this);
-      const numKeys = d.data.keys.length;
-      const totalWidth = numKeys * (nodeWidth + nodeSpacing) - nodeSpacing;
-
-      // Node background with animation
+      const numKeys = nodeData.keys.length;
+      const totalWidth = Math.max(nodeWidth, numKeys * (nodeWidth + nodeSpacing) - nodeSpacing);
+      
+      // Node background
       nodeGroup.append("rect")
         .attr("x", -totalWidth / 2)
         .attr("y", -nodeHeight / 2)
         .attr("width", totalWidth)
         .attr("height", nodeHeight)
-        .attr("fill", d.data.isLeaf ? "white" : "hsl(var(--primary) / 0.1)")
+        .attr("fill", nodeData.isLeaf ? "white" : "hsl(var(--primary) / 0.1)")
         .attr("stroke", "hsl(var(--primary))")
-        .attr("stroke-width", 2)
+        .attr("stroke-width", 1.5)
         .attr("rx", 6)
         .attr("opacity", 0)
         .transition()
         .duration(500)
         .attr("opacity", 1);
 
-      // Draw key cells with animation
-      d.data.keys.forEach((key: number, i: number) => {
+      // Draw key cells
+      nodeData.keys.forEach((key: number, i: number) => {
         const x = -totalWidth / 2 + i * (nodeWidth + nodeSpacing);
         
         // Cell background
@@ -101,24 +161,25 @@ export const BPlusTreeVisualization = ({
           .attr("width", nodeWidth)
           .attr("height", nodeHeight)
           .attr("fill", currentNode === key ? "hsl(var(--primary))" :
-                       visitedNodes.includes(key) ? "hsl(var(--primary) / 0.2)" : 
-                       "transparent")
+                      visitedNodes.includes(key) ? "hsl(var(--primary) / 0.2)" : 
+                      "transparent")
           .attr("stroke", "hsl(var(--primary))")
           .attr("stroke-width", 1)
-          .attr("rx", 6)
+          .attr("rx", 4)
           .attr("opacity", 0)
           .transition()
           .duration(500)
           .delay(i * 100)
           .attr("opacity", 1);
 
-        // Key text with animation
+        // Key text
         nodeGroup.append("text")
           .attr("x", x + nodeWidth / 2)
           .attr("y", 0)
           .attr("dy", "0.3em")
           .attr("text-anchor", "middle")
-          .attr("fill", currentNode === key || visitedNodes.includes(key) ? "white" : "currentColor")
+          .attr("fill", currentNode === key ? "white" : 
+                         visitedNodes.includes(key) ? "hsl(var(--primary))" : "currentColor")
           .attr("class", "text-sm font-medium")
           .attr("opacity", 0)
           .text(key)
@@ -158,22 +219,6 @@ export const BPlusTreeVisualization = ({
       });
     });
 
-    // Add next pointers for leaf nodes with animation
-    if (tree.isLeaf && tree.next) {
-      g.append("path")
-        .attr("class", "next-pointer")
-        .attr("fill", "none")
-        .attr("stroke", "hsl(var(--primary))")
-        .attr("stroke-width", 2)
-        .attr("stroke-dasharray", "4")
-        .attr("marker-end", "url(#arrowhead)")
-        .attr("d", `M ${width - margin.right} ${height/2} L ${width - margin.right + 20} ${height/2}`)
-        .attr("opacity", 0)
-        .transition()
-        .duration(500)
-        .attr("opacity", 1);
-    }
-
     // Add arrowhead marker definition
     svg.append("defs").append("marker")
       .attr("id", "arrowhead")
@@ -193,10 +238,10 @@ export const BPlusTreeVisualization = ({
     <div className="relative">
       <svg
         ref={svgRef}
-        className="w-full h-[600px] border border-border rounded-lg bg-white shadow-lg"
+        className="w-full h-[500px] border border-border rounded-lg bg-white shadow-sm"
       />
       {visitedNodes.length > 0 && (
-        <div className="absolute bottom-4 right-4 bg-white p-3 rounded-lg shadow-lg border border-border">
+        <div className="absolute bottom-4 right-4 bg-white p-3 rounded-lg shadow-sm border border-border">
           <h4 className="text-sm font-medium mb-2">Visitation Order</h4>
           <div className="flex gap-2">
             {visitedNodes.map((node, index) => (

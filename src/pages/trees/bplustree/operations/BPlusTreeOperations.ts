@@ -2,9 +2,11 @@ import { BPlusTreeNode } from "../types/BPlusTreeTypes";
 
 export class BPlusTreeOperations {
   private degree: number;
+  private maxKeys: number;
 
   constructor(degree: number) {
     this.degree = degree;
+    this.maxKeys = degree - 1;
   }
 
   insertNode(root: BPlusTreeNode | null, value: number): BPlusTreeNode {
@@ -17,21 +19,64 @@ export class BPlusTreeOperations {
       };
     }
 
-    // Simple insert for now - we'll implement splitting later
-    if (root.isLeaf) {
-      root.keys.push(value);
-      root.keys.sort((a, b) => a - b);
+    if (root.isLeaf && root.keys.length >= this.maxKeys) {
+      const newRoot: BPlusTreeNode = {
+        keys: [],
+        children: [root],
+        isLeaf: false,
+        next: null
+      };
+      
+      this.splitChild(newRoot, 0);
+      return this.insertNonFull(newRoot, value);
+    }
+
+    return this.insertNonFull(root, value);
+  }
+
+  private insertNonFull(node: BPlusTreeNode, value: number): BPlusTreeNode {
+    if (node.isLeaf) {
+      let insertPos = node.keys.length;
+      while (insertPos > 0 && value < node.keys[insertPos - 1]) {
+        insertPos--;
+      }
+      node.keys.splice(insertPos, 0, value);
+      return node;
     } else {
-      let index = root.keys.length;
-      for (let i = 0; i < root.keys.length; i++) {
-        if (value < root.keys[i]) {
-          index = i;
-          break;
+      let childIndex = node.keys.length;
+      while (childIndex > 0 && value < node.keys[childIndex - 1]) {
+        childIndex--;
+      }
+      if (node.children[childIndex].keys.length >= this.maxKeys) {
+        this.splitChild(node, childIndex);
+        if (value > node.keys[childIndex]) {
+          childIndex++;
         }
       }
-      root.children[index] = this.insertNode(root.children[index], value);
+      node.children[childIndex] = this.insertNonFull(node.children[childIndex], value);
+      return node;
     }
-    return root;
+  }
+
+  private splitChild(parent: BPlusTreeNode, childIndex: number): void {
+    const child = parent.children[childIndex];
+    const middleIndex = Math.floor(child.keys.length / 2);
+    
+    const newSibling: BPlusTreeNode = {
+      keys: child.keys.splice(middleIndex, child.keys.length - middleIndex),
+      children: child.isLeaf ? [] : child.children.splice(middleIndex + 1),
+      isLeaf: child.isLeaf,
+      next: child.next
+    };
+    
+    if (child.isLeaf) {
+      child.next = newSibling;
+    }
+    
+    const medianKey = child.isLeaf ? child.keys[middleIndex - 1] : child.keys.pop()!;
+    parent.keys.splice(childIndex, 0, medianKey);
+    
+    parent.children.splice(childIndex + 1, 0, newSibling);
   }
 
   deleteNode(root: BPlusTreeNode | null, value: number): BPlusTreeNode | null {

@@ -37,7 +37,12 @@ export const BPlusTreeNodeInsertForm = ({
               disabled={disabled}
             />
           </div>
-          <Button type="submit" className="w-full gap-1" size="sm" disabled={disabled}>
+          <Button 
+            type="submit" 
+            className="w-full gap-1 bg-primary hover:bg-primary/90" 
+            size="sm" 
+            disabled={disabled}
+          >
             <Plus className="w-4 h-4" />
             Insert Node
           </Button>

@@ -21,7 +21,7 @@ export const BPlusTreeActions = ({
         <Button 
           onClick={onGenerateRandom} 
           variant="outline" 
-          className="w-full gap-1" 
+          className="w-full gap-1 bg-white hover:bg-gray-50" 
           size="sm" 
           disabled={!isConfigured}
         >
