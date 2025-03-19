@@ -15,7 +15,7 @@ export const VisitationOrder = memo(({ visitedNodes }: VisitationOrderProps) => 
         {visitedNodes.map((node, index) => (
           <div
             key={index}
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-secondary text-white text-sm font-bold"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-sm font-bold"
           >
             {node}
           </div>

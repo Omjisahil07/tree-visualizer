@@ -12,9 +12,10 @@ export const convertToHierarchy = (node: BPlusTreeNode | null, depth = 0): any =
   };
   
   if (!node.isLeaf && node.children.length > 0) {
-    result.children = node.children.map(child => 
-      convertToHierarchy(child, depth + 1)
-    ).filter(Boolean);
+    result.children = node.children
+      .filter(child => child !== null)
+      .map(child => convertToHierarchy(child, depth + 1))
+      .filter(Boolean);
   }
   
   return result;

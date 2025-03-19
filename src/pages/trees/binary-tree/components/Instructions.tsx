@@ -1,3 +1,4 @@
+
 import { Info } from "lucide-react";
 
 export const Instructions = () => {
@@ -5,7 +6,7 @@ export const Instructions = () => {
     <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
       <div className="flex items-center gap-2 mb-4">
         <Info className="w-5 h-5 text-primary" />
-        <h3 className="text-lg font-semibold">Available Functions</h3>
+        <h3 className="text-lg font-semibold">Available Operations</h3>
       </div>
       <ul className="space-y-2 text-sm text-muted-foreground">
         <li>• Enter a number and select insertion position (Left, Right, or Auto)</li>
