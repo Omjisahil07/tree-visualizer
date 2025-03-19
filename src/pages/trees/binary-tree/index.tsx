@@ -15,7 +15,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Wand2, Plus } from "lucide-react";
+import { Wand2, Plus, Info } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -109,6 +109,23 @@ const BinaryTree = () => {
   return (
     <div className="container mx-auto py-6">
       <h1 className="text-2xl font-bold mb-4">Binary Tree Visualization</h1>
+      
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Info className="w-5 h-5 text-primary" />
+          <h3 className="text-lg font-semibold">Available Operations</h3>
+        </div>
+        <ul className="space-y-2 text-sm text-muted-foreground">
+          <li>• Enter a number and select insertion position (Left, Right, or Auto)</li>
+          <li>• Click "Insert Node" to add a new node at the selected position</li>
+          <li>• Click on a node to select it for updating</li>
+          <li>• Double click on a node to delete it</li>
+          <li>• Select a traversal type (Preorder, Inorder, or Postorder)</li>
+          <li>• Use traversal controls to visualize the algorithm step by step</li>
+          <li>• Watch the pseudocode highlight as the traversal progresses</li>
+          <li>• View the sequence of visited nodes in real-time</li>
+        </ul>
+      </div>
       
       <div className="flex justify-end mb-2">
         <Button

@@ -1,3 +1,4 @@
+
 /**
  * Main AVL Tree visualization component
  */
@@ -8,7 +9,7 @@ import { AVLControls } from "./components/AVLControls";
 import { AVLTraversalControls } from "./components/AVLTraversalControls";
 import { TraversalType } from "./types/AVLTypes";
 import { Button } from "@/components/ui/button";
-import { Wand2 } from "lucide-react";
+import { Wand2, Info } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { useAVLTree } from "./hooks/useAVLTree";
 
@@ -43,6 +44,7 @@ const AVLTree = () => {
       
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
         <div className="flex items-center gap-2 mb-4">
+          <Info className="w-5 h-5 text-primary" />
           <h3 className="text-lg font-semibold">Available Operations</h3>
         </div>
         <ul className="space-y-2 text-sm text-muted-foreground">

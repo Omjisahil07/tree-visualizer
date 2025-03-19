@@ -5,13 +5,13 @@ import { BPlusTreeTraversalControls } from "./components/BPlusTreeTraversalContr
 import { BPlusTreeNodeInsertForm } from "./components/BPlusTreeNodeInsertForm";
 import { BPlusTreeConfigForm } from "./components/BPlusTreeConfigForm";
 import { BPlusTreeActions } from "./components/BPlusTreeActions";
-import { BPlusTreeInstructions } from "./components/BPlusTreeInstructions";
 import { useState, useCallback } from "react";
 import { Footer } from "@/components/Footer";
 import { BPlusTreeNode, TraversalType } from "./types/BPlusTreeTypes";
 import { BPlusTreeOperations } from "./operations/BPlusTreeOperations";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
+import { Info } from "lucide-react";
 
 const BPlusTree = () => {
   const [tree, setTree] = useState<BPlusTreeNode | null>(null);
@@ -108,9 +108,21 @@ const BPlusTree = () => {
   return (
     <div className="container mx-auto py-6">
       <h1 className="text-2xl font-bold mb-2">B+ Tree Visualization</h1>
-      <p className="text-gray-600 mb-4">
-        Visualize B+ tree operations and understand how they maintain balance and order.
-      </p>
+      
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Info className="w-5 h-5 text-primary" />
+          <h3 className="text-lg font-semibold">Available Operations</h3>
+        </div>
+        <ul className="space-y-2 text-sm text-muted-foreground">
+          <li>• Set the B+ tree degree first, then insert nodes or generate a random tree.</li>
+          <li>• Enter a number to insert a new node in the B+ tree.</li>
+          <li>• B+ Trees store keys in both <strong>internal nodes</strong> and <strong>leaf nodes</strong>.</li>
+          <li>• Leaf nodes are connected by <strong>next pointers</strong> for efficient range queries.</li>
+          <li>• Use the traversal controls to visualize different ways to navigate the tree.</li>
+          <li>• Watch the pseudocode highlight as the traversal progresses.</li>
+        </ul>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Main visualization panel - 8 columns */}
@@ -179,8 +191,6 @@ const BPlusTree = () => {
         
         {/* Controls and pseudocode panel - 4 columns */}
         <div className="lg:col-span-4 space-y-4">
-          <BPlusTreeInstructions />
-          
           {!treeOperations ? (
             <BPlusTreeConfigForm onSetDegree={handleSetDegree} />
           ) : (
