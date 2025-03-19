@@ -2,13 +2,15 @@
 import { BPlusTreePseudocode } from "./components/BPlusTreePseudocode";
 import { BPlusTreeVisualization } from "./components/BPlusTreeVisualization";
 import { BPlusTreeTraversalControls } from "./components/BPlusTreeTraversalControls";
-import { BPlusTreeControls } from "./components/BPlusTreeControls";
-import { BPlusTreeHeader } from "./components/BPlusTreeHeader";
+import { BPlusTreeNodeInsertForm } from "./components/BPlusTreeNodeInsertForm";
+import { BPlusTreeConfigForm } from "./components/BPlusTreeConfigForm";
+import { BPlusTreeActions } from "./components/BPlusTreeActions";
 import { useState, useCallback } from "react";
 import { Footer } from "@/components/Footer";
 import { BPlusTreeNode, TraversalType } from "./types/BPlusTreeTypes";
 import { BPlusTreeOperations } from "./operations/BPlusTreeOperations";
 import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
 
 const BPlusTree = () => {
   const [tree, setTree] = useState<BPlusTreeNode>({
@@ -25,8 +27,6 @@ const BPlusTree = () => {
   const [currentNode, setCurrentNode] = useState<number | null>(null);
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [updateValue, setUpdateValue] = useState("");
-  const [selectedNode, setSelectedNode] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState(false);
 
   const handleSetDegree = (degree: number) => {
@@ -93,79 +93,94 @@ const BPlusTree = () => {
   };
 
   return (
-    <div className="container mx-auto py-12">
-      <BPlusTreeHeader
-        onGenerateRandom={generateRandomBPlusTree}
-        onSetDegree={handleSetDegree}
-        isConfigured={treeOperations !== null}
-      />
+    <div className="container mx-auto py-6">
+      <h1 className="text-2xl font-bold mb-4">B+ Tree Visualization</h1>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <BPlusTreeVisualization
-            tree={tree}
-            currentNode={currentNode}
-            visitedNodes={visitedNodes}
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Main visualization panel - 8 columns */}
+        <div className="lg:col-span-8 space-y-4">
+          <Card className="shadow-sm">
+            <CardContent className="p-4">
+              <BPlusTreeVisualization
+                tree={tree}
+                currentNode={currentNode}
+                visitedNodes={visitedNodes}
+              />
+            </CardContent>
+          </Card>
           
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <BPlusTreeTraversalControls
-              onStart={() => {
-                if (!treeOperations) {
-                  toast.error("Please set the B+ tree degree first");
-                  return;
-                }
-                setIsTraversing(true);
-                setIsPaused(false);
-                setVisitedNodes([]);
-                setCurrentNode(null);
-                setCurrentLine(0);
-                setCurrentStep("");
-
-                const traversalFunction = {
-                  inorder: treeOperations.traverseInOrder.bind(treeOperations),
-                  preorder: treeOperations.traversePreOrder.bind(treeOperations),
-                  postorder: treeOperations.traversePostOrder.bind(treeOperations),
-                  levelorder: treeOperations.traverseLevelOrder.bind(treeOperations),
-                }[traversalType];
-
-                if (!traversalFunction) return;
-
-                traversalFunction(tree, handleTraversalStep).then(() => {
-                  if (!isPaused) {
-                    setIsTraversing(false);
-                    setCurrentLine(-1);
-                    setCurrentStep("Traversal complete");
+          <Card className="shadow-sm">
+            <CardContent className="p-4">
+              <BPlusTreeTraversalControls
+                onStart={() => {
+                  if (!treeOperations) {
+                    toast.error("Please set the B+ tree degree first");
+                    return;
                   }
-                });
-              }}
-              onPause={() => {
-                setIsPaused(true);
-                setIsTraversing(false);
-              }}
-              onReset={() => {
-                setIsTraversing(false);
-                setIsPaused(false);
-                setVisitedNodes([]);
-                setCurrentNode(null);
-                setCurrentLine(-1);
-                setCurrentStep("");
-              }}
-              isTraversing={isTraversing}
-              traversalType={traversalType}
-              onTraversalTypeChange={setTraversalType}
-            />
-          </div>
+                  setIsTraversing(true);
+                  setIsPaused(false);
+                  setVisitedNodes([]);
+                  setCurrentNode(null);
+                  setCurrentLine(0);
+                  setCurrentStep("");
+
+                  const traversalFunction = {
+                    inorder: treeOperations.traverseInOrder.bind(treeOperations),
+                    preorder: treeOperations.traversePreOrder.bind(treeOperations),
+                    postorder: treeOperations.traversePostOrder.bind(treeOperations),
+                    levelorder: treeOperations.traverseLevelOrder.bind(treeOperations),
+                  }[traversalType];
+
+                  if (!traversalFunction) return;
+
+                  traversalFunction(tree, handleTraversalStep).then(() => {
+                    if (!isPaused) {
+                      setIsTraversing(false);
+                      setCurrentLine(-1);
+                      setCurrentStep("Traversal complete");
+                    }
+                  });
+                }}
+                onPause={() => {
+                  setIsPaused(true);
+                  setIsTraversing(false);
+                }}
+                onReset={() => {
+                  setIsTraversing(false);
+                  setIsPaused(false);
+                  setVisitedNodes([]);
+                  setCurrentNode(null);
+                  setCurrentLine(-1);
+                  setCurrentStep("");
+                }}
+                isTraversing={isTraversing}
+                traversalType={traversalType}
+                onTraversalTypeChange={setTraversalType}
+              />
+            </CardContent>
+          </Card>
         </div>
-
-        <div className="space-y-6">
-          <BPlusTreeControls
-            inputValue={inputValue}
-            onInputChange={setInputValue}
-            onSubmit={handleInsert}
-            disabled={!treeOperations}
-          />
-
+        
+        {/* Controls and pseudocode panel - 4 columns */}
+        <div className="lg:col-span-4 space-y-4">
+          {!treeOperations ? (
+            <BPlusTreeConfigForm onSetDegree={handleSetDegree} />
+          ) : (
+            <>
+              <BPlusTreeActions 
+                onGenerateRandom={generateRandomBPlusTree}
+                isConfigured={treeOperations !== null}
+              />
+              
+              <BPlusTreeNodeInsertForm
+                inputValue={inputValue}
+                setInputValue={setInputValue}
+                handleInsert={handleInsert}
+                disabled={!treeOperations}
+              />
+            </>
+          )}
+          
           <BPlusTreePseudocode
             currentStep={currentStep}
             currentLine={currentLine}
