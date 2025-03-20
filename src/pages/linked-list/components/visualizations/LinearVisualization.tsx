@@ -74,6 +74,8 @@ export const LinearVisualization: React.FC<LinearVisualizationProps> = ({
             index={index}
             isHighlighted={currentNode === index}
             isVisited={visitedNodes.includes(index)}
+            nextAddress={node.next}
+            prevAddress={isDoubly ? node.prev : undefined}
           />
           
           {/* Next pointer */}

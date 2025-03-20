@@ -7,13 +7,17 @@ interface LinkedListNodeProps {
   index: number;
   isHighlighted: boolean;
   isVisited: boolean;
+  nextAddress?: number | null;
+  prevAddress?: number | null;
 }
 
 export const LinkedListNodeComponent: React.FC<LinkedListNodeProps> = ({
   value,
   index,
   isHighlighted,
-  isVisited
+  isVisited,
+  nextAddress,
+  prevAddress
 }) => {
   return (
     <div className="flex flex-col items-center">
@@ -32,6 +36,20 @@ export const LinkedListNodeComponent: React.FC<LinkedListNodeProps> = ({
       <span className="text-xs text-muted-foreground mt-1">
         {index}
       </span>
+      {(nextAddress !== undefined || prevAddress !== undefined) && (
+        <div className="text-xs mt-1 flex flex-col items-center">
+          {prevAddress !== undefined && (
+            <span className="text-blue-500">
+              prev: {prevAddress !== null ? prevAddress : 'null'}
+            </span>
+          )}
+          {nextAddress !== undefined && (
+            <span className="text-green-500">
+              next: {nextAddress !== null ? nextAddress : 'null'}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 };

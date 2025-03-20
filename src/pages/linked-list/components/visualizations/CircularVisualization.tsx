@@ -263,6 +263,8 @@ export const CircularVisualization: React.FC<CircularVisualizationProps> = ({
               index={index}
               isHighlighted={currentNode === index}
               isVisited={visitedNodes.includes(index)}
+              nextAddress={node.next}
+              prevAddress={isDoubly ? node.prev : undefined}
             />
           </div>
         );
