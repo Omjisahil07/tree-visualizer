@@ -30,15 +30,15 @@ export const CircularVisualization: React.FC<CircularVisualizationProps> = ({
   
   // Calculate radius based on number of nodes
   const radius = list.length <= 4 ? 120 : list.length <= 8 ? 150 : 180;
-  const centerX = radius + 20; // add padding
-  const centerY = radius + 20; // add padding
+  const centerX = radius + 40; // add more padding
+  const centerY = radius + 40; // add more padding
   
   return (
     <div 
-      className="relative mx-auto" 
+      className="relative mx-auto mt-8 mb-12" 
       style={{ 
-        width: (radius * 2) + 40, 
-        height: (radius * 2) + 40 
+        width: (radius * 2) + 80,  // increase width for better spacing
+        height: (radius * 2) + 80  // increase height for better spacing
       }}
     >
       {/* Circle guide and index numbers */}
