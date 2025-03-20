@@ -1,7 +1,7 @@
 
 import React from "react";
 import { LinkedListNode, LinkedListType } from "../../types/LinkedListTypes";
-import { LinkedListNodeComponent } from "../../LinkedListNode";
+import { LinkedListNodeComponent } from "../../../components/LinkedListNode";
 import { ArrowRight, ArrowLeft, RotateCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getAdjacentIndices } from "./linear/linearUtils";
