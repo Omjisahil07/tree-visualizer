@@ -9,7 +9,7 @@ export const TraversalIndicator: React.FC<TraversalIndicatorProps> = ({
   isDoubly
 }) => {
   if (!traversalDirection) return null;
-  return <div className="mt-10 mb-6 flex justify-center gap-4 items-center mx-0 my-[60px]">
+  return <div className="mt-10 mb-6 flex justify-center gap-4 items-center mx-0 my-[70px]">
       <div className="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full">
         {isDoubly ? <RefreshCcw className="h-5 w-5 text-slate-600" /> : <RotateCcw className="h-5 w-5 text-slate-600" />}
         <span className="text-xs font-medium text-slate-600 mx-0 px-0">
