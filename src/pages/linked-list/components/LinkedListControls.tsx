@@ -80,23 +80,24 @@ export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
                            operation === LinkedListOperations.UPDATE;
   
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>List Operations</CardTitle>
+    <div className="space-y-4">
+      <Card className="shadow-sm">
+        <CardHeader className="py-3 px-4">
+          <CardTitle className="text-base">List Operations</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="py-2 px-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div className="space-y-2">
-              <Label htmlFor="operation">Operation</Label>
-              <div className="grid grid-cols-1 gap-2">
+              <Label htmlFor="operation" className="text-sm">Operation</Label>
+              <div className="grid grid-cols-2 gap-1 text-xs">
                 {operations.map((op) => (
                   <Button
                     key={op}
                     type="button"
                     variant={operation === op ? "default" : "outline"}
                     onClick={() => setOperation(op)}
-                    className="justify-start"
+                    className="justify-start py-1 h-8 text-xs"
+                    size="sm"
                   >
                     {op === LinkedListOperations.INSERT_AT_BEGINNING && "Insert at Beginning"}
                     {op === LinkedListOperations.INSERT_AT_END && "Insert at End"}
@@ -111,21 +112,22 @@ export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
             </div>
             
             {needsValueInput && (
-              <div className="space-y-2">
-                <Label htmlFor="value">Value</Label>
+              <div className="space-y-1">
+                <Label htmlFor="value" className="text-sm">Value</Label>
                 <Input
                   id="value"
                   type="number"
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
                   placeholder="Enter a number"
+                  className="h-8 text-sm"
                 />
               </div>
             )}
             
             {needsPositionInput && (
-              <div className="space-y-2">
-                <Label htmlFor="position">Position</Label>
+              <div className="space-y-1">
+                <Label htmlFor="position" className="text-sm">Position</Label>
                 <Input
                   id="position"
                   type="number"
@@ -134,31 +136,33 @@ export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
                   placeholder={`0 - ${listLength > 0 ? listLength - 1 : 0}`}
                   min={0}
                   max={operation === LinkedListOperations.INSERT_AT_POSITION ? listLength : listLength - 1}
+                  className="h-8 text-sm"
                 />
               </div>
             )}
             
-            <Button type="submit" className="w-full">
-              {operation.includes("insert") && <ChevronRight className="mr-2 h-4 w-4" />}
-              {operation.includes("delete") && <RotateCcw className="mr-2 h-4 w-4" />}
-              {operation === LinkedListOperations.UPDATE && <ChevronLeft className="mr-2 h-4 w-4" />}
+            <Button type="submit" className="w-full h-8 text-sm" size="sm">
+              {operation.includes("insert") && <ChevronRight className="mr-1 h-3 w-3" />}
+              {operation.includes("delete") && <RotateCcw className="mr-1 h-3 w-3" />}
+              {operation === LinkedListOperations.UPDATE && <ChevronLeft className="mr-1 h-3 w-3" />}
               Submit
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Traversal</CardTitle>
+      <Card className="shadow-sm">
+        <CardHeader className="py-3 px-4">
+          <CardTitle className="text-base">Traversal</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="py-2 px-4">
           <Button 
             onClick={onTraverse} 
             disabled={isTraversing || listLength === 0}
-            className="w-full"
+            className="w-full h-9 flex items-center justify-center"
+            size="sm"
           >
-            <Play className="mr-2 h-4 w-4" />
+            <Play className="mr-2 h-3 w-3" />
             Start Traversal
           </Button>
         </CardContent>

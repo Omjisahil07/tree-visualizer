@@ -111,21 +111,22 @@ const DoubleCircularLinkedList = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-3">Double Circular Linked List</h1>
-        <p className="text-muted-foreground text-lg mb-3">
+      <div className="text-center mb-6">
+        <h1 className="text-3xl font-bold mb-2">Double Circular Linked List</h1>
+        <p className="text-muted-foreground text-base mb-3">
           Combines features of doubly linked list and circular linked list
         </p>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-8 space-y-6">
-          <div className="flex justify-between mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="lg:col-span-8 space-y-4">
+          <div className="flex justify-between mb-3">
             <div className="space-x-2">
               <Button
                 onClick={() => setTraverseDirection("forward")}
                 variant={traverseDirection === "forward" ? "default" : "outline"}
                 size="sm"
+                className="h-8 text-xs"
               >
                 Forward Traversal
               </Button>
@@ -133,6 +134,7 @@ const DoubleCircularLinkedList = () => {
                 onClick={() => setTraverseDirection("reverse")}
                 variant={traverseDirection === "reverse" ? "default" : "outline"}
                 size="sm"
+                className="h-8 text-xs"
               >
                 Reverse Traversal
               </Button>
@@ -140,9 +142,10 @@ const DoubleCircularLinkedList = () => {
             <Button
               onClick={handleGenerateRandom}
               variant="outline"
-              className="gap-2"
+              className="gap-1"
+              size="sm"
             >
-              <Wand2 className="w-4 h-4" />
+              <Wand2 className="w-3 h-3" />
               Generate Random List
             </Button>
           </div>
@@ -152,12 +155,13 @@ const DoubleCircularLinkedList = () => {
             currentNode={currentNode}
             visitedNodes={visitedNodes}
             type="double-circular"
+            traversalDirection={traverseDirection}
           />
           
           <VisitationSequence sequence={visitSequence} />
         </div>
         
-        <div className="lg:col-span-4 space-y-6">
+        <div className="lg:col-span-4">
           <LinkedListControls
             onInsert={handleInsert}
             onDelete={handleDelete}

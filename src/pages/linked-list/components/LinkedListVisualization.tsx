@@ -72,7 +72,7 @@ export const LinkedListVisualization: React.FC<LinkedListVisualizationProps> = (
       
       {/* Add traversal direction indicator for linear lists */}
       {!isCircular && traversalDirection && (
-        <div className="mt-6 flex justify-center">
+        <div className="mt-10 mb-6 flex justify-center">
           <div className="flex items-center gap-1 bg-blue-100 px-3 py-1 rounded-full">
             {traversalDirection === "forward" ? (
               <ArrowRight className="h-5 w-5 text-blue-600" />

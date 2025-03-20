@@ -40,12 +40,12 @@ export const LinearVisualization: React.FC<LinearVisualizationProps> = ({
   );
   
   return (
-    <div className="flex items-center justify-center flex-wrap">
+    <div className="flex items-center justify-center flex-wrap my-8">
       {list.map((node, index) => (
         <React.Fragment key={index}>
           {/* Prev pointer for doubly linked lists */}
           {isDoubly && index > 0 && (
-            <div className="flex items-center mx-1">
+            <div className="flex items-center mx-2">
               <ArrowLeft 
                 className={cn(
                   "h-4 w-4", 
@@ -71,7 +71,7 @@ export const LinearVisualization: React.FC<LinearVisualizationProps> = ({
           
           {/* Next pointer */}
           {index < list.length - 1 && (
-            <div className="flex items-center mx-1">
+            <div className="flex items-center mx-2">
               <ArrowRight 
                 className={cn(
                   "h-4 w-4", 
@@ -88,7 +88,7 @@ export const LinearVisualization: React.FC<LinearVisualizationProps> = ({
           
           {/* Circular connection from last to first node */}
           {isCircular && index === list.length - 1 && (
-            <div className="flex flex-col items-center mx-1">
+            <div className="flex flex-col items-center mx-2">
               <div 
                 className={cn(
                   "rounded-full p-1", 
