@@ -1,46 +1,40 @@
 
 import React from "react";
-import { LinkedListNode, LinkedListType } from "../../types/LinkedListTypes";
-import { LinkedListNodeComponent } from "../../LinkedListNode";
+import { LinkedListNode } from "../../../types/LinkedListTypes";
 import { ArrowRight, ArrowLeft, RotateCw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getAdjacentIndices } from "./linear/linearUtils";
+import { getAdjacentIndices } from "./linearUtils";
 
-interface LinearVisualizationProps {
+interface LinearConnectionsProps {
   list: LinkedListNode[];
   currentNode: number | null;
-  visitedNodes: number[];
-  type: LinkedListType;
   lastVisitedNode: number | null;
-  traversalDirection?: "forward" | "reverse";
+  visitedNodes: number[];
+  isDoubly: boolean;
+  isCircular: boolean;
+  traversalDirection: "forward" | "reverse";
 }
 
-export const LinearVisualization: React.FC<LinearVisualizationProps> = ({
+export const LinearConnections: React.FC<LinearConnectionsProps> = ({
   list,
   currentNode,
-  visitedNodes,
-  type,
   lastVisitedNode,
-  traversalDirection = "forward"
+  visitedNodes,
+  isDoubly,
+  isCircular,
+  traversalDirection
 }) => {
-  if (list.length === 0) {
-    return null;
-  }
-  
-  const isDoubly = type === "doubly" || type === "double-circular";
-  const isCircular = type === "circular" || type === "double-circular";
-  
   const activeConnection = getAdjacentIndices(
     lastVisitedNode, 
     currentNode, 
     visitedNodes, 
-    list, 
-    traversalDirection, 
+    list,
+    traversalDirection,
     isDoubly
   );
   
   return (
-    <div className="flex items-center justify-center flex-wrap">
+    <>
       {list.map((node, index) => (
         <React.Fragment key={index}>
           {/* Prev pointer for doubly linked lists */}
@@ -60,16 +54,7 @@ export const LinearVisualization: React.FC<LinearVisualizationProps> = ({
             </div>
           )}
           
-          <LinkedListNodeComponent
-            value={node.value}
-            index={index}
-            isHighlighted={currentNode === index}
-            isVisited={visitedNodes.includes(index)}
-            nextAddress={node.next}
-            prevAddress={isDoubly ? node.prev : undefined}
-          />
-          
-          {/* Next pointer */}
+          {/* Node will be inserted between connections */}
           {index < list.length - 1 && (
             <div className="flex items-center mx-1">
               <ArrowRight 
@@ -115,6 +100,6 @@ export const LinearVisualization: React.FC<LinearVisualizationProps> = ({
           )}
         </React.Fragment>
       ))}
-    </div>
+    </>
   );
 };
