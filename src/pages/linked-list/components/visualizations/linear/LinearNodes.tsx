@@ -17,7 +17,7 @@ export const LinearNodes: React.FC<LinearNodesProps> = ({
   isDoubly
 }) => {
   return (
-    <>
+    <div className="flex items-center justify-center flex-wrap gap-3 my-8">
       {list.map((node, index) => (
         <LinkedListNodeComponent
           key={index}
@@ -29,6 +29,6 @@ export const LinearNodes: React.FC<LinearNodesProps> = ({
           prevAddress={isDoubly ? node.prev : undefined}
         />
       ))}
-    </>
+    </div>
   );
 };
