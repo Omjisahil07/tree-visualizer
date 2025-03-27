@@ -3,12 +3,7 @@ import { LinkedListNode } from "../../../types/LinkedListTypes";
 
 // Calculates node position on a circle
 export const calculateNodePosition = (index: number, totalNodes: number, radius: number, centerX: number, centerY: number) => {
-  // Calculate angle, starting from top (270 degrees or -90 degrees or 3π/2 radians)
-  // and going clockwise
-  const startAngle = -Math.PI / 2; // Start from top (-90 degrees)
-  const angle = startAngle + (index / totalNodes) * 2 * Math.PI;
-  
-  // Calculate position using the angle
+  const angle = (index / totalNodes) * 2 * Math.PI;
   const x = centerX + radius * Math.cos(angle);
   const y = centerY + radius * Math.sin(angle);
   
@@ -52,25 +47,25 @@ export const calculateCurveControlPoints = (
   isInnerCurve: boolean = false
 ) => {
   // Determine if we're going clockwise or counterclockwise
-  // This handling is important for proper path creation
-  let angleDiff = toAngle - fromAngle;
+  const isClockwise = ((toAngle - fromAngle + 2 * Math.PI) % (2 * Math.PI)) < Math.PI;
   
-  // Normalize the angle difference to range [-PI, PI]
-  while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
-  while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+  // Calculate midpoint angle
+  let midAngle = (fromAngle + toAngle) / 2;
   
-  // Calculate midpoint angle, adjusting for the shortest path
-  let midAngle = fromAngle + angleDiff / 2;
+  // Adjust midpoint for better curves when angles are far apart
+  if (Math.abs(toAngle - fromAngle) > Math.PI) {
+    midAngle += Math.PI;
+  }
   
   // Control point distance from center
   let controlDistance;
   
   if (isInnerCurve) {
     // Inner curves (for prev pointers in doubly linked lists)
-    controlDistance = radius * 0.6; // Move control point closer to center
+    controlDistance = radius * 0.5; // Move control point closer to center
   } else {
     // Outer curves (for next pointers)
-    controlDistance = radius * 1.4; // Move control point away from center
+    controlDistance = radius * 1.5; // Move control point away from center
   }
   
   // Calculate control point position
