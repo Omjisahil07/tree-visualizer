@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { LinkedListNode, LinkedListOperations } from "../types/LinkedListTypes";
 import { LinkedListVisualization } from "../components/LinkedListVisualization";
@@ -12,6 +11,7 @@ import {
   insertNode, 
   deleteNode, 
   updateNode,
+  replaceNode,
   generateRandomList,
   traverseList 
 } from "./operations/singlyLinkedListOperations";
@@ -61,6 +61,22 @@ const SinglyLinkedList = () => {
     const newList = updateNode(list, position, value);
     setList(newList);
     toast.success(`Updated node at position ${position} to ${value}`);
+  };
+
+  const handleReplaceNode = (position: number, value: number) => {
+    if (list.length === 0) {
+      toast.error("List is empty");
+      return;
+    }
+    
+    if (position < 0 || position >= list.length) {
+      toast.error("Invalid position");
+      return;
+    }
+    
+    const newList = replaceNode(list, position, value);
+    setList(newList);
+    toast.success(`Replaced node at position ${position} with new node of value ${value}`);
   };
 
   const handleGenerateRandom = () => {
@@ -134,6 +150,7 @@ const SinglyLinkedList = () => {
             onInsert={handleInsert}
             onDelete={handleDelete}
             onUpdate={handleUpdate}
+            onReplaceNode={handleReplaceNode}
             onTraverse={handleTraverse}
             isTraversing={isTraversing}
             listLength={list.length}
@@ -144,7 +161,8 @@ const SinglyLinkedList = () => {
               LinkedListOperations.DELETE_FROM_BEGINNING,
               LinkedListOperations.DELETE_FROM_END,
               LinkedListOperations.DELETE_FROM_POSITION,
-              LinkedListOperations.UPDATE
+              LinkedListOperations.UPDATE,
+              LinkedListOperations.REPLACE_NODE
             ]}
           />
         </div>

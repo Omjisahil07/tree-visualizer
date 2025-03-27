@@ -1,4 +1,3 @@
-
 import { LinkedListNode, TraversalCallback } from "../../types/LinkedListTypes";
 
 export const insertNode = (
@@ -85,6 +84,29 @@ export const updateNode = (
   const newList = [...list];
   newList[position] = { ...newList[position], value };
 
+  return newList;
+};
+
+export const replaceNode = (
+  list: LinkedListNode[],
+  position: number,
+  value: number
+): LinkedListNode[] => {
+  if (list.length === 0 || position < 0 || position >= list.length) {
+    return list;
+  }
+
+  const newList = [...list];
+  
+  // Create a new node with the new value
+  const newNode: LinkedListNode = {
+    value,
+    next: newList[position].next
+  };
+  
+  // Replace the node at position
+  newList[position] = newNode;
+  
   return newList;
 };
 

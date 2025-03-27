@@ -12,7 +12,8 @@ export enum LinkedListOperations {
   DELETE_FROM_BEGINNING = "deleteFromBeginning",
   DELETE_FROM_END = "deleteFromEnd",
   DELETE_FROM_POSITION = "deleteFromPosition",
-  UPDATE = "update"
+  UPDATE = "update",
+  REPLACE_NODE = "replaceNode"
 }
 
 export type LinkedListType = "singly" | "doubly" | "circular" | "double-circular";

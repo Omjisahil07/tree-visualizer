@@ -11,6 +11,7 @@ interface LinkedListControlsProps {
   onInsert: (value: number, position: number) => void;
   onDelete: (position: number) => void;
   onUpdate: (position: number, value: number) => void;
+  onReplaceNode?: (position: number, value: number) => void;
   onTraverse: () => void;
   isTraversing: boolean;
   listLength: number;
@@ -21,6 +22,7 @@ export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
   onInsert,
   onDelete,
   onUpdate,
+  onReplaceNode,
   onTraverse,
   isTraversing,
   listLength,
@@ -41,6 +43,11 @@ export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
         return;
       }
       onUpdate(numPosition, numValue);
+    } else if (operation === LinkedListOperations.REPLACE_NODE) {
+      if (isNaN(numValue) || numPosition < 0 || numPosition >= listLength) {
+        return;
+      }
+      onReplaceNode && onReplaceNode(numPosition, numValue);
     } else if (
       operation === LinkedListOperations.DELETE_FROM_BEGINNING ||
       operation === LinkedListOperations.DELETE_FROM_END ||
@@ -77,7 +84,8 @@ export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
   
   const needsPositionInput = operation === LinkedListOperations.INSERT_AT_POSITION || 
                            operation === LinkedListOperations.DELETE_FROM_POSITION || 
-                           operation === LinkedListOperations.UPDATE;
+                           operation === LinkedListOperations.UPDATE ||
+                           operation === LinkedListOperations.REPLACE_NODE;
   
   return (
     <div className="space-y-4">
@@ -106,6 +114,7 @@ export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
                     {op === LinkedListOperations.DELETE_FROM_END && "Delete from End"}
                     {op === LinkedListOperations.DELETE_FROM_POSITION && "Delete from Position"}
                     {op === LinkedListOperations.UPDATE && "Update Node"}
+                    {op === LinkedListOperations.REPLACE_NODE && "Replace Node"}
                   </Button>
                 ))}
               </div>
@@ -144,7 +153,7 @@ export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
             <Button type="submit" className="w-full h-8 text-sm" size="sm">
               {operation.includes("insert") && <ChevronRight className="mr-1 h-3 w-3" />}
               {operation.includes("delete") && <RotateCcw className="mr-1 h-3 w-3" />}
-              {operation === LinkedListOperations.UPDATE && <ChevronLeft className="mr-1 h-3 w-3" />}
+              {(operation === LinkedListOperations.UPDATE || operation === LinkedListOperations.REPLACE_NODE) && <ChevronLeft className="mr-1 h-3 w-3" />}
               Submit
             </Button>
           </form>
