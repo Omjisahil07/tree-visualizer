@@ -27,6 +27,8 @@ export const CircularCurvedArrows: React.FC<CircularCurvedArrowsProps> = ({
   if (list.length < 2) return null;
   
   const getArrowPath = (startIndex: number, endIndex: number, isReverse: boolean = false) => {
+    const nodeRadius = 32; // Node radius to prevent overlap
+    
     const { x: x1, y: y1, angle: angle1 } = calculateNodePosition(
       startIndex, 
       list.length, 
@@ -43,7 +45,7 @@ export const CircularCurvedArrows: React.FC<CircularCurvedArrowsProps> = ({
       centerY
     );
     
-    // Calculate control points for curved path
+    // Calculate control points for curved path with adjusted curvature
     const { cx, cy } = calculateCurveControlPoints(
       angle1, 
       angle2, 
@@ -53,7 +55,17 @@ export const CircularCurvedArrows: React.FC<CircularCurvedArrowsProps> = ({
       isReverse
     );
     
-    return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
+    // Calculate start and end points slightly outside the node to prevent overlap
+    const startAngle = Math.atan2(cy - y1, cx - x1);
+    const endAngle = Math.atan2(y2 - cy, x2 - cx);
+    
+    const startX = x1 + (nodeRadius * 0.8) * Math.cos(startAngle);
+    const startY = y1 + (nodeRadius * 0.8) * Math.sin(startAngle);
+    
+    const endX = x2 - (nodeRadius * 0.8) * Math.cos(endAngle);
+    const endY = y2 - (nodeRadius * 0.8) * Math.sin(endAngle);
+    
+    return `M ${startX} ${startY} Q ${cx} ${cy} ${endX} ${endY}`;
   };
   
   // Calculate if the connection between lastVisitedNode and currentNode is active
@@ -76,10 +88,10 @@ export const CircularCurvedArrows: React.FC<CircularCurvedArrowsProps> = ({
         <marker
           id="forwardArrow"
           viewBox="0 0 10 10"
-          refX="5"
+          refX="8"
           refY="5"
-          markerWidth="6"
-          markerHeight="6"
+          markerWidth="5"
+          markerHeight="5"
           orient="auto"
         >
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
@@ -89,10 +101,10 @@ export const CircularCurvedArrows: React.FC<CircularCurvedArrowsProps> = ({
         <marker
           id="activeForwardArrow"
           viewBox="0 0 10 10"
-          refX="5"
+          refX="8"
           refY="5"
-          markerWidth="6"
-          markerHeight="6"
+          markerWidth="5"
+          markerHeight="5"
           orient="auto"
         >
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9" />
@@ -104,10 +116,10 @@ export const CircularCurvedArrows: React.FC<CircularCurvedArrowsProps> = ({
             <marker
               id="reverseArrow"
               viewBox="0 0 10 10"
-              refX="5"
+              refX="8"
               refY="5"
-              markerWidth="6"
-              markerHeight="6"
+              markerWidth="5"
+              markerHeight="5"
               orient="auto"
             >
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8" />
@@ -116,10 +128,10 @@ export const CircularCurvedArrows: React.FC<CircularCurvedArrowsProps> = ({
             <marker
               id="activeReverseArrow"
               viewBox="0 0 10 10"
-              refX="5"
+              refX="8"
               refY="5"
-              markerWidth="6"
-              markerHeight="6"
+              markerWidth="5"
+              markerHeight="5"
               orient="auto"
             >
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9" />
@@ -144,7 +156,7 @@ export const CircularCurvedArrows: React.FC<CircularCurvedArrowsProps> = ({
             d={getArrowPath(index, nextIndex)}
             fill="none"
             stroke={active ? "#0ea5e9" : "#64748b"}
-            strokeWidth={active ? "3" : "2"}
+            strokeWidth={active ? "2.5" : "2"}
             markerEnd={active ? "url(#activeForwardArrow)" : "url(#forwardArrow)"}
             className={active ? "animate-pulse" : ""}
           />
@@ -164,7 +176,7 @@ export const CircularCurvedArrows: React.FC<CircularCurvedArrowsProps> = ({
             d={getArrowPath(index, prevIndex, true)}
             fill="none"
             stroke={active ? "#0ea5e9" : "#94a3b8"}
-            strokeWidth={active ? "3" : "1.5"}
+            strokeWidth={active ? "2.5" : "1.5"}
             strokeDasharray={active ? "0" : "4"}
             opacity={active ? "1" : "0.7"}
             markerEnd={active ? "url(#activeReverseArrow)" : "url(#reverseArrow)"}

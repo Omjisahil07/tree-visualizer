@@ -49,7 +49,7 @@ export const calculateCurveControlPoints = (
   // Determine if we're going clockwise or counterclockwise
   const isClockwise = ((toAngle - fromAngle + 2 * Math.PI) % (2 * Math.PI)) < Math.PI;
   
-  // Calculate midpoint angle
+  // Calculate midpoint angle with adjustment for better curves
   let midAngle = (fromAngle + toAngle) / 2;
   
   // Adjust midpoint for better curves when angles are far apart
@@ -57,15 +57,19 @@ export const calculateCurveControlPoints = (
     midAngle += Math.PI;
   }
   
+  // Calculate curvature based on angle difference and list size
+  const angleDiff = Math.abs(((toAngle - fromAngle + 2 * Math.PI) % (2 * Math.PI)) - Math.PI);
+  const curveFactor = 0.3 + (angleDiff / Math.PI) * 0.4; // Adjust curvature based on angle difference
+  
   // Control point distance from center
   let controlDistance;
   
   if (isInnerCurve) {
     // Inner curves (for prev pointers in doubly linked lists)
-    controlDistance = radius * 0.5; // Move control point closer to center
+    controlDistance = radius * (0.7 - curveFactor * 0.2); // Move control point closer to center
   } else {
     // Outer curves (for next pointers)
-    controlDistance = radius * 1.5; // Move control point away from center
+    controlDistance = radius * (1.3 + curveFactor * 0.2); // Move control point away from center
   }
   
   // Calculate control point position

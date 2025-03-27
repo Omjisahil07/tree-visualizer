@@ -23,13 +23,19 @@ export const CircularNodes: React.FC<CircularNodesProps> = ({
   currentNode,
   visitedNodes
 }) => {
+  // Node size for adjustment
+  const nodeSize = 64;
+  const halfNodeSize = nodeSize / 2;
+  
   return (
     <>
       {list.map((node, index) => {
         // Calculate position on the circle
         const { x, y } = calculateNodePosition(index, list.length, radius, centerX, centerY);
-        const nodeX = x - 32; // Adjust for node width
-        const nodeY = y - 32; // Adjust for node height
+        
+        // Center the node on the calculated position
+        const nodeX = x - halfNodeSize;
+        const nodeY = y - halfNodeSize;
         
         return (
           <div
@@ -38,6 +44,11 @@ export const CircularNodes: React.FC<CircularNodesProps> = ({
             style={{
               left: nodeX,
               top: nodeY,
+              width: nodeSize,
+              height: nodeSize,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
             <LinkedListNodeComponent
