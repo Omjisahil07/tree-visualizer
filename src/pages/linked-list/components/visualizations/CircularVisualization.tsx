@@ -5,6 +5,7 @@ import { CircularGuide } from "./circular/CircularGuide";
 import { CircularConnections } from "./circular/CircularConnections";
 import { CircularNodes } from "./circular/CircularNodes";
 import { CircularCurvedArrows } from "./circular/CircularCurvedArrows";
+import { TraversalIndicator } from "./TraversalIndicator";
 
 interface CircularVisualizationProps {
   list: LinkedListNode[];
@@ -35,55 +36,63 @@ export const CircularVisualization: React.FC<CircularVisualizationProps> = ({
   const centerY = radius + 50; // increase padding
   
   return (
-    <div 
-      className="relative mx-auto mt-8 mb-16" 
-      style={{ 
-        width: (radius * 2) + 100,  // increase width for better spacing
-        height: (radius * 2) + 100  // increase height for better spacing
-      }}
-    >
-      {/* Circle guide and index numbers */}
-      <CircularGuide 
-        radius={radius} 
-        centerX={centerX} 
-        centerY={centerY} 
-        nodeCount={list.length} 
-      />
+    <div className="relative mx-auto">
+      <div 
+        className="relative mx-auto mt-8" 
+        style={{ 
+          width: (radius * 2) + 100,  // increase width for better spacing
+          height: (radius * 2) + 100  // increase height for better spacing
+        }}
+      >
+        {/* Circle guide and index numbers */}
+        <CircularGuide 
+          radius={radius} 
+          centerX={centerX} 
+          centerY={centerY} 
+          nodeCount={list.length} 
+        />
+        
+        {/* Main connection arrows */}
+        <CircularConnections
+          list={list}
+          radius={radius}
+          centerX={centerX}
+          centerY={centerY}
+          isDoubly={isDoubly}
+          currentNode={currentNode}
+          lastVisitedNode={lastVisitedNode}
+          visitedNodes={visitedNodes}
+          traversalDirection={traversalDirection}
+        />
+        
+        {/* Curved arrows for better visual representation */}
+        <CircularCurvedArrows
+          list={list}
+          radius={radius}
+          centerX={centerX}
+          centerY={centerY}
+          isDoubly={isDoubly}
+          currentNode={currentNode}
+          lastVisitedNode={lastVisitedNode}
+          traversalDirection={traversalDirection}
+        />
+        
+        {/* Nodes */}
+        <CircularNodes
+          list={list}
+          radius={radius}
+          centerX={centerX}
+          centerY={centerY}
+          isDoubly={isDoubly}
+          currentNode={currentNode}
+          visitedNodes={visitedNodes}
+        />
+      </div>
       
-      {/* Connection arrows */}
-      <CircularConnections
-        list={list}
-        radius={radius}
-        centerX={centerX}
-        centerY={centerY}
-        isDoubly={isDoubly}
-        currentNode={currentNode}
-        lastVisitedNode={lastVisitedNode}
-        visitedNodes={visitedNodes}
+      {/* Visual indicator for circular connection */}
+      <TraversalIndicator
         traversalDirection={traversalDirection}
-      />
-      
-      {/* Curved arrows for better visual representation */}
-      <CircularCurvedArrows
-        list={list}
-        radius={radius}
-        centerX={centerX}
-        centerY={centerY}
         isDoubly={isDoubly}
-        currentNode={currentNode}
-        lastVisitedNode={lastVisitedNode}
-        traversalDirection={traversalDirection}
-      />
-      
-      {/* Nodes */}
-      <CircularNodes
-        list={list}
-        radius={radius}
-        centerX={centerX}
-        centerY={centerY}
-        isDoubly={isDoubly}
-        currentNode={currentNode}
-        visitedNodes={visitedNodes}
       />
     </div>
   );
