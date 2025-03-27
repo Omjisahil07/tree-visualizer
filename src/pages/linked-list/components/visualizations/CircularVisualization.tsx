@@ -4,6 +4,7 @@ import { LinkedListNode, LinkedListType } from "../../types/LinkedListTypes";
 import { CircularGuide } from "./circular/CircularGuide";
 import { CircularConnections } from "./circular/CircularConnections";
 import { CircularNodes } from "./circular/CircularNodes";
+import { CircularCurvedArrows } from "./circular/CircularCurvedArrows";
 
 interface CircularVisualizationProps {
   list: LinkedListNode[];
@@ -30,15 +31,15 @@ export const CircularVisualization: React.FC<CircularVisualizationProps> = ({
   
   // Calculate radius based on number of nodes
   const radius = list.length <= 4 ? 120 : list.length <= 8 ? 150 : 180;
-  const centerX = radius + 40; // add more padding
-  const centerY = radius + 40; // add more padding
+  const centerX = radius + 50; // increase padding
+  const centerY = radius + 50; // increase padding
   
   return (
     <div 
-      className="relative mx-auto mt-8 mb-12" 
+      className="relative mx-auto mt-8 mb-16" 
       style={{ 
-        width: (radius * 2) + 80,  // increase width for better spacing
-        height: (radius * 2) + 80  // increase height for better spacing
+        width: (radius * 2) + 100,  // increase width for better spacing
+        height: (radius * 2) + 100  // increase height for better spacing
       }}
     >
       {/* Circle guide and index numbers */}
@@ -59,6 +60,18 @@ export const CircularVisualization: React.FC<CircularVisualizationProps> = ({
         currentNode={currentNode}
         lastVisitedNode={lastVisitedNode}
         visitedNodes={visitedNodes}
+        traversalDirection={traversalDirection}
+      />
+      
+      {/* Curved arrows for better visual representation */}
+      <CircularCurvedArrows
+        list={list}
+        radius={radius}
+        centerX={centerX}
+        centerY={centerY}
+        isDoubly={isDoubly}
+        currentNode={currentNode}
+        lastVisitedNode={lastVisitedNode}
         traversalDirection={traversalDirection}
       />
       

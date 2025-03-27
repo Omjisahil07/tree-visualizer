@@ -46,17 +46,31 @@ export const calculateCurveControlPoints = (
   centerY: number, 
   isInnerCurve: boolean = false
 ) => {
-  const midAngle = (fromAngle + toAngle) / 2;
-  const controlDistance = radius * (isInnerCurve ? 0.4 : 0.5);
+  // Determine if we're going clockwise or counterclockwise
+  const isClockwise = ((toAngle - fromAngle + 2 * Math.PI) % (2 * Math.PI)) < Math.PI;
   
-  // Calculate direction vector perpendicular to radius
-  const dx = isInnerCurve ? Math.sin(midAngle) : -Math.sin(midAngle);
-  const dy = isInnerCurve ? -Math.cos(midAngle) : Math.cos(midAngle);
+  // Calculate midpoint angle
+  let midAngle = (fromAngle + toAngle) / 2;
   
-  // Control point
-  const distanceFromCenter = isInnerCurve ? (radius - controlDistance) : (radius + controlDistance);
-  const cx = centerX + distanceFromCenter * Math.cos(midAngle) + dx * controlDistance;
-  const cy = centerY + distanceFromCenter * Math.sin(midAngle) + dy * controlDistance;
+  // Adjust midpoint for better curves when angles are far apart
+  if (Math.abs(toAngle - fromAngle) > Math.PI) {
+    midAngle += Math.PI;
+  }
+  
+  // Control point distance from center
+  let controlDistance;
+  
+  if (isInnerCurve) {
+    // Inner curves (for prev pointers in doubly linked lists)
+    controlDistance = radius * 0.5; // Move control point closer to center
+  } else {
+    // Outer curves (for next pointers)
+    controlDistance = radius * 1.5; // Move control point away from center
+  }
+  
+  // Calculate control point position
+  const cx = centerX + controlDistance * Math.cos(midAngle);
+  const cy = centerY + controlDistance * Math.sin(midAngle);
   
   return { cx, cy };
 };
