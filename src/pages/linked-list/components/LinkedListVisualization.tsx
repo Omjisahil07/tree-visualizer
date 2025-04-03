@@ -97,7 +97,7 @@ export const LinkedListVisualization: React.FC<LinkedListVisualizationProps> = (
             ) : (
               <ArrowLeft className={cn(
                 "h-5 w-5",
-                traversalDirection === "reverse" ? "text-indigo-600 animate-slide-left" : "text-blue-600 animate-slide-right"
+                traversalDirection === "forward" ? "text-blue-600 animate-slide-right" : "text-indigo-600 animate-slide-left"
               )} />
             )}
             <span className={cn(
