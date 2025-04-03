@@ -23,12 +23,21 @@ const CircularLinkedList = () => {
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [visitSequence, setVisitSequence] = useState<number[]>([]);
   const [isTraversing, setIsTraversing] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const isMobile = useIsMobile();
 
+  const animateOperation = (callback: () => void) => {
+    setIsAnimating(true);
+    callback();
+    setTimeout(() => setIsAnimating(false), 500);
+  };
+
   const handleInsert = (value: number, position: number) => {
-    const newList = insertNode(list, value, position);
-    setList(newList);
-    toast.success(`Inserted ${value} at position ${position}`);
+    animateOperation(() => {
+      const newList = insertNode(list, value, position);
+      setList(newList);
+      toast.success(`Inserted ${value} at position ${position}`);
+    });
   };
 
   const handleDelete = (position: number) => {
@@ -42,9 +51,11 @@ const CircularLinkedList = () => {
       return;
     }
     
-    const newList = deleteNode(list, position);
-    setList(newList);
-    toast.success(`Deleted node at position ${position}`);
+    animateOperation(() => {
+      const newList = deleteNode(list, position);
+      setList(newList);
+      toast.success(`Deleted node at position ${position}`);
+    });
   };
 
   const handleUpdate = (position: number, value: number) => {
@@ -58,17 +69,21 @@ const CircularLinkedList = () => {
       return;
     }
     
-    const newList = updateNode(list, position, value);
-    setList(newList);
-    toast.success(`Updated node at position ${position} to ${value}`);
+    animateOperation(() => {
+      const newList = updateNode(list, position, value);
+      setList(newList);
+      toast.success(`Updated node at position ${position} to ${value}`);
+    });
   };
 
   const handleGenerateRandom = () => {
-    const size = Math.floor(Math.random() * 5) + 3; // 3-7 nodes
-    const newList = generateRandomList(size);
-    setList(newList);
-    setVisitSequence([]);
-    toast.success(`Generated random circular linked list with ${size} nodes`);
+    animateOperation(() => {
+      const size = Math.floor(Math.random() * 5) + 3; // 3-7 nodes
+      const newList = generateRandomList(size);
+      setList(newList);
+      setVisitSequence([]);
+      toast.success(`Generated random circular linked list with ${size} nodes`);
+    });
   };
 
   const handleTraverse = async () => {
@@ -108,7 +123,7 @@ const CircularLinkedList = () => {
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-8 space-y-6">
+        <div className={`lg:col-span-8 space-y-6 transition-all duration-300 ${isAnimating ? 'scale-[1.01]' : ''}`}>
           <div className="flex justify-end mb-4">
             <Button
               onClick={handleGenerateRandom}

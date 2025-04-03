@@ -21,6 +21,7 @@ export const LinkedListNodeComponent: React.FC<LinkedListNodeProps> = ({
 }) => {
   const [prevValue, setPrevValue] = useState(value);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isNewNode, setIsNewNode] = useState(true);
   
   useEffect(() => {
     // If the value has changed, trigger the update animation
@@ -37,8 +38,20 @@ export const LinkedListNodeComponent: React.FC<LinkedListNodeProps> = ({
     }
   }, [value, prevValue]);
 
+  // Animation for new nodes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsNewNode(false);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="flex flex-col items-center">
+    <div className={cn(
+      "flex flex-col items-center",
+      isNewNode && "animate-scale-in"
+    )}>
       <div 
         className={cn(
           "w-16 h-16 rounded-full flex items-center justify-center shadow-md transition-all duration-300",
@@ -47,7 +60,8 @@ export const LinkedListNodeComponent: React.FC<LinkedListNodeProps> = ({
             : isVisited 
               ? "bg-primary/20 text-primary" 
               : "bg-white text-foreground border border-gray-200",
-          isUpdating && "animate-pulse bg-yellow-100"
+          isUpdating && "animate-pulse bg-yellow-100",
+          isHighlighted && "animate-bounce-subtle"
         )}
       >
         <span 
@@ -65,12 +79,18 @@ export const LinkedListNodeComponent: React.FC<LinkedListNodeProps> = ({
       {(nextAddress !== undefined || prevAddress !== undefined) && 
         <div className="text-xs mt-1 flex flex-col items-center">
           {prevAddress !== undefined && 
-            <span className="text-blue-500 font-normal">
+            <span className={cn(
+              "text-blue-500 font-normal",
+              isHighlighted && "animate-pulse"
+            )}>
               prev: {prevAddress !== null ? prevAddress : 'null'}
             </span>
           }
           {nextAddress !== undefined && 
-            <span className="text-green-500">
+            <span className={cn(
+              "text-green-500",
+              isHighlighted && "animate-pulse"
+            )}>
               next: {nextAddress !== null ? nextAddress : 'null'}
             </span>
           }

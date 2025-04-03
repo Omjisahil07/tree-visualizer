@@ -7,6 +7,7 @@ import { ListInfoPanel } from "./visualizations/ListInfoPanel";
 import { TraversalIndicator } from "./visualizations/TraversalIndicator";
 import { EmptyListMessage } from "./visualizations/EmptyListMessage";
 import { ArrowRight, ArrowLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface LinkedListVisualizationProps {
   list: LinkedListNode[];
@@ -24,11 +25,19 @@ export const LinkedListVisualization: React.FC<LinkedListVisualizationProps> = (
   traversalDirection = "forward"
 }) => {
   const [lastVisitedNode, setLastVisitedNode] = useState<number | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
   
   // Track the current traversal path to highlight the correct arrows
   useEffect(() => {
     if (currentNode !== null) {
+      setIsAnimating(true);
       setLastVisitedNode(currentNode);
+      
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, 500);
+      
+      return () => clearTimeout(timer);
     }
   }, [currentNode]);
 
@@ -40,7 +49,10 @@ export const LinkedListVisualization: React.FC<LinkedListVisualizationProps> = (
   const isCircular = type === "circular" || type === "double-circular";
   
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-8">
+    <div className={cn(
+      "bg-white border border-gray-200 rounded-lg shadow-lg p-8 transition-all duration-300",
+      isAnimating && "bg-slate-50"
+    )}>
       {/* Display circular linked lists in a circle layout */}
       {isCircular ? (
         <CircularVisualization
@@ -73,13 +85,25 @@ export const LinkedListVisualization: React.FC<LinkedListVisualizationProps> = (
       {/* Add traversal direction indicator for linear lists */}
       {!isCircular && traversalDirection && (
         <div className="mt-10 mb-6 flex justify-center">
-          <div className="flex items-center gap-1 bg-blue-100 px-3 py-1 rounded-full">
+          <div className={cn(
+            "flex items-center gap-1 px-3 py-1 rounded-full transition-colors duration-300",
+            traversalDirection === "forward" ? "bg-blue-100" : "bg-indigo-100"
+          )}>
             {traversalDirection === "forward" ? (
-              <ArrowRight className="h-5 w-5 text-blue-600" />
+              <ArrowRight className={cn(
+                "h-5 w-5",
+                traversalDirection === "forward" ? "text-blue-600 animate-slide-right" : "text-indigo-600 animate-slide-left"
+              )} />
             ) : (
-              <ArrowLeft className="h-5 w-5 text-blue-600" />
+              <ArrowLeft className={cn(
+                "h-5 w-5",
+                traversalDirection === "forward" ? "text-blue-600 animate-slide-right" : "text-indigo-600 animate-slide-left"
+              )} />
             )}
-            <span className="text-xs font-medium text-blue-600">
+            <span className={cn(
+              "text-xs font-medium",
+              traversalDirection === "forward" ? "text-blue-600" : "text-indigo-600"
+            )}>
               {traversalDirection === "forward" ? "Forward Traversal" : "Reverse Traversal"}
             </span>
           </div>
