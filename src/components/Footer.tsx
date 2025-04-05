@@ -1,4 +1,5 @@
-import { Github, Linkedin, Mail, Twitter } from "lucide-react";
+
+import { Github, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -13,12 +14,6 @@ export const Footer = () => {
             <Github className="w-5 h-5" />
           </a>
           <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-            <Twitter className="w-5 h-5" />
-          </a>
-          <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-            <Linkedin className="w-5 h-5" />
-          </a>
-          <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
             <Mail className="w-5 h-5" />
           </a>
         </div>
@@ -26,8 +21,8 @@ export const Footer = () => {
           <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
             Home
           </Link>
-          <Link to="/tree" className="text-muted-foreground hover:text-primary transition-colors">
-            Tree
+          <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
+            Contact
           </Link>
           <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">
             About

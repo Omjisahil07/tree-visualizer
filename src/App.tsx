@@ -20,6 +20,7 @@ import DFS from "./pages/graphs/dfs";
 import BFS from "./pages/graphs/bfs";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/linked-list/circular" element={<CircularLinkedList />} />
           <Route path="/linked-list/double-circular" element={<DoubleCircularLinkedList />} />
           <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
