@@ -1,42 +1,101 @@
-import React from 'react';
-import { Footer } from '@/components/Footer';
+
+import { Layout } from '@/components/Layout';
 
 const About = () => {
   return (
-    <div className="max-w-6xl mx-auto py-12 px-4">
-      <h1 className="text-3xl font-bold mb-4 text-blue-600">About Us</h1>
-      <p className="text-gray-700 mb-4">
-        Welcome to Tree-Visualizer! We are dedicated to providing the best tools for visualizing and understanding tree data structures.
-      </p>
-      <p className="text-gray-700 mb-4">
-        Our mission is to make learning and working with trees easier and more intuitive. Whether you are a student, educator, or professional, our tools are designed to help you achieve your goals.
-      </p>
-      <p className="text-gray-700 mb-4">
-        Thank you for choosing Tree-Visualizer. We hope you find our tools helpful and easy to use.
-      </p>
-      <h2 className="text-2xl font-bold mb-4 text-green-600">Key Features</h2>
-      <ul className="list-disc list-inside mb-4 text-gray-700">
-        <li>Support for various tree types: Binary Tree, Binary Search Tree (BST), AVL Tree, B-Tree</li>
-        <li>Interactive controls for adding, deleting, and modifying nodes</li>
-        <li>Dynamic visualization of changes in real time</li>
-        <li>Perform key operations like insertion, deletion, traversal, and balancing</li>
-        <li>Drag-and-drop nodes for better interaction</li>
-        <li>Visual feedback for operations</li>
-        <li>Step-by-step visualization of operations with explanations</li>
-        <li>Custom tree settings and export/import functionality</li>
-      </ul>
-      <h2 className="text-2xl font-bold mb-4 text-purple-600">Tech Stack</h2>
-      <p className="text-gray-700 mb-4">
-        Our frontend is built with React.js and uses D3.js for rendering tree structures. We use Tailwind CSS for styling to ensure a modern and responsive UI. For backend operations, we use Node.js with Express.js and MongoDB for storing custom trees or user data.
-      </p>
-      <h2 className="text-2xl font-bold mb-4 text-red-600">Implementation Approach</h2>
-      <p className="text-gray-700 mb-4">
-        We follow a structured approach to implement the Tree Data Structure Creator and Visualizer. This includes setting up the project, implementing core tree operations, creating dynamic visualizations, designing a user-friendly interface, and ensuring persistence through JSON files. We also focus on testing and optimization to handle edge cases and ensure smooth performance.
-      </p>
-      <h2 className="text-2xl text-primary mb-4 ">Email us at : treevisualizer@gmail.com</h2>
-    <Footer/>
-    </div>    
-    
+    <Layout>
+      <div className="container max-w-4xl mx-auto py-12 px-4">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">About Data Structure Visualizer</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            An interactive platform for visualizing and understanding complex data structures
+          </p>
+        </div>
+        
+        <div className="space-y-8">
+          <section>
+            <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
+            <p className="text-muted-foreground mb-4">
+              We believe that visual learning is one of the most effective ways to understand complex concepts. 
+              Our mission is to make data structures and algorithms more accessible through interactive 
+              visualizations, helping students, educators, and professionals to better understand these 
+              fundamental computer science concepts.
+            </p>
+          </section>
+          
+          <section>
+            <h2 className="text-2xl font-bold mb-4">What We Offer</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border rounded-lg p-6 bg-card">
+                <h3 className="text-xl font-semibold mb-2">Tree Visualizations</h3>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>Binary Trees</li>
+                  <li>Binary Search Trees (BST)</li>
+                  <li>AVL Trees</li>
+                  <li>B+ Trees</li>
+                </ul>
+              </div>
+              
+              <div className="border rounded-lg p-6 bg-card">
+                <h3 className="text-xl font-semibold mb-2">Graph Algorithms</h3>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>Depth-First Search (DFS)</li>
+                  <li>Breadth-First Search (BFS)</li>
+                </ul>
+              </div>
+              
+              <div className="border rounded-lg p-6 bg-card">
+                <h3 className="text-xl font-semibold mb-2">Linked Lists</h3>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>Singly Linked Lists</li>
+                  <li>Doubly Linked Lists</li>
+                  <li>Circular Linked Lists</li>
+                  <li>Double Circular Linked Lists</li>
+                </ul>
+              </div>
+              
+              <div className="border rounded-lg p-6 bg-card">
+                <h3 className="text-xl font-semibold mb-2">Interactive Features</h3>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>Step-by-step visualizations</li>
+                  <li>Custom data structure creation</li>
+                  <li>Algorithm animations</li>
+                  <li>Educational explanations</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          
+          <section>
+            <h2 className="text-2xl font-bold mb-4">Our Technology</h2>
+            <p className="text-muted-foreground mb-4">
+              Built with modern web technologies including React, TypeScript, and D3.js, our platform
+              provides smooth, interactive visualizations that work across devices. We're continuously 
+              improving our tools and adding new features to enhance your learning experience.
+            </p>
+          </section>
+          
+          <section>
+            <h2 className="text-2xl font-bold mb-4">For Educators</h2>
+            <p className="text-muted-foreground mb-4">
+              Our visualizer is a valuable teaching tool that can be used in classrooms to demonstrate 
+              data structure concepts. It provides a hands-on approach to learning that complements 
+              traditional teaching methods and helps students grasp complex concepts more easily.
+            </p>
+          </section>
+          
+          <section className="text-center border-t pt-8 mt-8">
+            <h2 className="text-xl font-bold mb-4">Have suggestions or feedback?</h2>
+            <p className="text-muted-foreground mb-6">
+              We're always looking to improve our platform based on user feedback.
+            </p>
+            <a href="/contact" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+              Send Us Feedback
+            </a>
+          </section>
+        </div>
+      </div>
+    </Layout>
   );
 };
 
