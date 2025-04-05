@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { Send } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Contact() {
   const [feedbackForm, setFeedbackForm] = useState({
@@ -16,6 +17,7 @@ export default function Contact() {
     subject: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFeedbackChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFeedbackForm({
@@ -24,15 +26,52 @@ export default function Contact() {
     });
   };
 
-  const handleFeedbackSubmit = (e: React.FormEvent) => {
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the form data to a backend
-    console.log("Feedback form submitted:", feedbackForm);
-    toast({
-      title: "Feedback Sent",
-      description: "Thank you for your feedback. We appreciate your input!",
-    });
-    setFeedbackForm({ name: "", email: "", subject: "", message: "" });
+    setIsSubmitting(true);
+    
+    try {
+      // Step 1: Store feedback in Supabase
+      const { error: dbError } = await supabase
+        .from('feedback')
+        .insert([
+          {
+            name: feedbackForm.name,
+            email: feedbackForm.email,
+            subject: feedbackForm.subject,
+            message: feedbackForm.message
+          }
+        ]);
+      
+      if (dbError) throw dbError;
+      
+      // Step 2: Send email notification
+      const { error: emailError } = await supabase.functions.invoke('send-feedback-email', {
+        body: feedbackForm
+      });
+      
+      if (emailError) {
+        console.error("Email sending error:", emailError);
+        // Continue even if email fails, we already saved to DB
+      }
+      
+      toast({
+        title: "Feedback Sent",
+        description: "Thank you for your feedback. We appreciate your input!",
+      });
+      
+      // Reset form
+      setFeedbackForm({ name: "", email: "", subject: "", message: "" });
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast({
+        title: "Submission Failed",
+        description: "There was a problem sending your feedback. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -64,6 +103,7 @@ export default function Contact() {
                     onChange={handleFeedbackChange}
                     placeholder="Your name"
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="space-y-2">
@@ -76,6 +116,7 @@ export default function Contact() {
                     onChange={handleFeedbackChange}
                     placeholder="Your email address"
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -88,6 +129,7 @@ export default function Contact() {
                   onChange={handleFeedbackChange}
                   placeholder="What's your feedback about?"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
               <div className="space-y-2">
@@ -100,13 +142,23 @@ export default function Contact() {
                   placeholder="Your feedback"
                   rows={5}
                   required
+                  disabled={isSubmitting}
                 />
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full md:w-auto">
-                <Send className="mr-2 h-4 w-4" />
-                Submit Feedback
+              <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Submit Feedback
+                  </>
+                )}
               </Button>
             </CardFooter>
           </form>
