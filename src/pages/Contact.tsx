@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "@/hooks/use-toast";
 import { Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
 export default function Contact() {
   const [feedbackForm, setFeedbackForm] = useState({
@@ -41,7 +42,7 @@ export default function Contact() {
             subject: feedbackForm.subject,
             message: feedbackForm.message
           }
-        ]);
+        ] as any); // Using type assertion as a workaround for the type issue
       
       if (dbError) throw dbError;
       
