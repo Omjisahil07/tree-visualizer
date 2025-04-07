@@ -1,3 +1,4 @@
+
 import { BinaryTreeNode, TraversalCallback } from "../../types/BinaryTreeTypes";
 
 export const traverseInOrder = async (
@@ -6,8 +7,6 @@ export const traverseInOrder = async (
 ): Promise<void> => {
   if (!node || node.value === null) {
     await visit(null, "if (node === null) return;");
-    // Add a small delay for null node checks to keep visualization smooth
-    await new Promise(resolve => setTimeout(resolve, 300));
     return;
   }
   
@@ -23,8 +22,6 @@ export const traversePreOrder = async (
 ): Promise<void> => {
   if (!node || node.value === null) {
     await visit(null, "if (node === null) return;");
-    // Add a small delay for null node checks to keep visualization smooth
-    await new Promise(resolve => setTimeout(resolve, 300));
     return;
   }
   
@@ -39,8 +36,6 @@ export const traversePostOrder = async (
 ): Promise<void> => {
   if (!node || node.value === null) {
     await visit(null, "if (node === null) return;");
-    // Add a small delay for null node checks to keep visualization smooth
-    await new Promise(resolve => setTimeout(resolve, 300));
     return;
   }
   

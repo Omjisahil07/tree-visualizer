@@ -14,8 +14,6 @@ export const dfsTraversal = async (
     // Mark current node as visited
     visited.add(nodeId);
     await callback(nodeId, `Visiting node ${nodeId}`);
-    // Added a consistent delay to slow down the visualization
-    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const node = graph.nodes.find(n => n.id === nodeId);
     if (!node) return;
@@ -29,8 +27,6 @@ export const dfsTraversal = async (
     }
 
     await callback(nodeId, `Backtracking from node ${nodeId}`);
-    // Added a small delay for backtracking visualization
-    await new Promise(resolve => setTimeout(resolve, 500));
   };
 
   await dfs(startNodeId);

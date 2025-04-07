@@ -1,4 +1,3 @@
-
 import { TreeNode } from "../binary-tree/TreeNode";
 
 // Simple Queue implementation
@@ -56,16 +55,12 @@ export const traverseInOrder = async (node: TreeNode, visit: (value: number | nu
   if (!node || !node.value) return;
   await traverseInOrder(node.children[0], visit);
   await visit(node.value, "Visiting node");
-  // Added delay to slow down traversal visualization
-  await new Promise(resolve => setTimeout(resolve, 1000));
   await traverseInOrder(node.children[1], visit);
 };
 
 export const traversePreOrder = async (node: TreeNode, visit: (value: number | null, step: string) => Promise<void>) => {
   if (!node || !node.value) return;
   await visit(node.value, "Visiting node");
-  // Added delay to slow down traversal visualization
-  await new Promise(resolve => setTimeout(resolve, 1000));
   await traversePreOrder(node.children[0], visit);
   await traversePreOrder(node.children[1], visit);
 };
@@ -75,8 +70,6 @@ export const traversePostOrder = async (node: TreeNode, visit: (value: number | 
   await traversePostOrder(node.children[0], visit);
   await traversePostOrder(node.children[1], visit);
   await visit(node.value, "Visiting node");
-  // Added delay to slow down traversal visualization
-  await new Promise(resolve => setTimeout(resolve, 1000));
 };
 
 export const traverseLevelOrder = async (root: TreeNode, visit: (value: number | null, step: string) => Promise<void>) => {
@@ -88,8 +81,6 @@ export const traverseLevelOrder = async (root: TreeNode, visit: (value: number |
     const node = queue.dequeue();
     if (node) {
       await visit(node.value, "Visiting node");
-      // Added delay to slow down traversal visualization
-      await new Promise(resolve => setTimeout(resolve, 1000));
       if (node.children[0] && node.children[0].value !== null) queue.enqueue(node.children[0]);
       if (node.children[1] && node.children[1].value !== null) queue.enqueue(node.children[1]);
     }
