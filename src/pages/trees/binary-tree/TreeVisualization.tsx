@@ -1,7 +1,8 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import type { TreeNode } from './TreeNode';
+import { TraversalState } from './types/BinaryTreeTypes';
 
 interface TreeVisualizationProps {
   tree: TreeNode;
@@ -10,6 +11,7 @@ interface TreeVisualizationProps {
   onNodeHighlight: (value: number | null) => void;
   currentNode?: number | null;
   visitedNodes: number[];
+  traversalState?: TraversalState;
 }
 
 export const TreeVisualization = ({ 
@@ -18,9 +20,22 @@ export const TreeVisualization = ({
   onNodeClick,
   onNodeHighlight,
   currentNode,
-  visitedNodes
+  visitedNodes,
+  traversalState
 }: TreeVisualizationProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const [blinkingNode, setBlinkingNode] = useState<number | null>(null);
+
+  // Set blinking effect on current node
+  useEffect(() => {
+    if (currentNode !== null && currentNode !== undefined) {
+      setBlinkingNode(currentNode);
+      const timer = setTimeout(() => {
+        setBlinkingNode(null);
+      }, 700); // Blink for 700ms
+      return () => clearTimeout(timer);
+    }
+  }, [currentNode]);
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -81,7 +96,7 @@ export const TreeVisualization = ({
         .y((d: any) => d.y))
       .style("opacity", 0)
       .transition()
-      .duration(1000)
+      .duration(1500)
       .style("opacity", 1);
 
     const nodes = g.selectAll(".node")
@@ -90,36 +105,55 @@ export const TreeVisualization = ({
       .attr("class", "node")
       .attr("transform", (d: any) => `translate(${d.x},${d.y})`);
 
-    // Add circles to nodes with slower animation
+    // Add circles to nodes with specific colors based on traversal state
     nodes.append("circle")
       .attr("r", 0)
       .attr("fill", (d: any) => {
-        if (d.data.value === currentNode) return "hsl(var(--primary))";
-        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary) / 0.8)";
+        if (blinkingNode === d.data.value) return "hsl(var(--primary))";
+        if (d.data.value === currentNode) {
+          if (traversalState === 'current') return "hsl(var(--primary))";
+          if (traversalState === 'visiting') return "hsl(var(--primary) / 0.7)";
+          if (traversalState === 'backtracking') return "hsl(var(--destructive) / 0.7)";
+        }
+        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary) / 0.4)";
         return "white";
       })
-      .attr("stroke", "hsl(var(--primary))")
+      .attr("stroke", (d: any) => {
+        if (d.data.value === currentNode && traversalState === 'backtracking') 
+          return "hsl(var(--destructive))";
+        return "hsl(var(--primary))";
+      })
       .attr("stroke-width", 2)
-      .attr("class", "transition-colors duration-500")
+      .attr("class", (d: any) => 
+        blinkingNode === d.data.value 
+          ? "transition-colors duration-300 animate-pulse" 
+          : "transition-colors duration-500"
+      )
       .transition()
-      .duration(1000)
-      .attr("r", 25);
+      .duration(1500)
+      .attr("r", (d: any) => 
+        d.data.value === currentNode ? 28 : 25
+      );
 
     // Add text to nodes with slower animation
     nodes.append("text")
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
-      .attr("class", "text-sm font-medium")
+      .attr("class", (d: any) => 
+        blinkingNode === d.data.value
+          ? "text-sm font-medium text-white"
+          : "text-sm font-medium"
+      )
       .style("opacity", 0)
       .text((d: any) => d.data.value)
       .transition()
-      .duration(1000)
+      .duration(1500)
       .style("opacity", 1);
 
     // Add drag behavior to nodes
     nodes.call(drag as any);
 
-  }, [tree, onNodeDelete, onNodeClick, onNodeHighlight, currentNode, visitedNodes]);
+  }, [tree, onNodeDelete, onNodeClick, onNodeHighlight, currentNode, visitedNodes, blinkingNode, traversalState]);
 
   return (
     <svg
