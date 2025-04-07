@@ -10,11 +10,10 @@ export const traverseInOrder = async (
     return;
   }
   
-  await visit(node.value, "// Traverse left subtree", "visiting");
+  await visit(node.value, "// Traverse left subtree");
   await traverseInOrder(node.children[0], visit);
-  await visit(node.value, "// Visit current node", "current");
+  await visit(node.value, "// Visit current node");
   await traverseInOrder(node.children[1], visit);
-  await visit(node.value, "// Backtracking", "backtracking");
 };
 
 export const traversePreOrder = async (
@@ -26,12 +25,9 @@ export const traversePreOrder = async (
     return;
   }
   
-  await visit(node.value, "// Visit current node", "current");
-  await visit(node.value, "// Traverse left subtree", "visiting");
+  await visit(node.value, "// Visit current node");
   await traversePreOrder(node.children[0], visit);
-  await visit(node.value, "// Traverse right subtree", "visiting");
   await traversePreOrder(node.children[1], visit);
-  await visit(node.value, "// Backtracking", "backtracking");
 };
 
 export const traversePostOrder = async (
@@ -43,10 +39,7 @@ export const traversePostOrder = async (
     return;
   }
   
-  await visit(node.value, "// Traverse left subtree", "visiting");
   await traversePostOrder(node.children[0], visit);
-  await visit(node.value, "// Traverse right subtree", "visiting");
   await traversePostOrder(node.children[1], visit);
-  await visit(node.value, "// Visit current node", "current");
-  await visit(node.value, "// Backtracking", "backtracking");
+  await visit(node.value, "// Visit current node");
 };

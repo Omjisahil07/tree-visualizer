@@ -1,4 +1,3 @@
-
 export interface BinaryTreeNode {
   value: number | null;
   children: BinaryTreeNode[];
@@ -8,5 +7,4 @@ export interface BinaryTreeNode {
 
 export type InsertPosition = 'left' | 'right' | 'auto';
 export type TraversalType = 'inorder' | 'preorder' | 'postorder';
-export type TraversalState = 'current' | 'visiting' | 'visited' | 'backtracking' | undefined;
-export type TraversalCallback = (value: number | null, step: string, state?: TraversalState) => Promise<void>;
+export type TraversalCallback = (value: number | null, step: string) => Promise<void>;

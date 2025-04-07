@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from "react";
 import { TreeVisualization } from "./TreeVisualization";
-import { BinaryTreeNode, InsertPosition, TraversalState } from "./types/BinaryTreeTypes";
+import { BinaryTreeNode, InsertPosition } from "./types/BinaryTreeTypes";
 import { insertNode } from "./operations/insert/insertNode";
 import { 
   traverseInOrder,
@@ -29,19 +29,14 @@ const BinaryTree = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [traversalType, setTraversalType] = useState("inorder");
   const [inputValue, setInputValue] = useState("");
-  const [traversalState, setTraversalState] = useState<TraversalState>(undefined);
 
-  const handleTraversalStep = useCallback(async (value: number | null, step: string, state?: TraversalState) => {
+  const handleTraversalStep = useCallback(async (value: number | null, step: string) => {
     setCurrentNode(value);
     setCurrentStep(step);
-    setTraversalState(state);
-    if (value !== null && !visitedNodes.includes(value) && state !== 'backtracking') {
-      setVisitedNodes(prev => [...prev, value]);
-    }
+    setVisitedNodes(prev => (value !== null && !prev.includes(value) ? [...prev, value] : prev));
     setCurrentLine(prev => prev + 1);
-    // Increased delay for slower traversal
-    await new Promise(resolve => setTimeout(resolve, 1200));
-  }, [visitedNodes]);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }, []);
 
   const startTraversal = async () => {
     setIsTraversing(true);
@@ -49,7 +44,6 @@ const BinaryTree = () => {
     setVisitedNodes([]);
     setCurrentNode(null);
     setCurrentLine(0);
-    setTraversalState(undefined);
 
     const traversalFunction = {
       inorder: traverseInOrder,
@@ -65,7 +59,6 @@ const BinaryTree = () => {
       setIsTraversing(false);
       setCurrentLine(-1);
       setCurrentStep("Traversal complete");
-      setTraversalState(undefined);
     }
   };
 
@@ -158,7 +151,6 @@ const BinaryTree = () => {
                 onNodeHighlight={setCurrentNode}
                 currentNode={currentNode}
                 visitedNodes={visitedNodes}
-                traversalState={traversalState}
               />
             </CardContent>
           </Card>
