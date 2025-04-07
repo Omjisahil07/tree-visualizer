@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Input } from "@/components/ui/input";
@@ -33,6 +32,7 @@ export default function Contact() {
     
     try {
       // Step 1: Store feedback in Supabase
+      console.log("Submitting feedback to database:", feedbackForm);
       const { error: dbError } = await supabase
         .from('feedback')
         .insert([
@@ -44,9 +44,15 @@ export default function Contact() {
           }
         ] as any); // Using type assertion as a workaround for the type issue
       
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error("Database error:", dbError);
+        throw dbError;
+      }
+      
+      console.log("Feedback stored in database successfully");
       
       // Step 2: Send email notification
+      console.log("Invoking send-feedback-email function");
       const { error: emailError, data: emailData } = await supabase.functions.invoke('send-feedback-email', {
         body: feedbackForm
       });
