@@ -49,7 +49,8 @@ const BSTTree = () => {
       value !== null && !prev.includes(value) ? [...prev, value] : prev
     );
     setCurrentLine(prev => prev + 1);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Increased delay from 500ms to 1000ms for slower traversal visualization
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }, [isPaused]);
 
   const startTraversal = async () => {

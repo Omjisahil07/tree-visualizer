@@ -11,10 +11,14 @@ export const bfsTraversal = async (
 
   await callback(startNodeId, `Starting BFS from node ${startNodeId}`);
   visited.add(startNodeId);
+  // Added a consistent delay to slow down the visualization
+  await new Promise(resolve => setTimeout(resolve, 1000));
 
   while (queue.length > 0) {
     const nodeId = queue.shift()!;
     await callback(nodeId, `Processing node ${nodeId}`);
+    // Added a consistent delay to slow down the visualization
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const node = graph.nodes.find(n => n.id === nodeId);
     if (!node) continue;
@@ -26,6 +30,8 @@ export const bfsTraversal = async (
         visited.add(neighborId);
         queue.push(neighborId);
         await callback(neighborId, `Discovered node ${neighborId} from ${nodeId}`);
+        // Added a smaller delay for discovered nodes
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
   }
