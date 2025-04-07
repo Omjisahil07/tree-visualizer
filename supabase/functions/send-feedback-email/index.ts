@@ -46,10 +46,10 @@ serve(async (req) => {
     
     console.log("Email sent to user:", userEmailResponse);
     
-    // Send notification email to admin
+    // Send notification email to admin (updated email address)
     const adminEmailResponse = await resend.emails.send({
       from: "Data Structure Visualizer <onboarding@resend.dev>",
-      to: ["admin@datastructurevisualizer.com"], // Replace with your actual admin email
+      to: ["houndsahil12345@gmail.com"], // Updated admin email address
       subject: `New Feedback: ${subject}`,
       html: `
         <h1>New Feedback Received</h1>
