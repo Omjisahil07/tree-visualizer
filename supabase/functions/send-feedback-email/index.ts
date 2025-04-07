@@ -27,6 +27,8 @@ serve(async (req) => {
     const { name, email, subject, message }: FeedbackRequest = await req.json();
     
     console.log("Received feedback from:", name, email);
+    console.log("Subject:", subject);
+    console.log("Message:", message);
 
     // Send confirmation email to the user
     const userEmailResponse = await resend.emails.send({
@@ -42,6 +44,8 @@ serve(async (req) => {
       `,
     });
     
+    console.log("Email sent to user:", userEmailResponse);
+    
     // Send notification email to admin
     const adminEmailResponse = await resend.emails.send({
       from: "Data Structure Visualizer <onboarding@resend.dev>",
@@ -56,7 +60,6 @@ serve(async (req) => {
       `,
     });
 
-    console.log("Email sent to user:", userEmailResponse);
     console.log("Email sent to admin:", adminEmailResponse);
 
     return new Response(JSON.stringify({ success: true }), {

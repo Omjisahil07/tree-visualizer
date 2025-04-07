@@ -47,9 +47,11 @@ export default function Contact() {
       if (dbError) throw dbError;
       
       // Step 2: Send email notification
-      const { error: emailError } = await supabase.functions.invoke('send-feedback-email', {
+      const { error: emailError, data: emailData } = await supabase.functions.invoke('send-feedback-email', {
         body: feedbackForm
       });
+      
+      console.log("Email function response:", emailData);
       
       if (emailError) {
         console.error("Email sending error:", emailError);
