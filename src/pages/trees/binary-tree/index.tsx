@@ -48,6 +48,8 @@ const BinaryTree = () => {
           nodeStates={nodeStates}
           isTraversing={isTraversing}
           traversalType={traversalType}
+          currentStep={currentStep}
+          currentLine={currentLine}
           onStartTraversal={startTraversal}
           onPauseTraversal={pauseTraversal}
           onResetTraversal={resetTraversal}
@@ -55,9 +57,6 @@ const BinaryTree = () => {
         />
         
         <BinaryTreeControlPanel
-          traversalType={traversalType}
-          currentStep={currentStep}
-          currentLine={currentLine}
           onInsertNode={handleInsertNode}
         />
       </div>

@@ -11,6 +11,7 @@ import { dfsTraversal } from "./operations/DFSOperations";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
+import { Card, CardContent } from "@/components/ui/card";
 
 const DFS = () => {
   const [graph, setGraph] = useState<Graph>({ nodes: [], edges: [] });
@@ -219,24 +220,45 @@ const DFS = () => {
         </Button>
       </div>
       
+      {/* Updated layout - main content area */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main visualization panel - wider */}
-        <div className="lg:col-span-8 space-y-4">
-          <DFSVisualization
-            graph={graph}
-            currentNode={currentNode}
-            visitedNodes={visitedNodes}
-            isDirected={isDirected}
-          />
+        {/* Main visualization panel */}
+        <div className="lg:col-span-6">
+          <Card className="shadow-sm mb-4">
+            <CardContent className="p-4">
+              <DFSVisualization
+                graph={graph}
+                currentNode={currentNode}
+                visitedNodes={visitedNodes}
+                isDirected={isDirected}
+              />
+            </CardContent>
+          </Card>
           
-          <VisitationSequence sequence={visitedNodes.map(nodeId => {
-            const node = graph.nodes.find(n => n.id === nodeId);
-            return node?.value || nodeId;
-          })} />
+          <Card className="shadow-sm">
+            <CardContent className="p-4">
+              <VisitationSequence sequence={visitedNodes.map(nodeId => {
+                const node = graph.nodes.find(n => n.id === nodeId);
+                return node?.value || nodeId;
+              })} />
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Controls and pseudocode panel - narrower */}
-        <div className="lg:col-span-4 space-y-4">
+        {/* Pseudocode Panel - Now in the middle */}
+        <div className="lg:col-span-3">
+          <Card className="shadow-sm h-full">
+            <CardContent className="p-4">
+              <DFSPseudocode
+                currentStep={currentStep}
+                currentLine={currentLine}
+              />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Controls panel */}
+        <div className="lg:col-span-3">
           <DFSControls
             onAddNode={(value) => addNode(parseInt(value))}
             onAddEdge={(from, to) => addEdge(parseInt(from), parseInt(to))}
@@ -247,11 +269,6 @@ const DFS = () => {
             nodes={graph.nodes}
             startNode={startNode}
             onStartNodeChange={setStartNode}
-          />
-
-          <DFSPseudocode
-            currentStep={currentStep}
-            currentLine={currentLine}
           />
         </div>
       </div>

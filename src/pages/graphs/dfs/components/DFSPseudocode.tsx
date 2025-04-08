@@ -14,9 +14,9 @@ export const DFSPseudocode = ({ currentStep, currentLine }: DFSPseudocodeProps) 
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="h-full flex flex-col">
       <h3 className="text-lg font-medium mb-4">DFS Pseudocode</h3>
-      <div className="font-mono text-sm">
+      <div className="font-mono text-sm bg-white p-4 rounded-lg shadow-sm mb-4 flex-grow">
         {lines.map((line, index) => (
           <div
             key={index}
@@ -27,8 +27,9 @@ export const DFSPseudocode = ({ currentStep, currentLine }: DFSPseudocodeProps) 
         ))}
       </div>
       {currentStep && (
-        <div className="mt-4 p-2 bg-muted text-sm">
-          Current step: {currentStep}
+        <div className="p-3 bg-muted rounded-lg text-sm">
+          <strong>Current step:</strong>
+          <div className="mt-1">{currentStep}</div>
         </div>
       )}
     </div>
