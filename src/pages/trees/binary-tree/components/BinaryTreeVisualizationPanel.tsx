@@ -1,0 +1,67 @@
+
+import { Card, CardContent } from "@/components/ui/card";
+import { TreeVisualization } from "../TreeVisualization";
+import { NodeVisitationSequence } from "./NodeVisitationSequence";
+import { TraversalControls } from "./TraversalControls";
+import { BinaryTreeNode, TraversalState } from "../types/BinaryTreeTypes";
+
+interface BinaryTreeVisualizationPanelProps {
+  tree: BinaryTreeNode;
+  currentNode: number | null;
+  visitedNodes: number[];
+  nodeStates: Map<number, TraversalState>;
+  isTraversing: boolean;
+  traversalType: string;
+  onStartTraversal: () => void;
+  onPauseTraversal: () => void;
+  onResetTraversal: () => void;
+  onTraversalTypeChange: (type: string) => void;
+}
+
+export const BinaryTreeVisualizationPanel = ({
+  tree,
+  currentNode,
+  visitedNodes,
+  nodeStates,
+  isTraversing,
+  traversalType,
+  onStartTraversal,
+  onPauseTraversal,
+  onResetTraversal,
+  onTraversalTypeChange,
+}: BinaryTreeVisualizationPanelProps) => {
+  return (
+    <div className="lg:col-span-8">
+      <Card className="shadow-sm">
+        <CardContent className="p-4">
+          <TreeVisualization
+            tree={tree}
+            onNodeDelete={() => {}}
+            onNodeClick={() => {}}
+            onNodeHighlight={() => {}}
+            currentNode={currentNode}
+            visitedNodes={visitedNodes}
+            nodeStates={nodeStates}
+          />
+        </CardContent>
+      </Card>
+      
+      <div className="mt-4">
+        <Card className="shadow-sm">
+          <CardContent className="p-4">
+            <TraversalControls
+              onStart={onStartTraversal}
+              onPause={onPauseTraversal}
+              onReset={onResetTraversal}
+              isTraversing={isTraversing}
+              traversalType={traversalType}
+              onTraversalTypeChange={onTraversalTypeChange}
+            />
+            
+            <NodeVisitationSequence visitedNodes={visitedNodes} />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
