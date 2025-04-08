@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import type { TreeNode } from './TreeNode';
+import { TraversalState } from './types/BinaryTreeTypes';
 
 interface TreeVisualizationProps {
   tree: TreeNode;
@@ -10,6 +11,7 @@ interface TreeVisualizationProps {
   onNodeHighlight: (value: number | null) => void;
   currentNode?: number | null;
   visitedNodes: number[];
+  nodeStates: Map<number, TraversalState>;
 }
 
 export const TreeVisualization = ({ 
@@ -18,7 +20,8 @@ export const TreeVisualization = ({
   onNodeClick,
   onNodeHighlight,
   currentNode,
-  visitedNodes
+  visitedNodes,
+  nodeStates
 }: TreeVisualizationProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -94,13 +97,28 @@ export const TreeVisualization = ({
     nodes.append("circle")
       .attr("r", 0)
       .attr("fill", (d: any) => {
-        if (d.data.value === currentNode) return "hsl(var(--primary))";
-        if (visitedNodes.includes(d.data.value)) return "hsl(var(--primary) / 0.8)";
+        const nodeValue = d.data.value;
+        const nodeState = nodeStates.get(nodeValue);
+        
+        if (nodeState === 'current') return "hsl(var(--primary))";
+        if (nodeState === 'visited') return "hsl(var(--primary) / 0.8)";
+        if (nodeState === 'backtracking') return "hsl(var(--secondary))";
+        if (visitedNodes.includes(nodeValue)) return "hsl(var(--primary) / 0.5)";
         return "white";
       })
-      .attr("stroke", "hsl(var(--primary))")
+      .attr("stroke", (d: any) => {
+        const nodeValue = d.data.value;
+        const nodeState = nodeStates.get(nodeValue);
+        
+        if (nodeState === 'backtracking') return "hsl(var(--secondary))";
+        return "hsl(var(--primary))";
+      })
       .attr("stroke-width", 2)
-      .attr("class", "transition-colors duration-500")
+      .attr("class", (d: any) => {
+        const nodeValue = d.data.value;
+        const nodeState = nodeStates.get(nodeValue);
+        return nodeState === 'current' ? "animate-pulse" : "transition-colors duration-500";
+      })
       .transition()
       .duration(1000)
       .attr("r", 25);
@@ -119,7 +137,7 @@ export const TreeVisualization = ({
     // Add drag behavior to nodes
     nodes.call(drag as any);
 
-  }, [tree, onNodeDelete, onNodeClick, onNodeHighlight, currentNode, visitedNodes]);
+  }, [tree, onNodeDelete, onNodeClick, onNodeHighlight, currentNode, visitedNodes, nodeStates]);
 
   return (
     <svg
