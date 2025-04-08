@@ -42,11 +42,11 @@ const Tree = () => {
         </p>
       </div>
       
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
         {treeTypes.map((tree, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow">
+          <Card key={index} className="hover:shadow-lg transition-shadow h-full">
             <CardHeader>
-              <div className="flex items-center justify-center mb-4 text-primary">
+              <div className="flex items-center justify-center mb-6 text-primary">
                 {tree.icon}
               </div>
               <CardTitle className="text-center">{tree.title}</CardTitle>

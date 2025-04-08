@@ -32,9 +32,9 @@ const Graph = () => {
       
       <div className="grid md:grid-cols-2 gap-6">
         {graphTypes.map((graph, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow">
+          <Card key={index} className="hover:shadow-lg transition-shadow h-full">
             <CardHeader>
-              <div className="flex items-center justify-center mb-4 text-primary">
+              <div className="flex items-center justify-center mb-6 text-primary">
                 {graph.icon}
               </div>
               <CardTitle className="text-center">{graph.title}</CardTitle>

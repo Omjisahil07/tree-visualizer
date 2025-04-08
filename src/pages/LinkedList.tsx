@@ -1,6 +1,7 @@
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { Footer } from "@/components/Footer";
 
 const linkedListOperations = [
   {
@@ -31,33 +32,38 @@ const linkedListOperations = [
 
 const LinkedList = () => {
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Linked List Visualizations</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {linkedListOperations.map((operation, index) => (
-            <Link 
-              key={index} 
-              to={operation.route}
-              className="transition-transform hover:scale-105"
-            >
-              <Card className="h-full shadow-sm">
-                <CardHeader className="py-3 px-4">
-                  <CardTitle className="text-lg">{operation.name}</CardTitle>
-                  <CardDescription className="text-xs">{operation.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="p-3">
-                  <img 
-                    src={operation.image} 
-                    alt={operation.name} 
-                    className="w-full h-32 object-cover rounded-md"
-                  />
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+    <div className="container mx-auto py-12">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4">Linked List Visualizations</h1>
+        <p className="text-muted-foreground text-lg">
+          Explore different types of linked list implementations
+        </p>
       </div>
+      
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {linkedListOperations.map((operation, index) => (
+          <Link 
+            key={index} 
+            to={operation.route}
+            className="transition-transform hover:scale-105"
+          >
+            <Card className="hover:shadow-lg transition-shadow h-full">
+              <CardHeader>
+                <CardTitle>{operation.name}</CardTitle>
+                <CardDescription>{operation.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="pb-6">
+                <img 
+                  src={operation.image} 
+                  alt={operation.name} 
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
+      <Footer />
     </div>
   );
 };
