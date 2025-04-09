@@ -3,7 +3,6 @@ import { useState } from "react";
 import { LinkedListNode, LinkedListOperations } from "../types/LinkedListTypes";
 import { LinkedListVisualization } from "../components/LinkedListVisualization";
 import { LinkedListControls } from "../components/LinkedListControls";
-import { VisitationSequence } from "../components/VisitationSequence";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
 import { toast } from "sonner";
@@ -135,10 +134,9 @@ const DoubleCircularLinkedList = () => {
             currentNode={currentNode} 
             visitedNodes={visitedNodes} 
             type="double-circular" 
-            traversalDirection={traverseDirection} 
+            traversalDirection={traverseDirection}
+            visitSequence={visitSequence}
           />
-          
-          <VisitationSequence sequence={visitSequence} />
         </div>
         
         <div className="lg:col-span-4">

@@ -13,6 +13,7 @@ interface CircularVisualizationProps {
   type: LinkedListType;
   lastVisitedNode: number | null;
   traversalDirection?: "forward" | "reverse";
+  visitSequence?: number[];
 }
 
 export const CircularVisualization: React.FC<CircularVisualizationProps> = ({
@@ -21,7 +22,8 @@ export const CircularVisualization: React.FC<CircularVisualizationProps> = ({
   visitedNodes,
   type,
   lastVisitedNode,
-  traversalDirection = "forward"
+  traversalDirection = "forward",
+  visitSequence = []
 }) => {
   if (list.length === 0) {
     return null;
@@ -48,56 +50,75 @@ export const CircularVisualization: React.FC<CircularVisualizationProps> = ({
   const containerHeight = (radius * 2) + (padding * 2);
   
   return (
-    <div 
-      className="relative mx-auto mt-8 mb-4" 
-      style={{ 
-        width: containerWidth,
-        height: containerHeight
-      }}
-    >
-      {/* Circle guide and index numbers */}
-      <CircularGuide 
-        radius={radius} 
-        centerX={centerX} 
-        centerY={centerY} 
-        nodeCount={list.length} 
-      />
+    <div className="space-y-4">
+      <div 
+        className="relative mx-auto mt-8 mb-4" 
+        style={{ 
+          width: containerWidth,
+          height: containerHeight
+        }}
+      >
+        {/* Circle guide and index numbers */}
+        <CircularGuide 
+          radius={radius} 
+          centerX={centerX} 
+          centerY={centerY} 
+          nodeCount={list.length} 
+        />
+        
+        {/* Connection arrows */}
+        <CircularConnections
+          list={list}
+          radius={radius}
+          centerX={centerX}
+          centerY={centerY}
+          isDoubly={isDoubly}
+          currentNode={currentNode}
+          lastVisitedNode={lastVisitedNode}
+          visitedNodes={visitedNodes}
+          traversalDirection={traversalDirection}
+        />
+        
+        {/* Curved arrows for better visual representation */}
+        <CircularCurvedArrows
+          list={list}
+          radius={radius}
+          centerX={centerX}
+          centerY={centerY}
+          isDoubly={isDoubly}
+          currentNode={currentNode}
+          lastVisitedNode={lastVisitedNode}
+          traversalDirection={traversalDirection}
+        />
+        
+        {/* Nodes */}
+        <CircularNodes
+          list={list}
+          radius={radius}
+          centerX={centerX}
+          centerY={centerY}
+          isDoubly={isDoubly}
+          currentNode={currentNode}
+          visitedNodes={visitedNodes}
+        />
+      </div>
       
-      {/* Connection arrows */}
-      <CircularConnections
-        list={list}
-        radius={radius}
-        centerX={centerX}
-        centerY={centerY}
-        isDoubly={isDoubly}
-        currentNode={currentNode}
-        lastVisitedNode={lastVisitedNode}
-        visitedNodes={visitedNodes}
-        traversalDirection={traversalDirection}
-      />
-      
-      {/* Curved arrows for better visual representation */}
-      <CircularCurvedArrows
-        list={list}
-        radius={radius}
-        centerX={centerX}
-        centerY={centerY}
-        isDoubly={isDoubly}
-        currentNode={currentNode}
-        lastVisitedNode={lastVisitedNode}
-        traversalDirection={traversalDirection}
-      />
-      
-      {/* Nodes */}
-      <CircularNodes
-        list={list}
-        radius={radius}
-        centerX={centerX}
-        centerY={centerY}
-        isDoubly={isDoubly}
-        currentNode={currentNode}
-        visitedNodes={visitedNodes}
-      />
+      {/* Visitation Sequence displayed within the circular visualization component */}
+      {visitSequence && visitSequence.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-3 mx-auto max-w-fit">
+          <h3 className="text-sm font-semibold mb-2 text-center">Visitation Sequence</h3>
+          <div className="flex flex-wrap justify-center gap-2">
+            {visitSequence.map((value, index) => (
+              <div
+                key={index}
+                className="px-3 py-1 bg-primary text-primary-foreground rounded-full font-medium animate-fade-in"
+              >
+                {value}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

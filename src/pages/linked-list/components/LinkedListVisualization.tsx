@@ -15,6 +15,7 @@ interface LinkedListVisualizationProps {
   visitedNodes: number[];
   type: LinkedListType;
   traversalDirection?: "forward" | "reverse";
+  visitSequence?: number[];
 }
 
 export const LinkedListVisualization: React.FC<LinkedListVisualizationProps> = ({
@@ -22,7 +23,8 @@ export const LinkedListVisualization: React.FC<LinkedListVisualizationProps> = (
   currentNode,
   visitedNodes,
   type,
-  traversalDirection = "forward"
+  traversalDirection = "forward",
+  visitSequence = []
 }) => {
   const [lastVisitedNode, setLastVisitedNode] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -62,6 +64,7 @@ export const LinkedListVisualization: React.FC<LinkedListVisualizationProps> = (
           type={type}
           lastVisitedNode={lastVisitedNode}
           traversalDirection={traversalDirection}
+          visitSequence={visitSequence}
         />
       ) : (
         <LinearVisualization
@@ -106,6 +109,23 @@ export const LinkedListVisualization: React.FC<LinkedListVisualizationProps> = (
             )}>
               {traversalDirection === "forward" ? "Forward Traversal" : "Reverse Traversal"}
             </span>
+          </div>
+        </div>
+      )}
+      
+      {/* For non-circular lists, show visitation sequence here */}
+      {!isCircular && visitSequence && visitSequence.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-3 mx-auto max-w-fit mt-4">
+          <h3 className="text-sm font-semibold mb-2 text-center">Visitation Sequence</h3>
+          <div className="flex flex-wrap justify-center gap-2">
+            {visitSequence.map((value, index) => (
+              <div
+                key={index}
+                className="px-3 py-1 bg-primary text-primary-foreground rounded-full font-medium animate-fade-in"
+              >
+                {value}
+              </div>
+            ))}
           </div>
         </div>
       )}
