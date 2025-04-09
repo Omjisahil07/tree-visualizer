@@ -1,3 +1,4 @@
+
 import { BSTNode, TraversalCallback } from "../types/BSTTypes";
 
 class Queue<T> {
@@ -70,6 +71,8 @@ export const traverseInOrder = async (
   if (!node || !node.value) return;
   await traverseInOrder(node.children[0], visit);
   await visit(node.value, "Visiting node");
+  // Increase delay between nodes
+  await new Promise(resolve => setTimeout(resolve, 1200));
   await traverseInOrder(node.children[1], visit);
 };
 
@@ -79,6 +82,8 @@ export const traversePreOrder = async (
 ) => {
   if (!node || !node.value) return;
   await visit(node.value, "Visiting node");
+  // Increase delay between nodes
+  await new Promise(resolve => setTimeout(resolve, 1200));
   await traversePreOrder(node.children[0], visit);
   await traversePreOrder(node.children[1], visit);
 };
@@ -91,6 +96,8 @@ export const traversePostOrder = async (
   await traversePostOrder(node.children[0], visit);
   await traversePostOrder(node.children[1], visit);
   await visit(node.value, "Visiting node");
+  // Increase delay between nodes
+  await new Promise(resolve => setTimeout(resolve, 1200));
 };
 
 export const traverseLevelOrder = async (
@@ -105,6 +112,8 @@ export const traverseLevelOrder = async (
     const node = queue.dequeue();
     if (node) {
       await visit(node.value, "Visiting node");
+      // Increase delay between nodes
+      await new Promise(resolve => setTimeout(resolve, 1200));
       if (node.children[0] && node.children[0].value !== null)
         queue.enqueue(node.children[0]);
       if (node.children[1] && node.children[1].value !== null)

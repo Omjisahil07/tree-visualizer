@@ -1,3 +1,4 @@
+
 import { BPlusTreeNode } from "../types/BPlusTreeTypes";
 
 export class BPlusTreeOperations {
@@ -126,11 +127,15 @@ export class BPlusTreeOperations {
     if (node.isLeaf) {
       for (const key of node.keys) {
         await visit(key, "Visiting leaf node");
+        // Increased delay for slower traversal
+        await new Promise(resolve => setTimeout(resolve, 1200));
       }
     } else {
       for (let i = 0; i < node.keys.length; i++) {
         await this.traverseInOrder(node.children[i], visit);
         await visit(node.keys[i], "Visiting internal node");
+        // Increased delay for slower traversal
+        await new Promise(resolve => setTimeout(resolve, 1200));
       }
       await this.traverseInOrder(node.children[node.keys.length], visit);
     }
@@ -144,6 +149,8 @@ export class BPlusTreeOperations {
 
     for (const key of node.keys) {
       await visit(key, "Visiting node");
+      // Increased delay for slower traversal
+      await new Promise(resolve => setTimeout(resolve, 1200));
     }
 
     for (const child of node.children) {
@@ -163,6 +170,8 @@ export class BPlusTreeOperations {
 
     for (const key of node.keys) {
       await visit(key, "Visiting node");
+      // Increased delay for slower traversal
+      await new Promise(resolve => setTimeout(resolve, 1200));
     }
   }
 
@@ -180,6 +189,8 @@ export class BPlusTreeOperations {
       if (node) {
         for (const key of node.keys) {
           await visit(key, "Visiting node");
+          // Increased delay for slower traversal
+          await new Promise(resolve => setTimeout(resolve, 1200));
         }
         for (const child of node.children) {
           if (child) queue.push(child);
