@@ -159,7 +159,6 @@ const DoubleCircularLinkedList = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

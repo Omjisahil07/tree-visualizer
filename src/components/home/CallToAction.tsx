@@ -37,12 +37,6 @@ export const CallToAction = () => {
           </Button>
         </div>
         
-        <Button size="lg" asChild className="mt-6">
-          <Link to="/tree" className="flex items-center gap-2">
-            Get Started Now
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </Button>
       </div>
     </section>
   );

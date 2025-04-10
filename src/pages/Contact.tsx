@@ -125,113 +125,115 @@ export default function Contact() {
   };
 
   return (
-    <div className="container max-w-4xl py-12">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">Send Your Feedback</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Help us improve our data structure visualizer by sharing your thoughts and suggestions.
-        </p>
-      </div>
+    <div className="min-h-screen py-12 bg-gradient-to-br from-purple-100/50 via-white to-white">
+      <div className="container max-w-4xl py-12">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">Send Your Feedback</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Help us improve our data structure visualizer by sharing your thoughts and suggestions.
+          </p>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Share Your Feedback</CardTitle>
-          <CardDescription>
-            We value your input to improve our visualizer and make it better for everyone.
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleFeedbackSubmit}>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Share Your Feedback</CardTitle>
+            <CardDescription>
+              We value your input to improve our visualizer and make it better for everyone.
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleFeedbackSubmit}>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="feedback-name">Name</Label>
+                  <Input 
+                    id="feedback-name"
+                    name="name"
+                    value={feedbackForm.name}
+                    onChange={handleFeedbackChange}
+                    placeholder="Your name"
+                    required
+                    disabled={isSubmitting}
+                    className={errors.name ? "border-red-500" : ""}
+                  />
+                  {errors.name && (
+                    <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="feedback-email">Email</Label>
+                  <Input 
+                    id="feedback-email"
+                    name="email"
+                    type="email"
+                    value={feedbackForm.email}
+                    onChange={handleFeedbackChange}
+                    placeholder="Your email address"
+                    required
+                    disabled={isSubmitting}
+                    className={errors.email ? "border-red-500" : ""}
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                  )}
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label htmlFor="feedback-name">Name</Label>
+                <Label htmlFor="feedback-subject">Subject</Label>
                 <Input 
-                  id="feedback-name"
-                  name="name"
-                  value={feedbackForm.name}
+                  id="feedback-subject"
+                  name="subject"
+                  value={feedbackForm.subject}
                   onChange={handleFeedbackChange}
-                  placeholder="Your name"
+                  placeholder="What's your feedback about?"
                   required
                   disabled={isSubmitting}
-                  className={errors.name ? "border-red-500" : ""}
+                  className={errors.subject ? "border-red-500" : ""}
                 />
-                {errors.name && (
-                  <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                {errors.subject && (
+                  <p className="text-red-500 text-xs mt-1">{errors.subject}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="feedback-email">Email</Label>
-                <Input 
-                  id="feedback-email"
-                  name="email"
-                  type="email"
-                  value={feedbackForm.email}
+                <Label htmlFor="feedback-message">Feedback</Label>
+                <Textarea 
+                  id="feedback-message"
+                  name="message"
+                  value={feedbackForm.message}
                   onChange={handleFeedbackChange}
-                  placeholder="Your email address"
+                  placeholder="Your feedback"
+                  rows={5}
                   required
                   disabled={isSubmitting}
-                  className={errors.email ? "border-red-500" : ""}
+                  className={errors.message ? "border-red-500" : ""}
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                {errors.message && (
+                  <p className="text-red-500 text-xs mt-1">{errors.message}</p>
                 )}
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="feedback-subject">Subject</Label>
-              <Input 
-                id="feedback-subject"
-                name="subject"
-                value={feedbackForm.subject}
-                onChange={handleFeedbackChange}
-                placeholder="What's your feedback about?"
-                required
-                disabled={isSubmitting}
-                className={errors.subject ? "border-red-500" : ""}
-              />
-              {errors.subject && (
-                <p className="text-red-500 text-xs mt-1">{errors.subject}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="feedback-message">Feedback</Label>
-              <Textarea 
-                id="feedback-message"
-                name="message"
-                value={feedbackForm.message}
-                onChange={handleFeedbackChange}
-                placeholder="Your feedback"
-                rows={5}
-                required
-                disabled={isSubmitting}
-                className={errors.message ? "border-red-500" : ""}
-              />
-              {errors.message && (
-                <p className="text-red-500 text-xs mt-1">{errors.message}</p>
-              )}
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button 
-              type="submit" 
-              className="w-full md:w-auto" 
-              disabled={isSubmitting || !isFormValid}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4" />
-                  Submit Feedback
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                type="submit" 
+                className="w-full md:w-auto" 
+                disabled={isSubmitting || !isFormValid}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Submit Feedback
+                  </>
+                )}
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
     </div>
   );
 }

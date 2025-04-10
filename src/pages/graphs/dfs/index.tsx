@@ -272,7 +272,6 @@ const DFS = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -50,7 +50,6 @@ const Graph = () => {
           </Card>
         ))}
       </div>
-      <Footer/>
     </div>
   );
 };

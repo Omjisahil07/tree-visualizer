@@ -85,7 +85,6 @@ const BinaryTree = () => {
           </Card>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { BSTVisualization } from "./components/BSTVisualization";
 import { BSTTraversalControls } from "./components/BSTTraversalControls";
@@ -238,7 +237,6 @@ const BSTTree = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

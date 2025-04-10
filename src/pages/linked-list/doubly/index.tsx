@@ -177,7 +177,6 @@ const DoublyLinkedList = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -69,7 +69,6 @@ const LinkedList = () => {
           </Card>
         ))}
       </div>
-      <Footer />
     </div>
   );
 };

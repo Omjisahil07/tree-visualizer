@@ -272,7 +272,6 @@ const BFS = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

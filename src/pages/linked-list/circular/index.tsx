@@ -163,7 +163,6 @@ const CircularLinkedList = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

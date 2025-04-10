@@ -4,21 +4,21 @@ import { Card, CardContent } from "@/components/ui/card";
 const testimonials = [
   {
     quote: "This visualization tool has completely transformed how I understand data structures. Being able to see the algorithms in action makes complex concepts click instantly.",
-    name: "Corey Smith",
-    role: "Computer Science Student",
-    initials: "CS"
+    name: "Samir Kariya",
+    role: "Computer Science Teacher",
+    initials: "SK"
   },
   {
     quote: "As a professor, I've integrated this tool into my curriculum. The interactive visualizations help students grasp concepts faster than traditional teaching methods alone.",
-    name: "Dr. Jennifer Lee",
-    role: "CS Professor",
-    initials: "JL"
+    name: "Dr. Krunal Vagehla",
+    role: "CS HOD",
+    initials: "KV"
   },
   {
     quote: "The ability to visualize algorithms step-by-step helped me prepare for technical interviews. I can now explain complex data structures with confidence.",
-    name: "Michael Johnson",
-    role: "Software Engineer",
-    initials: "MJ"
+    name: "Deep Ratanpara",
+    role: "Student",
+    initials: "DR"
   }
 ];
 

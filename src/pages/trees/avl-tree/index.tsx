@@ -135,7 +135,6 @@ const AVLTree = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

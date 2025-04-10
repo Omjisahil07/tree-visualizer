@@ -168,7 +168,6 @@ const SinglyLinkedList = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

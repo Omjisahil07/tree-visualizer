@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,7 +31,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/tree" element={<Tree />} />
           <Route path="/tree/binary-tree" element={<BinaryTree />} />
-          <Route path="/tree/bst-tree" element={<BSTTree/>} />
+          <Route path="/tree/bst-tree" element={<BSTTree />} />
           <Route path="/tree/avl-tree" element={<AVLTree />} />
           <Route path="/tree/bplustree" element={<BPlusTree />} />
           <Route path="/graph" element={<Graph />} />

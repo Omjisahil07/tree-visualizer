@@ -216,7 +216,6 @@ const BPlusTree = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };
