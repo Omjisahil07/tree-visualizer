@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,18 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { Send, Loader2, AlertCircle } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
-
-// Define validation schema using Zod
-const feedbackSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  subject: z.string().min(5, { message: "Subject must be at least 5 characters" }),
-  message: z.string().min(10, { message: "Message must be at least 10 characters" }),
-});
 
 export default function Contact() {
   const [feedbackForm, setFeedbackForm] = useState({
@@ -28,80 +18,16 @@ export default function Contact() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-
-  // Validate form on input change
-  useEffect(() => {
-    if (Object.keys(touched).length > 0) {
-      validateForm();
-    }
-  }, [feedbackForm, touched]);
-
-  const validateForm = () => {
-    try {
-      feedbackSchema.parse(feedbackForm);
-      setErrors({});
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const newErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
-          if (err.path[0]) {
-            newErrors[err.path[0] as string] = err.message;
-          }
-        });
-        setErrors(newErrors);
-      }
-      return false;
-    }
-  };
 
   const handleFeedbackChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    
     setFeedbackForm({
       ...feedbackForm,
-      [name]: value,
-    });
-    
-    // Mark field as touched
-    setTouched({
-      ...touched,
-      [name]: true,
-    });
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name } = e.target;
-    setTouched({
-      ...touched,
-      [name]: true,
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Mark all fields as touched for validation
-    const allTouched = Object.keys(feedbackForm).reduce((acc, key) => {
-      acc[key] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
-    
-    setTouched(allTouched);
-    
-    // Validate before submission
-    const isValid = validateForm();
-    if (!isValid) {
-      toast({
-        title: "Form Validation Error",
-        description: "Please check the form for errors and try again.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
     setIsSubmitting(true);
     
     try {
@@ -145,7 +71,6 @@ export default function Contact() {
       
       // Reset form
       setFeedbackForm({ name: "", email: "", subject: "", message: "" });
-      setTouched({});
     } catch (error) {
       console.error("Submission error:", error);
       toast({
@@ -175,7 +100,7 @@ export default function Contact() {
               We value your input to improve our visualizer and make it better for everyone.
             </CardDescription>
           </CardHeader>
-          <form onSubmit={handleFeedbackSubmit} noValidate>
+          <form onSubmit={handleFeedbackSubmit}>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -185,17 +110,10 @@ export default function Contact() {
                     name="name"
                     value={feedbackForm.name}
                     onChange={handleFeedbackChange}
-                    onBlur={handleBlur}
                     placeholder="Your name"
                     required
                     disabled={isSubmitting}
-                    className={errors.name ? "border-destructive" : ""}
                   />
-                  {errors.name && touched.name && (
-                    <p className="text-sm text-destructive flex items-center gap-1 mt-1">
-                      <AlertCircle className="h-3 w-3" /> {errors.name}
-                    </p>
-                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="feedback-email">Email</Label>
@@ -205,17 +123,10 @@ export default function Contact() {
                     type="email"
                     value={feedbackForm.email}
                     onChange={handleFeedbackChange}
-                    onBlur={handleBlur}
                     placeholder="Your email address"
                     required
                     disabled={isSubmitting}
-                    className={errors.email ? "border-destructive" : ""}
                   />
-                  {errors.email && touched.email && (
-                    <p className="text-sm text-destructive flex items-center gap-1 mt-1">
-                      <AlertCircle className="h-3 w-3" /> {errors.email}
-                    </p>
-                  )}
                 </div>
               </div>
               <div className="space-y-2">
@@ -225,17 +136,10 @@ export default function Contact() {
                   name="subject"
                   value={feedbackForm.subject}
                   onChange={handleFeedbackChange}
-                  onBlur={handleBlur}
                   placeholder="What's your feedback about?"
                   required
                   disabled={isSubmitting}
-                  className={errors.subject ? "border-destructive" : ""}
                 />
-                {errors.subject && touched.subject && (
-                  <p className="text-sm text-destructive flex items-center gap-1 mt-1">
-                    <AlertCircle className="h-3 w-3" /> {errors.subject}
-                  </p>
-                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="feedback-message">Feedback</Label>
@@ -244,18 +148,11 @@ export default function Contact() {
                   name="message"
                   value={feedbackForm.message}
                   onChange={handleFeedbackChange}
-                  onBlur={handleBlur}
                   placeholder="Your feedback"
                   rows={5}
                   required
                   disabled={isSubmitting}
-                  className={errors.message ? "border-destructive" : ""}
                 />
-                {errors.message && touched.message && (
-                  <p className="text-sm text-destructive flex items-center gap-1 mt-1">
-                    <AlertCircle className="h-3 w-3" /> {errors.message}
-                  </p>
-                )}
               </div>
             </CardContent>
             <CardFooter>
