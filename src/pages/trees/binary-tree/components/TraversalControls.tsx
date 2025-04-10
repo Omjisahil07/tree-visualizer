@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Play, Pause, RotateCcw } from "lucide-react";
@@ -23,7 +24,7 @@ export const TraversalControls = ({
     <div className="space-y-4">
       <div className="flex items-center gap-4">
         <Select value={traversalType} onValueChange={onTraversalTypeChange}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] border-purple-200">
             <SelectValue placeholder="Select traversal type" />
           </SelectTrigger>
           <SelectContent>
@@ -35,7 +36,7 @@ export const TraversalControls = ({
         <Button
           variant="outline"
           onClick={isTraversing ? onPause : onStart}
-          className="gap-2"
+          className="gap-2 border-purple-200 hover:bg-purple-100"
         >
           {isTraversing ? (
             <>
@@ -52,7 +53,7 @@ export const TraversalControls = ({
         <Button
           variant="outline"
           onClick={onReset}
-          className="gap-2"
+          className="gap-2 border-purple-200 hover:bg-purple-100"
         >
           <RotateCcw className="h-4 w-4" />
           Reset
