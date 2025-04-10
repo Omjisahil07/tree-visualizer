@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,18 @@ export const TreeForm = ({ onInsert, onUpdate, selectedNode }: TreeFormProps) =>
   const [inputValue, setInputValue] = useState("");
   const [updateValue, setUpdateValue] = useState("");
   const [insertPosition, setInsertPosition] = useState<InsertPosition>("auto");
+  const [isInsertValid, setIsInsertValid] = useState(false);
+  const [isUpdateValid, setIsUpdateValid] = useState(false);
+
+  useEffect(() => {
+    const value = parseInt(inputValue);
+    setIsInsertValid(!isNaN(value) && inputValue.trim() !== "");
+  }, [inputValue]);
+
+  useEffect(() => {
+    const value = parseInt(updateValue);
+    setIsUpdateValid(!isNaN(value) && updateValue.trim() !== "");
+  }, [updateValue]);
 
   const handleInsert = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +93,11 @@ export const TreeForm = ({ onInsert, onUpdate, selectedNode }: TreeFormProps) =>
               </p>
             )}
           </div>
-          <Button type="submit" className="w-full gap-2">
+          <Button 
+            type="submit" 
+            className="w-full gap-2" 
+            disabled={!isInsertValid}
+          >
             <Plus className="h-4 w-4" />
             {selectedNode !== null ? `Insert Node as Child of ${selectedNode}` : 'Insert Node'}
           </Button>
@@ -102,7 +118,11 @@ export const TreeForm = ({ onInsert, onUpdate, selectedNode }: TreeFormProps) =>
                 placeholder="Enter new value"
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={!isUpdateValid}
+            >
               Update Node
             </Button>
           </form>

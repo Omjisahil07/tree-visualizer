@@ -102,33 +102,33 @@ const DoubleCircularLinkedList = () => {
         <p className="text-muted-foreground text-base mb-3">Combines features of doubly linked list and circular linked list</p>
       </div>
       
+      <div className="flex justify-between mb-4">
+        <div className="space-x-2">
+          <Button 
+            onClick={() => setTraverseDirection("forward")} 
+            variant={traverseDirection === "forward" ? "default" : "outline"} 
+            size="sm" 
+            className="h-8"
+          >
+            Forward Traversal
+          </Button>
+          <Button 
+            onClick={() => setTraverseDirection("reverse")} 
+            variant={traverseDirection === "reverse" ? "default" : "outline"} 
+            size="sm" 
+            className="h-8"
+          >
+            Reverse Traversal
+          </Button>
+        </div>
+        <Button onClick={handleGenerateRandom} variant="outline" className="gap-1">
+          <Wand2 className="w-4 h-4" />
+          Generate Random List
+        </Button>
+      </div>
+      
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <div className="lg:col-span-8 space-y-4">
-          <div className="flex justify-between mb-4">
-            <div className="space-x-2">
-              <Button 
-                onClick={() => setTraverseDirection("forward")} 
-                variant={traverseDirection === "forward" ? "default" : "outline"} 
-                size="sm" 
-                className="h-8"
-              >
-                Forward Traversal
-              </Button>
-              <Button 
-                onClick={() => setTraverseDirection("reverse")} 
-                variant={traverseDirection === "reverse" ? "default" : "outline"} 
-                size="sm" 
-                className="h-8"
-              >
-                Reverse Traversal
-              </Button>
-            </div>
-            <Button onClick={handleGenerateRandom} variant="outline" className="gap-1">
-              <Wand2 className="w-4 h-4" />
-              Generate Random List
-            </Button>
-          </div>
-          
           <LinkedListVisualization 
             list={list} 
             currentNode={currentNode} 

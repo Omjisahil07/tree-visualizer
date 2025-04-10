@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,18 @@ import { toast } from "@/hooks/use-toast";
 import { Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { z } from "zod";
+
+const feedbackSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").max(50, "Name is too long"),
+  email: z.string().email("Invalid email address"),
+  subject: z.string().min(3, "Subject must be at least 3 characters").max(100, "Subject is too long"),
+  message: z.string().min(10, "Message must be at least 10 characters").max(1000, "Message is too long")
+});
+
+type ValidationErrors = {
+  [key: string]: string | undefined;
+};
 
 export default function Contact() {
   const [feedbackForm, setFeedbackForm] = useState({
@@ -18,16 +31,51 @@ export default function Contact() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  const validateForm = () => {
+    try {
+      feedbackSchema.parse(feedbackForm);
+      setErrors({});
+      setIsFormValid(true);
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: ValidationErrors = {};
+        error.errors.forEach((err) => {
+          if (err.path) {
+            newErrors[err.path[0]] = err.message;
+          }
+        });
+        setErrors(newErrors);
+        setIsFormValid(false);
+      }
+      return false;
+    }
+  };
 
   const handleFeedbackChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
     setFeedbackForm({
       ...feedbackForm,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    
+    // Validate on change after a short delay
+    setTimeout(() => {
+      validateForm();
+    }, 500);
   };
 
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Final validation before submission
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -113,7 +161,11 @@ export default function Contact() {
                     placeholder="Your name"
                     required
                     disabled={isSubmitting}
+                    className={errors.name ? "border-red-500" : ""}
                   />
+                  {errors.name && (
+                    <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="feedback-email">Email</Label>
@@ -126,7 +178,11 @@ export default function Contact() {
                     placeholder="Your email address"
                     required
                     disabled={isSubmitting}
+                    className={errors.email ? "border-red-500" : ""}
                   />
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">
@@ -139,7 +195,11 @@ export default function Contact() {
                   placeholder="What's your feedback about?"
                   required
                   disabled={isSubmitting}
+                  className={errors.subject ? "border-red-500" : ""}
                 />
+                {errors.subject && (
+                  <p className="text-red-500 text-xs mt-1">{errors.subject}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="feedback-message">Feedback</Label>
@@ -152,11 +212,19 @@ export default function Contact() {
                   rows={5}
                   required
                   disabled={isSubmitting}
+                  className={errors.message ? "border-red-500" : ""}
                 />
+                {errors.message && (
+                  <p className="text-red-500 text-xs mt-1">{errors.message}</p>
+                )}
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting}>
+              <Button 
+                type="submit" 
+                className="w-full md:w-auto" 
+                disabled={isSubmitting || !isFormValid}
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

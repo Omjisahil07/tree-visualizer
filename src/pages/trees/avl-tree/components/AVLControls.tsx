@@ -1,7 +1,9 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 interface AVLControlsProps {
   inputValue: string;
@@ -22,6 +24,19 @@ export const AVLControls = ({
   handleInsert,
   handleUpdate,
 }: AVLControlsProps) => {
+  const [isInsertValid, setIsInsertValid] = useState(false);
+  const [isUpdateValid, setIsUpdateValid] = useState(false);
+
+  useEffect(() => {
+    const value = parseInt(inputValue);
+    setIsInsertValid(!isNaN(value) && inputValue.trim() !== "");
+  }, [inputValue]);
+
+  useEffect(() => {
+    const value = parseInt(updateValue);
+    setIsUpdateValid(!isNaN(value) && updateValue.trim() !== "");
+  }, [updateValue]);
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-lg p-6">
@@ -37,7 +52,7 @@ export const AVLControls = ({
               placeholder="Enter a number"
             />
           </div>
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={!isInsertValid}>
             Insert Node
           </Button>
         </form>
@@ -59,7 +74,7 @@ export const AVLControls = ({
                 placeholder="Enter new value"
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={!isUpdateValid}>
               Update Node
             </Button>
           </form>

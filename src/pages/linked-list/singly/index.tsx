@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { LinkedListNode, LinkedListOperations } from "../types/LinkedListTypes";
 import { LinkedListVisualization } from "../components/LinkedListVisualization";
@@ -122,19 +123,19 @@ const SinglyLinkedList = () => {
         </p>
       </div>
       
+      <div className="flex justify-end mb-4">
+        <Button
+          onClick={handleGenerateRandom}
+          variant="outline"
+          className="gap-2"
+        >
+          <Wand2 className="w-4 h-4" />
+          Generate Random List
+        </Button>
+      </div>
+      
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-8 space-y-6">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={handleGenerateRandom}
-              variant="outline"
-              className="gap-2"
-            >
-              <Wand2 className="w-4 h-4" />
-              Generate Random List
-            </Button>
-          </div>
-          
           <LinkedListVisualization 
             list={list}
             currentNode={currentNode}

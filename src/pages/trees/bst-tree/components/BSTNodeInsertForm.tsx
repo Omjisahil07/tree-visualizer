@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 
 interface BSTNodeInsertFormProps {
   inputValue: string;
@@ -16,6 +17,13 @@ export const BSTNodeInsertForm = ({
   setInputValue,
   handleInsert
 }: BSTNodeInsertFormProps) => {
+  const [isValid, setIsValid] = useState(false);
+
+  useEffect(() => {
+    const value = parseInt(inputValue);
+    setIsValid(!isNaN(value) && inputValue.trim() !== "");
+  }, [inputValue]);
+
   return (
     <Card className="shadow-sm">
       <CardHeader className="py-3 px-4">
@@ -34,7 +42,12 @@ export const BSTNodeInsertForm = ({
               className="mt-1"
             />
           </div>
-          <Button type="submit" className="w-full gap-1" size="sm">
+          <Button 
+            type="submit" 
+            className="w-full gap-1" 
+            size="sm"
+            disabled={!isValid}
+          >
             <Plus className="w-4 h-4" />
             Insert Node
           </Button>

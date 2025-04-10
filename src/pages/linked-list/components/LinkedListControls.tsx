@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +31,30 @@ export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
   const [value, setValue] = useState("");
   const [position, setPosition] = useState("");
   const [operation, setOperation] = useState<LinkedListOperations>(LinkedListOperations.INSERT_AT_END);
+  const [isFormValid, setIsFormValid] = useState(false);
+  
+  useEffect(() => {
+    const needsValueInput = operation !== LinkedListOperations.DELETE_FROM_BEGINNING && 
+                           operation !== LinkedListOperations.DELETE_FROM_END;
+    
+    const needsPositionInput = operation === LinkedListOperations.INSERT_AT_POSITION || 
+                             operation === LinkedListOperations.DELETE_FROM_POSITION || 
+                             operation === LinkedListOperations.UPDATE ||
+                             operation === LinkedListOperations.REPLACE_NODE;
+    
+    // Validate based on the current operation
+    if (needsValueInput && !value) {
+      setIsFormValid(false);
+      return;
+    }
+    
+    if (needsPositionInput && !position) {
+      setIsFormValid(false);
+      return;
+    }
+    
+    setIsFormValid(true);
+  }, [value, position, operation]);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,7 +174,12 @@ export const LinkedListControls: React.FC<LinkedListControlsProps> = ({
               </div>
             )}
             
-            <Button type="submit" className="w-full h-8 text-sm" size="sm">
+            <Button 
+              type="submit" 
+              className="w-full h-8 text-sm" 
+              size="sm" 
+              disabled={!isFormValid}
+            >
               {operation.includes("insert") && <ChevronRight className="mr-1 h-3 w-3" />}
               {operation.includes("delete") && <RotateCcw className="mr-1 h-3 w-3" />}
               {(operation === LinkedListOperations.UPDATE || operation === LinkedListOperations.REPLACE_NODE) && <ChevronLeft className="mr-1 h-3 w-3" />}

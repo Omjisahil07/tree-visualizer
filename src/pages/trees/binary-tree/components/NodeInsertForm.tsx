@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,12 @@ interface NodeInsertFormProps {
 
 export const NodeInsertForm = ({ onInsert }: NodeInsertFormProps) => {
   const [inputValue, setInputValue] = useState("");
+  const [isValid, setIsValid] = useState(false);
+
+  useEffect(() => {
+    const value = parseInt(inputValue);
+    setIsValid(!isNaN(value) && inputValue.trim() !== "");
+  }, [inputValue]);
 
   const handleInsertNode = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +44,12 @@ export const NodeInsertForm = ({ onInsert }: NodeInsertFormProps) => {
           className="mt-1"
         />
       </div>
-      <Button type="submit" className="w-full gap-1" size="sm">
+      <Button 
+        type="submit" 
+        className="w-full gap-1" 
+        size="sm" 
+        disabled={!isValid}
+      >
         <Plus className="w-4 h-4" />
         Insert Node
       </Button>

@@ -7,7 +7,7 @@ export const Footer = () => {
     <footer className="border-t py-12 px-4">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="text-sm text-muted-foreground">
-          © 2024 Data Structure Visualizer. All rights reserved.
+          © 2025 Data Structure Visualizer. All rights reserved.
         </div>
         <div className="flex gap-4">
           <a 

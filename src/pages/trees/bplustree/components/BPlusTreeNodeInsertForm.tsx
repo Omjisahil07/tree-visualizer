@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 
 interface BPlusTreeNodeInsertFormProps {
   inputValue: string;
@@ -18,6 +19,13 @@ export const BPlusTreeNodeInsertForm = ({
   handleInsert,
   disabled = false
 }: BPlusTreeNodeInsertFormProps) => {
+  const [isValid, setIsValid] = useState(false);
+
+  useEffect(() => {
+    const value = parseInt(inputValue);
+    setIsValid(!isNaN(value) && inputValue.trim() !== "");
+  }, [inputValue]);
+
   return (
     <Card className="shadow-sm">
       <CardHeader className="py-3 px-4">
@@ -41,7 +49,7 @@ export const BPlusTreeNodeInsertForm = ({
             type="submit" 
             className="w-full gap-1 bg-primary hover:bg-primary/90" 
             size="sm" 
-            disabled={disabled}
+            disabled={disabled || !isValid}
           >
             <Plus className="w-4 h-4" />
             Insert Node
