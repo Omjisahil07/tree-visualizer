@@ -6,6 +6,8 @@ import { BinaryTreeVisualizationPanel } from "./components/BinaryTreeVisualizati
 import { BinaryTreeControlPanel } from "./components/BinaryTreeControlPanel";
 import { useBinaryTree } from "./hooks/useBinaryTree";
 import { Footer } from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Wand2 } from "lucide-react";
 
 const BinaryTree = () => {
   const {
@@ -36,7 +38,7 @@ const BinaryTree = () => {
 
   return (
     <div className="container mx-auto py-6">
-      <BinaryTreeHeader onGenerateRandomTree={handleGenerateRandomTree} />
+      <h1 className="text-2xl font-bold mb-4">Binary Tree Visualization</h1>
       
       <BinaryTreeInstructions />
       
@@ -56,9 +58,23 @@ const BinaryTree = () => {
           onTraversalTypeChange={setTraversalType}
         />
         
-        <BinaryTreeControlPanel
-          onInsertNode={handleInsertNode}
-        />
+        <div className="lg:col-span-4 space-y-4">
+          <div className="flex justify-end mb-2">
+            <Button
+              onClick={handleGenerateRandomTree}
+              variant="outline"
+              size="sm"
+              className="w-full gap-1"
+            >
+              <Wand2 className="w-4 h-4" />
+              Generate Random Tree
+            </Button>
+          </div>
+          
+          <BinaryTreeControlPanel
+            onInsertNode={handleInsertNode}
+          />
+        </div>
       </div>
       <Footer />
     </div>
